@@ -15,7 +15,6 @@ import {
 } from "../../../core/middlewares/validation/query-pagination-sorting.validation-middleware";
 import {BlogSortField} from "./input/blog-sort-field";
 import {getBlogPostListHandler} from "./handlers/get-blog-post-list.handler";
-import {createPostHandler} from "../../post/routers/handlers/create-post.handler";
 import {PostSortField} from "../../post/routers/input/post-sort-field";
 import {blogInputValidation} from "./blog.input-dto.validation-middlewares";
 import {postInputValidation} from "../../post/routers/post.input-dto.validation-middlewares";

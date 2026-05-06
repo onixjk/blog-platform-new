@@ -6,11 +6,13 @@ import {postsService} from "../../../post/application/posts.service";
 import {mapToPostOutput} from "../../../post/routers/mapers/map-to-post-output.util";
 
 export async function createBlogPostHandler(
-    req: Request<{}, {}, PostInputDto>,
+    req: Request<{postId: string}, {}, PostInputDto>,
     res: Response
 ) {
     try {
-        const createdPostId = await postsService.create(req.body);
+
+        const postData = { ...req.body, blogId: req.body.blogId };
+        const createdPostId = await postsService.create(postData);
 
         const createdPost = await postsService.findByIdOrFail(createdPostId);
         const postOutput = mapToPostOutput(createdPost);
