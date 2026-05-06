@@ -18,20 +18,20 @@ export const postRouter = Router({});
 postRouter
     .get('',
         paginationAndSortingValidation(PostSortField),
-        inputValidationResultMiddleware,
+        // inputValidationResultMiddleware,
         getPostListHandler,
     )
 
     .get('/:id',
         idValidation,
-        inputValidationResultMiddleware,
+        // inputValidationResultMiddleware,
         getPostHandler
     )
 
     .post('',
         superAdminGuardMiddleware,
         postInputValidation,
-        inputValidationResultMiddleware,
+        // inputValidationResultMiddleware,
         createPostHandler,
     )
 
@@ -39,13 +39,13 @@ postRouter
         superAdminGuardMiddleware,
         idValidation,
         postInputValidation,
-        inputValidationResultMiddleware,
+        // inputValidationResultMiddleware,
         updatePostHandler,
     )
 
     .delete('/:id',
         superAdminGuardMiddleware,
         idValidation,
-        inputValidationResultMiddleware,
+        // inputValidationResultMiddleware,
         deletePostHandler,
     );
