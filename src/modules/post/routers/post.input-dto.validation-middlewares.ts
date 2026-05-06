@@ -1,6 +1,6 @@
 import {body} from "express-validator";
 
-const titleValidation = body('data.attributes.title')
+const titleValidation = body('title')
     .exists()
     .withMessage('Title is required')
     .isString().withMessage('title should be string')
@@ -8,7 +8,7 @@ const titleValidation = body('data.attributes.title')
     .isLength({min: 1, max: 30})
     .withMessage('Length of title is not correct');
 
-const shortDescriptionValidation = body('data.attributes.shortDescription')
+const shortDescriptionValidation = body('shortDescription')
     .exists()
     .withMessage('ShortDescription is required')
     .isString()
@@ -17,7 +17,7 @@ const shortDescriptionValidation = body('data.attributes.shortDescription')
     .isLength({min: 1, max: 100})
     .withMessage('Length of shortDescription is not correct');
 
-const contentValidation = body('data.attributes.content')
+const contentValidation = body('content')
     .exists()
     .withMessage('Content is required')
     .isString().withMessage('Content should be string')
@@ -25,7 +25,7 @@ const contentValidation = body('data.attributes.content')
     .isLength({min: 1, max: 1000})
     .withMessage('Length of content is not correct');
 
-const blogIdValidation = body('data.attributes.blogId')
+const blogIdValidation = body('blogId')
     .exists()
     .withMessage('ID is required') // Проверка на наличие
     .isString()
