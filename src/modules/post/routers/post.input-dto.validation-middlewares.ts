@@ -1,4 +1,4 @@
-import {body} from "express-validator";
+import {body, param} from "express-validator";
 
 const titleValidation = body('title')
     .exists()
@@ -25,7 +25,7 @@ const contentValidation = body('content')
     .isLength({min: 1, max: 1000})
     .withMessage('Length of content is not correct');
 
-const blogIdValidation = body('blogId')
+const blogIdValidation = param('blogId')
     .exists()
     .withMessage('ID is required') // Проверка на наличие
     .isString()
