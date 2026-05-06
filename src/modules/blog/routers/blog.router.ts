@@ -25,34 +25,34 @@ export const blogRouter = Router({});
 blogRouter
     .get('',
         paginationAndSortingValidation(BlogSortField),
-        // inputValidationResultMiddleware,
+        inputValidationResultMiddleware,
         getBlogListHandler,
     )
 
     .get('/:id',
         idValidation,
-        // inputValidationResultMiddleware,
+        inputValidationResultMiddleware,
         getBlogHandler,
     )
 
     .get('/:blogId/posts',
         blogIdValidation,
         paginationAndSortingValidation(PostSortField),
-        // inputValidationResultMiddleware,
+        inputValidationResultMiddleware,
         getBlogPostListHandler,
     )
 
     .post('',
         superAdminGuardMiddleware,
         blogInputValidation,
-        // inputValidationResultMiddleware,
+        inputValidationResultMiddleware,
         createBlogHandler,
     )
 
     .post('/:blogId/posts',
         superAdminGuardMiddleware,
         postInputValidation,
-        // inputValidationResultMiddleware,
+        inputValidationResultMiddleware,
         createPostHandler,
     )
 
@@ -60,13 +60,13 @@ blogRouter
         superAdminGuardMiddleware,
         idValidation,
         blogInputValidation,
-        // inputValidationResultMiddleware,
+        inputValidationResultMiddleware,
         updateBlogHandler,
     )
 
     .delete('/:id',
         superAdminGuardMiddleware,
         idValidation,
-        // inputValidationResultMiddleware,
+        inputValidationResultMiddleware,
         deleteBlogHandler,
     );
