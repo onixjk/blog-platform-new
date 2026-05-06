@@ -11,8 +11,8 @@ export async function createBlogPostHandler(
 ) {
     try {
 
-        const postData = { ...req.body, blogId: req.body.blogId };
-        const createdPostId = await postsService.create(postData);
+        // const postData = { ...req.body, blogId: req.body.blogId };
+        const createdPostId = await postsService.create(req.body);
 
         const createdPost = await postsService.findByIdOrFail(createdPostId);
         const postOutput = mapToPostOutput(createdPost);
