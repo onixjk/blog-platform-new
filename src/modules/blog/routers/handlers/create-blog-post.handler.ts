@@ -10,9 +10,7 @@ export async function createBlogPostHandler(
     res: Response
 ) {
     try {
-        const createdPostId = await postsService.create(
-            req.body,
-        );
+        const createdPostId = await postsService.create(req.body);
 
         const createdPost = await postsService.findByIdOrFail(createdPostId);
         const postOutput = mapToPostOutput(createdPost);
