@@ -1,12 +1,12 @@
 import {Request, Response} from "express";
 import {errorsHandler} from "../../../../core/errors/errors.handler";
 import {HttpStatus} from "../../../../core/types/http-statuses";
-import {PostInputDto} from "../../../post/routers/input/post.input-dto";
 import {postsService} from "../../../post/application/posts.service";
 import {mapToPostOutput} from "../../../post/routers/mapers/map-to-post-output.util";
+import {BlogPostInputDto} from "../../../post/routers/input/blog-post.input-dto";
 
 export async function createBlogPostHandler(
-    req: Request<{postId: string}, {}, PostInputDto>,
+    req: Request<{postId: string}, {}, BlogPostInputDto>,
     res: Response
 ) {
     try {
