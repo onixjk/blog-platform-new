@@ -10,8 +10,7 @@ export async function createBlogPostHandler(
     res: Response
 ) {
     try {
-        const blogId = req.params;
-        console.log(`АЙДИ - ${blogId}`);
+        const { blogId } = req.params;
 
         const postData = { ...req.body, blogId };
         const createdPostId = await postsService.create(postData);
