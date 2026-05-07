@@ -6,7 +6,7 @@ import {mapToPostOutput} from "../../../post/routers/mapers/map-to-post-output.u
 import {BlogPostInputDto} from "../../../post/routers/input/blog-post.input-dto";
 
 export async function createBlogPostHandler(
-    req: Request<{postId: string}, {}, BlogPostInputDto>,
+    req: Request<{blogId: string}, {}, BlogPostInputDto>,
     res: Response
 ) {
     try {
