@@ -44,6 +44,8 @@ export const postsService = {
     },
 
     async update(id: string, dto: PostInputDto): Promise<void> {
+        await postsRepository.findByIdOrFail(id)
+
         const blog = await blogsService.findByIdOrFail(dto.blogId);
 
         await postsRepository.update(id, dto, blog.name);
