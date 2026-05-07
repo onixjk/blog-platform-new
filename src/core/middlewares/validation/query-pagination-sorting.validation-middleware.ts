@@ -33,7 +33,7 @@ export function paginationAndSortingValidation<T extends string>(
             .toInt(),
 
         query('sortBy')
-            .default(Object.values(sortFieldsEnum)[0]) // Первое значение enum как дефолтное
+            .default(Object.values(sortFieldsEnum)[0])
             .isIn(allowedSortFields)
             .withMessage(
                 `Invalid sort field. Allowed values: ${allowedSortFields.join(', ')}`,
