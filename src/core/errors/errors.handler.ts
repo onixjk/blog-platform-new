@@ -37,6 +37,6 @@ export function errorsHandler(error: unknown, res: Response): void {
         return;
     }
 
-    res.status(HttpStatus.InternalServerError_500);
+    res.status(HttpStatus.InternalServerError_500).send({ message: "Internal Server Error" });
     return;
 }
