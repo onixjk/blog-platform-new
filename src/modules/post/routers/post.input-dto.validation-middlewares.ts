@@ -25,7 +25,7 @@ const contentValidation = body('content')
     .isLength({min: 1, max: 1000})
     .withMessage('Length of content is not correct');
 
-const blogIdValidation = param('blogId')
+const blogIdValidation = body('blogId')
     .exists()
     .withMessage('ID is required') // Проверка на наличие
     .isString()
