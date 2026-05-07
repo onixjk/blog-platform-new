@@ -114,7 +114,7 @@ export const postsRepository = {
         const deleteResult = await postCollection.deleteOne({_id: new ObjectId(id)});
 
         if (deleteResult.deletedCount < 1) {
-            throw new Error("Post not exist");
+            throw new RepositoryNotFoundError("Post not exist");
         }
 
         return;
