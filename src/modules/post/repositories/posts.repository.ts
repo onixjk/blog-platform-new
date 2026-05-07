@@ -123,10 +123,6 @@ export const postsRepository = {
     async deleteAllByBlogId(blogId: string): Promise<void> {
         const deleteResult = await postCollection.deleteMany({blogId: blogId});
 
-        if (deleteResult.deletedCount < 1) {
-            throw new Error("Post not exist");
-        }
-
         return;
     }
 }
