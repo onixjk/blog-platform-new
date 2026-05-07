@@ -17,6 +17,8 @@ export async function getBlogPostListHandler(
             ...req.query,
             pageNumber: Number(req.query.pageNumber) || 1,
             pageSize: Number(req.query.pageSize) || 10,
+            sortBy: req.query.sortBy || 'createdAt',
+            sortDirection: req.query.sortDirection || 'desc'
         };
 
         const {items, totalCount} = await postsService.findPostsByBlog(
