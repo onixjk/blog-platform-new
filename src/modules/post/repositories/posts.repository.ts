@@ -107,10 +107,6 @@ export const postsRepository = {
             }
         );
 
-        if (updateResult.matchedCount < 1) {
-            throw new Error("Post doesn't exist");
-        }
-
         return;
     },
 
