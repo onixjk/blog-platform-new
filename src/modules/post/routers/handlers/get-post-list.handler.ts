@@ -5,6 +5,7 @@ import {matchedData} from "express-validator";
 import {setDefaultSortAndPaginationIfNotExist} from "../../../../core/helpers/set-default-sort-and-pagination";
 import {postsService} from "../../application/posts.service";
 import {mapToPostListPaginatedOutput} from "../mapers/map-to-post-list-paginated-output.util";
+import {HttpStatus} from "../../../../core/types/http-statuses";
 
 export async function getPostListHandler(
     req: Request<{}, {}, {}, PostQueryInput>,
@@ -26,7 +27,7 @@ export async function getPostListHandler(
             totalCount,
         });
 
-        res.send(postsListOutput)
+        res.status(HttpStatus.Ok_200).send(postsListOutput)
     } catch (e: unknown) {
         errorsHandler(e, res);
     }
