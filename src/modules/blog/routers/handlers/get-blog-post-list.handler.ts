@@ -11,15 +11,15 @@ export async function getBlogPostListHandler(
 ) {
     try {
         const blogId = req.params.blogId;
-        const queryInput = req.query;
+        // const queryInput = req.query;
 
-        // const queryInput = {
-        //     ...req.query,
-        //     pageNumber: Number(req.query.pageNumber) || 1,
-        //     pageSize: Number(req.query.pageSize) || 10,
-        //     sortBy: req.query.sortBy || 'createdAt',
-        //     sortDirection: req.query.sortDirection || 'desc'
-        // };
+        const queryInput = {
+            ...req.query,
+            pageNumber: Number(req.query.pageNumber) || 1,
+            pageSize: Number(req.query.pageSize) || 10,
+            sortBy: req.query.sortBy || 'createdAt',
+            sortDirection: req.query.sortDirection || 'desc'
+        };
 
         const {items, totalCount} = await postsService.findPostsByBlog(
             queryInput,
