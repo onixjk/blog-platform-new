@@ -10,7 +10,7 @@ export function mapToPostListPaginatedOutput(
     return {
         page: meta.pageNumber,
         pageSize: meta.pageSize,
-        pageCount: Math.ceil(meta.totalCount / meta.pageSize),
+        pagesCount: Math.ceil(meta.totalCount / meta.pageSize),
         totalCount: meta.totalCount,
         items: posts.map(
             (post): PostOutput => ({
