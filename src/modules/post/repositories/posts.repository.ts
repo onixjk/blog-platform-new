@@ -90,7 +90,7 @@ export const postsRepository = {
         );
 
         if (updateResult.matchedCount < 1) {
-            throw new Error("Post doesn't exist");
+            throw new RepositoryNotFoundError("Post doesn't exist");
         }
         return;
     },

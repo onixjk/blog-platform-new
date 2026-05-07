@@ -4,7 +4,6 @@ import {postsService} from "../../application/posts.service";
 import {errorsHandler} from "../../../../core/errors/errors.handler";
 import {PostInputDto} from "../input/post.input-dto";
 
-
 export async function updatePostHandler(
     req: Request<{ id: string }, {}, PostInputDto>,
     res: Response
