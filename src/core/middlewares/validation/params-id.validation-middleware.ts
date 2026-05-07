@@ -6,7 +6,7 @@ export const idValidation = param('id')
     .isString()
     .withMessage('ID must be a string') // Проверка, что это строка
     .isMongoId()
-    .withMessage('Неверный формат ObjectId');
+    .withMessage('Invalid format ObjectId');
 
 export const blogIdValidation = param('blogId')
     .exists()
@@ -14,4 +14,4 @@ export const blogIdValidation = param('blogId')
     .isString()
     .withMessage('ID must be a string') // Проверка, что это строка
     .isMongoId()
-    .withMessage('Неверный формат ObjectId');
+    .withMessage('Invalid format ObjectId');
