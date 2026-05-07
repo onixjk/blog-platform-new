@@ -6,6 +6,7 @@ import {blogsRepository} from "../../blog/repositories/blogs.repository";
 import {blogsService} from "../../blog/application/blogs.service";
 import {PostInputDto} from "../routers/input/post.input-dto";
 import {Post} from "../types/post";
+import {BlogPostInputDto} from "../routers/input/blog-post.input-dto";
 
 export const postsService = {
     async findMany(

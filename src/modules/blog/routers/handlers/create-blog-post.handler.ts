@@ -6,12 +6,12 @@ import {mapToPostOutput} from "../../../post/routers/mapers/map-to-post-output.u
 import {BlogPostInputDto} from "../../../post/routers/input/blog-post.input-dto";
 
 export async function createBlogPostHandler(
-    req: Request<{postId: string}, {}, BlogPostInputDto>,
+    req: Request<{blogId: string}, {}, BlogPostInputDto>,
     res: Response
 ) {
     try {
-
-        const postData = { ...req.body, blogId: req.body.blogId };
+        const blogId = req.params;
+        const postData = { ...req.body, blogId };
         const createdPostId = await postsService.create(postData);
 
         const createdPost = await postsService.findByIdOrFail(createdPostId);
