@@ -13,11 +13,6 @@ export async function getBlogPostListHandler(
         const blogId = req.params.blogId;
         const queryInput = req.query;
 
-        const blog = await blogsService.findBlogById(blogId); // Или используйте репозиторий напрямую
-        if (!blog) {
-            return res.sendStatus(HttpStatus.NotFound_404); // Обязательно return, чтобы прервать выполнение
-        }
-
         const {items, totalCount} = await postsService.findPostsByBlog(
             queryInput,
             blogId,
