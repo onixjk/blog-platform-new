@@ -43,12 +43,8 @@ export const blogsRepository = {
     async findByIdOrFail(id: string): Promise<WithId<Blog>> {
         const blog = await blogCollection.findOne({_id: new ObjectId(id)});
 
-        if (!ObjectId.isValid(id)) {
-            throw new RepositoryNotFoundError('Invalid ID format');
-        }
-
         if (!blog) {
-            throw new Error('Blog not exist');
+            throw new RepositoryNotFoundError('Blog not exist');
         }
 
         return blog;
