@@ -12,6 +12,7 @@ export async function getBlogListHandler(
     res: Response
 ) {
     try {
+        console.log(req.query)
         const sanitizedQuery = matchedData<BlogQueryInput>(req, {
             locations: ['query'],
             includeOptionals: true,
