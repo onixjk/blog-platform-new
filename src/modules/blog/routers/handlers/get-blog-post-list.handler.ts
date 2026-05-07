@@ -3,6 +3,7 @@ import {errorsHandler} from "../../../../core/errors/errors.handler";
 import {postsService} from "../../../post/application/posts.service";
 import {PostQueryInput} from "../../../post/routers/input/post-query.input";
 import {mapToPostListPaginatedOutput} from "../../../post/routers/mapers/map-to-post-list-paginated-output.util";
+import {HttpStatus} from "../../../../core/types/http-statuses";
 
 export async function getBlogPostListHandler(
     req: Request<{ blogId: string }, {}, {}, PostQueryInput>,
@@ -23,7 +24,7 @@ export async function getBlogPostListHandler(
             totalCount,
         });
 
-        res.send(postListOutput);
+        res.status(HttpStatus.Ok_200).send(postListOutput);
     } catch (e: unknown) {
         errorsHandler(e, res);
     }
