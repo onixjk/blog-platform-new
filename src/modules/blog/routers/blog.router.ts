@@ -24,6 +24,8 @@ export const blogRouter = Router({});
 
 blogRouter
     .get('',
+        query('searchNameTerm').optional().isString().trim(),
+
         paginationAndSortingValidation(BlogSortField),
         inputValidationResultMiddleware,
         getBlogListHandler,
