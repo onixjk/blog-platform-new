@@ -60,10 +60,6 @@ export const postsRepository = {
     async findByIdOrFail(id: string): Promise<WithId<Post>> {
         const res = await postCollection.findOne({_id: new ObjectId(id)});
 
-        if (!ObjectId.isValid(id)) {
-            throw new RepositoryNotFoundError('Invalid ID format');
-        }
-
         if (!res) {
             throw new RepositoryNotFoundError('Post not exist');
         }
