@@ -5,7 +5,6 @@ import { DomainError } from './domain.error';
 import { createErrorMessages } from "../middlewares/validation/input-validtion-result.middleware";
 
 export function errorsHandler(error: unknown, res: Response): void {
-    console.error(error)
     if (error instanceof RepositoryNotFoundError) {
         const httpStatus = HttpStatus.NotFound_404;
 
