@@ -41,13 +41,13 @@ export const blogsRepository = {
     },
 
     async findByIdOrFail(id: string): Promise<WithId<Blog>> {
-        const res = await blogCollection.findOne({_id: new ObjectId(id)});
+        const blog = await blogCollection.findOne({_id: new ObjectId(id)});
 
-        if (!res) {
+        if (!blog) {
             throw new Error('Blog not exist');
         }
 
-        return res;
+        return blog;
     },
 
     async create(newBlog: Blog): Promise<string> {
