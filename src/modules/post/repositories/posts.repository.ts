@@ -1,4 +1,3 @@
-
 import {ObjectId, WithId} from "mongodb";
 import {postCollection} from "../../../db/mongo.db";
 import {PostQueryInput} from "../routers/input/post-query.input";
@@ -92,7 +91,7 @@ export const postsRepository = {
     },
 
     async updateAllBlogNames(blogId: string, blogName: string): Promise<void> {
-        const updateResult = await postCollection.updateMany(
+        await postCollection.updateMany(
             {
                 blogId: blogId
             },
@@ -117,7 +116,7 @@ export const postsRepository = {
     },
 
     async deleteAllByBlogId(blogId: string): Promise<void> {
-        const deleteResult = await postCollection.deleteMany({blogId: blogId});
+        await postCollection.deleteMany({blogId: blogId});
 
         return;
     }
