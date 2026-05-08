@@ -27,9 +27,9 @@ const contentValidation = body('content')
 
 const blogIdValidation = body('blogId')
     .exists()
-    .withMessage('ID is required') // Проверка на наличие
+    .withMessage('ID is required')
     .isString()
-    .withMessage('ID must be a string') // Проверка, что это строка
+    .withMessage('ID must be a string')
     .isMongoId()
     .withMessage('Incorrect format of ObjectId')
 
