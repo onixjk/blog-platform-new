@@ -8,7 +8,6 @@ import {
     blogIdValidation,
     idValidation,
 } from "../../../core/middlewares/validation/params-id.validation-middleware";
-import {inputValidationResultMiddleware} from "../../../core/middlewares/validation/input-validtion-result.middleware";
 import {superAdminGuardMiddleware} from "../../../auth/middlewares/super-admin.guard-middleware";
 import {
     paginationAndSortingValidation
@@ -19,6 +18,7 @@ import {PostSortField} from "../../post/routers/input/post-sort-field";
 import {blogInputValidation} from "./blog.input-dto.validation-middlewares";
 import {blogPostInputValidation} from "../../post/routers/post.input-dto.validation-middlewares";
 import {createBlogPostHandler} from "./handlers/create-blog-post.handler";
+import {inputValidationResultMiddleware} from "../../../core/middlewares/validation/input-validation-result.middleware";
 
 export const blogRouter = Router({});
 
