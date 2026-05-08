@@ -20,8 +20,6 @@ export function paginationAndSortingValidation<T extends string>(
     const allowedSortFields = Object.values(sortFieldsEnum);
 
     return [
-        query('searchNameTerm').optional().isString().trim(),
-
         query('pageNumber')
             .default(DEFAULT_PAGE_NUMBER)
             .isInt({ min: 1 })
@@ -47,5 +45,10 @@ export function paginationAndSortingValidation<T extends string>(
             .withMessage(
                 `Sort direction must be one of: ${Object.values(SortDirection).join(', ')}`,
             ),
+
+        query('searchNameTerm')
+            .optional()
+            .isString()
+            .trim(),
     ];
 }
