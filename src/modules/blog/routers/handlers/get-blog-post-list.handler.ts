@@ -6,18 +6,19 @@ import {mapToPostListPaginatedOutput} from "../../../post/routers/mapers/map-to-
 import {HttpStatus} from "../../../../core/types/http-statuses";
 
 export async function getBlogPostListHandler(
-    req: Request<{ blogId: string }, {}, {}, PostQueryInput>,
+    req: Request<{ blogId: string }, {}, {}, {}>,
     res: Response
 ) {
     try {
         const blogId = req.params.blogId;
+        const query = req.query as PostQueryInput;
 
         const queryInput = {
-            ...req.query,
-            pageNumber: Number(req.query.pageNumber) || 1,
-            pageSize: Number(req.query.pageSize) || 10,
-            sortBy: req.query.sortBy || 'createdAt',
-            sortDirection: req.query.sortDirection || 'desc'
+            ...query,
+            pageNumber: Number(query.pageNumber) || 1,
+            pageSize: Number(query.pageSize) || 10,
+            sortBy: query.sortBy || 'createdAt',
+            sortDirection: query.sortDirection || 'desc'
         };
 
         const {items, totalCount} = await postsService.findPostsByBlog(

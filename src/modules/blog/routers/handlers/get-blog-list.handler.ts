@@ -8,7 +8,7 @@ import {errorsHandler} from "../../../../core/errors/errors.handler";
 import {HttpStatus} from "../../../../core/types/http-statuses";
 
 export async function getBlogListHandler(
-    req: Request<{}, {}, {}, BlogQueryInput>,
+    req: Request,
     res: Response
 ) {
     try {

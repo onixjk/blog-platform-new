@@ -8,7 +8,7 @@ import {mapToPostListPaginatedOutput} from "../mapers/map-to-post-list-paginated
 import {HttpStatus} from "../../../../core/types/http-statuses";
 
 export async function getPostListHandler(
-    req: Request<{}, {}, {}, PostQueryInput>,
+    req: Request,
     res: Response,
 ) {
     try {
