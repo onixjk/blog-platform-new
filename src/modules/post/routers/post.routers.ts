@@ -6,12 +6,12 @@ import {createPostHandler} from "./handlers/create-post.handler";
 import {updatePostHandler} from "./handlers/update-post.handler";
 import {deletePostHandler} from "./handlers/delete-post.handler";
 import {idValidation} from "../../../core/middlewares/validation/params-id.validation-middleware";
-import {inputValidationResultMiddleware} from "../../../core/middlewares/validation/input-validtion-result.middleware";
 import {
     paginationAndSortingValidation
 } from "../../../core/middlewares/validation/query-pagination-sorting.validation-middleware";
 import {PostSortField} from "./input/post-sort-field";
 import {postInputValidation} from "./post.input-dto.validation-middlewares";
+import {inputValidationResultMiddleware} from "../../../core/middlewares/validation/input-validation-result.middleware";
 
 export const postRouter = Router({});
 

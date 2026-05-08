@@ -2,7 +2,7 @@ import { Response } from 'express';
 import { RepositoryNotFoundError } from './repository-not-found.error';
 import { HttpStatus } from '../types/http-statuses';
 import { DomainError } from './domain.error';
-import { createErrorMessages } from "../middlewares/validation/input-validtion-result.middleware";
+import {createErrorMessages} from "../middlewares/validation/input-validation-result.middleware";
 
 export function errorsHandler(error: unknown, res: Response): void {
     if (error instanceof RepositoryNotFoundError) {
