@@ -53,10 +53,6 @@ export const postsRepository = {
         return {items, totalCount};
     },
 
-    async findById(id: string): Promise<WithId<Post> | null> {
-        return postCollection.findOne({_id: new ObjectId(id)});
-    },
-
     async findByIdOrFail(id: string): Promise<WithId<Post>> {
         const res = await postCollection.findOne({_id: new ObjectId(id)});
 

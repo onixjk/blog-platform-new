@@ -36,10 +36,6 @@ export const blogsRepository = {
         return {items, totalCount};
     },
 
-    async findById(id: string): Promise<WithId<Blog> | null> {
-        return blogCollection.findOne({_id: new ObjectId(id)});
-    },
-
     async findByIdOrFail(id: string): Promise<WithId<Blog>> {
         const blog = await blogCollection.findOne({_id: new ObjectId(id)});
 
