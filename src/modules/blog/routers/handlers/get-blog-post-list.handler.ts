@@ -14,13 +14,6 @@ export async function getBlogPostListHandler(
     try {
         const blogId = req.params.blogId;
 
-        const sanitizedQuery = matchedData<PostQueryInput>(req, {
-            locations: ['query'],
-            includeOptionals: true,
-        });
-
-        const queryInput = setDefaultSortAndPaginationIfNotExist(sanitizedQuery);
-
         // const query = req.query as PostQueryInput;
         //
         // const queryInput = {
@@ -30,6 +23,14 @@ export async function getBlogPostListHandler(
         //     sortBy: query.sortBy || 'createdAt',
         //     sortDirection: query.sortDirection || 'desc'
         // };
+
+        const sanitizedQuery = matchedData<PostQueryInput>(req, {
+            locations: ['query'],
+            includeOptionals: true,
+        });
+
+        const queryInput = setDefaultSortAndPaginationIfNotExist(sanitizedQuery);
+
 
         const {items, totalCount} = await postsService.findPostsByBlog(
             queryInput,
