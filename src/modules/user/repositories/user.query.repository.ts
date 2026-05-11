@@ -3,7 +3,6 @@ import {userCollection} from "../../../db/mongo.db";
 import {ObjectId, WithId} from "mongodb";
 import {RepositoryNotFoundError} from "../../../core/errors/repository-not-found.error";
 import {UserQueryInput} from "../routers/input/user-query.input";
-import {IUserDB} from "../types/user.db.interface";
 
 export const userQueryRepository = {
 
@@ -42,7 +41,7 @@ export const userQueryRepository = {
         return res;
     },
 
-    async findByLoginOrEmail(loginOrEmail: string): Promise<WithId<IUserDB> | null> {
+    async findByLoginOrEmail(loginOrEmail: string): Promise<WithId<User> | null> {
         return userCollection.findOne({
             $or: [{email: loginOrEmail}, {login: loginOrEmail}],
         });

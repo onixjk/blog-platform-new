@@ -2,9 +2,9 @@ import {WithId} from "mongodb";
 import {UserQueryInput} from "../routers/input/user-query.input";
 import {User} from "../types/user";
 import {UserInputDto} from "../routers/input/user.input-dto";
-import {IUserDB} from "../types/user.db.interface";
 import {usersRepository} from "../repositories/user.repository";
 import {userQueryRepository} from "../repositories/user.query.repository";
+import {IUserDB} from "../types/user.db.interface";
 
 export const usersService = {
     async findMany(
