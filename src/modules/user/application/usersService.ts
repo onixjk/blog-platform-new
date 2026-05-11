@@ -1,0 +1,36 @@
+import {WithId} from "mongodb";
+import {UserQueryInput} from "../routers/input/user-query.input";
+import {User} from "../types/user";
+import {UserInputDto} from "../routers/input/user.input-dto";
+import {IUserDB} from "../types/user.db.interface";
+import {usersRepository} from "../repositories/user.repository";
+import {userQueryRepository} from "../repositories/user.query.repository";
+
+export const usersService = {
+    async findMany(
+        queryDto: UserQueryInput
+    ): Promise<{ items: WithId<User>[], totalCount: number }> {
+        return userQueryRepository.findMany(queryDto);
+    },
+
+    async findByIdOrFail(id: string): Promise<WithId<User>> {
+        return userQueryRepository.findByIdOrFail(id);
+    },
+
+    async create(dto: UserInputDto): Promise<string> {
+
+        const newUser: IUserDB = {
+            login: dto.login,
+            passwordHash: dto.password,
+            email: dto.email,
+            createdAt: new Date().toISOString(),
+        }
+
+        return usersRepository.create(newUser);
+    },
+
+    async delete(id: string): Promise<void> {
+        await usersRepository.delete(id);
+        return;
+    },
+}

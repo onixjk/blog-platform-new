@@ -1,10 +1,11 @@
 
 import express, { Express } from "express";
-import {BLOGS_PATH, POSTS_PATH, TESTING_PATH} from "./core/paths/paths";
+import {BLOGS_PATH, POSTS_PATH, TESTING_PATH, USERS_PATH} from "./core/paths/paths";
 import {blogRouter} from "./modules/blog/routers/blog.router";
 import {testingRouter} from "./modules/testing/routers/testing.router";
 import {postRouter} from "./modules/post/routers/post.routers";
 import cors from 'cors';
+import {userRouter} from "./modules/user/routers/user.routers";
 
 export const setupApp = (app: Express) => {
 
@@ -13,6 +14,7 @@ export const setupApp = (app: Express) => {
 
     app.use(BLOGS_PATH, blogRouter)
     app.use(POSTS_PATH, postRouter)
+    app.use(USERS_PATH, userRouter)
     app.use(TESTING_PATH, testingRouter)
 
     return app;

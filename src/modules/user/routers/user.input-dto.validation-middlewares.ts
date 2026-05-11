@@ -1,0 +1,46 @@
+import {body} from "express-validator";
+import {usersRepository} from "../repositories/user.repository";
+
+const loginValidation = body('login')
+    .exists().withMessage('Login is required')
+    .isString().withMessage('Login should be string')
+    .trim().isLength({min: 3, max: 10})
+    .withMessage('Length of login is not correct')
+    .matches(/^[a-zA-Z0-9_-]*$/)
+    .withMessage('Invalid login format, must match the pattern')
+    .custom(
+        async (email: string) => {
+            const user = await usersRepository.findByLoginOrEmail(email);
+            if (user) {
+                throw new Error("Email already exist");
+            }
+            return true;
+        });
+
+const passwordValidation = body('password')
+    .exists().withMessage('Password is required')
+    .isString().withMessage('Password should be string')
+    .trim().isLength({min: 6, max: 20})
+    .withMessage('Length of password is not correct');
+
+const emailValidation = body('email')
+    .exists().withMessage('Email is required')
+    .isString().withMessage('Email should be string')
+    .trim().isLength({min: 1})
+    .isEmail().withMessage('Email is not correct')
+    .matches(/^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/)
+    .withMessage('Invalid login format, must match the pattern')
+    .custom(
+        async (email: string) => {
+            const user = await usersRepository.findByLoginOrEmail(email);
+            if (user) {
+                throw new Error("Email already exist");
+            }
+            return true;
+        });
+
+export const userInputValidation = [
+    loginValidation,
+    passwordValidation,
+    emailValidation
+];

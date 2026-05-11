@@ -7,25 +7,26 @@ import {blogsService} from "../../blog/application/blogs.service";
 import {PostInputDto} from "../routers/input/post.input-dto";
 import {Post} from "../types/post";
 import {BlogPostInputDto} from "../routers/input/blog-post.input-dto";
+import {postsQueryRepository} from "../repositories/post.query.repository";
 
 export const postsService = {
     async findMany(
         queryDto: PostQueryInput
     ): Promise<{ items: WithId<Post>[], totalCount: number }> {
-        return postsRepository.findMany(queryDto);
+        return postsQueryRepository.findMany(queryDto);
     },
 
     async findPostsByBlog(
         queryDto: PostQueryInput,
         blogId: string,
     ): Promise<{ items: WithId<Post>[]; totalCount: number }> {
-        await blogsRepository.findByIdOrFail(blogId);
+        await postsQueryRepository.findByIdOrFail(blogId);
 
-        return postsRepository.findPostsByBlog(queryDto, blogId);
+        return postsQueryRepository.findPostsByBlog(queryDto, blogId);
     },
 
     async findByIdOrFail(id: string): Promise<WithId<Post>> {
-        return postsRepository.findByIdOrFail(id);
+        return postsQueryRepository.findByIdOrFail(id);
     },
 
     async create(dto: PostInputDto): Promise<string> {
@@ -65,5 +66,4 @@ export const postsService = {
         await postsRepository.deleteAllByBlogId(blogId);
         return;
     }
-
 }
