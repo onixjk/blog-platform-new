@@ -42,9 +42,9 @@ export const userQueryRepository = {
         return res;
     },
 
-    async findByEmail(email: string): Promise<WithId<IUserDB> | null> {
+    async findByLoginOrEmail(loginOrEmail: string): Promise<WithId<IUserDB> | null> {
         return userCollection.findOne({
-            $or: [{ email: loginOrEmail }, { login: loginOrEmail }],
+            $or: [{email: loginOrEmail}, {login: loginOrEmail}],
         });
     },
 }
