@@ -1,6 +1,4 @@
 import {body} from "express-validator";
-import {usersRepository} from "../repositories/user.repository";
-import {userQueryRepository} from "../repositories/user.query.repository";
 
 const loginValidation = body('login')
     .exists().withMessage('Login is required')
@@ -9,14 +7,6 @@ const loginValidation = body('login')
     .withMessage('Length of login is not correct')
     .matches(/^[a-zA-Z0-9_-]*$/)
     .withMessage('Invalid login format, must match the pattern')
-    .custom(
-        async (email: string) => {
-            const user = await userQueryRepository.findByLoginOrEmail(email);
-            if (user) {
-                throw new Error("Email already exist");
-            }
-            return true;
-        });
 
 const passwordValidation = body('password')
     .exists().withMessage('Password is required')
@@ -31,14 +21,6 @@ const emailValidation = body('email')
     .isEmail().withMessage('Email is not correct')
     .matches(/^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/)
     .withMessage('Invalid login format, must match the pattern')
-    .custom(
-        async (email: string) => {
-            const user = await userQueryRepository.findByLoginOrEmail(email);
-            if (user) {
-                throw new Error("Email already exist");
-            }
-            return true;
-        });
 
 export const userInputValidation = [
     loginValidation,

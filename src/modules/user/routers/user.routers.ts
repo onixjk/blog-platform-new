@@ -1,24 +1,36 @@
 import {Router} from 'express';
+import {superAdminGuardMiddleware} from "../../../auth/middlewares/super-admin.guard-middleware";
+import {
+    paginationAndSortingValidation
+} from "../../../core/middlewares/validation/query-pagination-sorting.validation-middleware";
+import {UserSortField} from "./input/user-sort-field";
+import {getUserListHandler} from "./handlers/get-user-list.handler";
+import {inputValidationResultMiddleware} from "../../../core/middlewares/validation/input-validation-result.middleware";
+import {userInputValidation} from "./user.input-dto.validation-middlewares";
+import {createUserHandler} from "./handlers/create-user.handler";
+import {idValidation} from "../../../core/middlewares/validation/params-id.validation-middleware";
+import {deleteUserHandler} from "./handlers/delete-user.handler";
 
 export const userRouter = Router({});
 
 userRouter
     .get('',
-        // paginationAndSortingValidation(PostSortField),
-        // inputValidationResultMiddleware,
-        // getUserListHandler,
+        superAdminGuardMiddleware,
+        paginationAndSortingValidation(UserSortField),
+        inputValidationResultMiddleware,
+        getUserListHandler,
     )
 
     .post('',
-        // superAdminGuardMiddleware,
-        // postInputValidation,
-        // inputValidationResultMiddleware,
-        // createUserHandler,
+        superAdminGuardMiddleware,
+        userInputValidation,
+        inputValidationResultMiddleware,
+        createUserHandler,
     )
 
     .delete('/:id',
-        // superAdminGuardMiddleware,
-        // idValidation,
-        // inputValidationResultMiddleware,
-        // deleteUserHandler,
+        superAdminGuardMiddleware,
+        idValidation,
+        inputValidationResultMiddleware,
+        deleteUserHandler,
     );

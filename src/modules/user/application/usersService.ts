@@ -5,6 +5,7 @@ import {UserInputDto} from "../routers/input/user.input-dto";
 import {usersRepository} from "../repositories/user.repository";
 import {userQueryRepository} from "../repositories/user.query.repository";
 import {IUserDB} from "../types/user.db.interface";
+import bcrypt from 'bcrypt'
 
 export const usersService = {
     async findMany(
@@ -19,9 +20,21 @@ export const usersService = {
 
     async create(dto: UserInputDto): Promise<string> {
 
+        const user = await userQueryRepository.findByLoginOrEmail(dto.login);
+
+        if (user?.login === dto.login) {
+            throw new Error("Login already exist");
+        }
+
+        if (user?.email === dto.email) {
+            throw new Error("Email already exist");
+        }
+
+        const passwordHash = await bcrypt.hash(dto.password, 10);
+
         const newUser: IUserDB = {
             login: dto.login,
-            passwordHash: dto.password,
+            passwordHash: passwordHash,
             email: dto.email,
             createdAt: new Date().toISOString(),
         }
