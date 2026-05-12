@@ -5,7 +5,7 @@ import {UserInputDto} from "../routers/input/user.input-dto";
 import {usersRepository} from "../repositories/user.repository";
 import {userQueryRepository} from "../repositories/user.query.repository";
 import {IUserDB} from "../types/user.db.interface";
-import bcrypt from 'bcrypt'
+import {bcryptService} from "../../../auth/adapters/bcrypt.service";
 
 export const usersService = {
     async findMany(
@@ -30,7 +30,7 @@ export const usersService = {
             throw new Error("Email already exist");
         }
 
-        const passwordHash = await bcrypt.hash(dto.password, 10);
+        const passwordHash = await bcryptService.generateHash(dto.password);
 
         const newUser: IUserDB = {
             login: dto.login,
