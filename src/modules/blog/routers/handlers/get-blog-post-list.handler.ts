@@ -6,6 +6,7 @@ import {mapToPostListPaginatedOutput} from "../../../post/routers/mapers/map-to-
 import {HttpStatus} from "../../../../core/types/http-statuses";
 import {matchedData} from "express-validator";
 import {setDefaultSortAndPaginationIfNotExist} from "../../../../core/helpers/set-default-sort-and-pagination";
+import {blogsService} from "../../application/blogs.service";
 
 export async function getBlogPostListHandler(
     req: Request<{ blogId: string }, {}, {}, {}>,
@@ -13,6 +14,7 @@ export async function getBlogPostListHandler(
 ) {
     try {
         const blogId = req.params.blogId;
+        await blogsService.findByIdOrFail(blogId);
 
         // const query = req.query as PostQueryInput;
         //

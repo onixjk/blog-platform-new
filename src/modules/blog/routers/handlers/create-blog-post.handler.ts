@@ -13,8 +13,6 @@ export async function createBlogPostHandler(
     try {
         const { blogId } = req.params;
 
-        await blogsService.findByIdOrFail(blogId);
-
         const postData = { ...req.body, blogId };
         const createdPostId = await postsService.create(postData);
 
