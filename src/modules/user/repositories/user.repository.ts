@@ -1,11 +1,11 @@
 import {ObjectId} from "mongodb";
 import {userCollection} from "../../../db/mongo.db";
 import {RepositoryNotFoundError} from "../../../core/errors/repository-not-found.error";
-import {User} from "../types/user";
+import {IUserDB} from "../types/user.db.interface";
 
 export const usersRepository = {
 
-    async create(newUser: User): Promise<string> {
+    async create(newUser: IUserDB): Promise<string> {
         const insertResult = await userCollection.insertOne(newUser);
 
         return insertResult.insertedId.toString()
