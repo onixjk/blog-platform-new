@@ -52,4 +52,4 @@ export const usersQueryRepository = {
             createdAt: user.createdAt.toString(),
         }
     }
-    }
+}

@@ -3,7 +3,6 @@ import {userCollection} from "../../../db/mongo.db";
 import {RepositoryNotFoundError} from "../../../core/errors/repository-not-found.error";
 import {IUserDB} from "../types/user.db.interface";
 import {User} from "../types/user";
-import {UserOutput} from "../routers/output/user-output";
 
 export const usersRepository = {
 

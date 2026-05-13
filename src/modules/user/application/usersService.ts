@@ -21,13 +21,15 @@ export const usersService = {
 
     async create(dto: UserInputDto): Promise<string> {
 
-        const user = await usersRepository.findByLoginOrEmail(dto.login);
+        const userWithLogin = await usersRepository.findByLoginOrEmail(dto.login);
 
-        if (user?.login === dto.login) {
+        if (userWithLogin?.login === dto.login) {
             throw new Error("Login already exist");
         }
 
-        if (user?.email === dto.email) {
+        const userWithEmail = await usersRepository.findByLoginOrEmail(dto.email);
+
+        if (userWithEmail?.email === dto.email) {
             throw new Error("Email already exist");
         }
 
