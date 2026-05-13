@@ -51,14 +51,4 @@ export const postsQueryRepository = {
 
         return {items, totalCount};
     },
-
-    async findByIdOrFail(id: string): Promise<WithId<Post>> {
-        const res = await postCollection.findOne({_id: new ObjectId(id)});
-
-        if (!res) {
-            throw new RepositoryNotFoundError('Post not exist');
-        }
-
-        return res;
-    },
 }

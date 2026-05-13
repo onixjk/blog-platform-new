@@ -7,7 +7,7 @@ import {blogsService} from "../../blog/application/blogs.service";
 import {PostInputDto} from "../routers/input/post.input-dto";
 import {Post} from "../types/post";
 import {BlogPostInputDto} from "../routers/input/blog-post.input-dto";
-import {postsQueryRepository} from "../repositories/post.query.repository";
+import {postsQueryRepository} from "../repositories/posts.query.repository";
 
 export const postsService = {
     async findMany(
@@ -24,7 +24,7 @@ export const postsService = {
     },
 
     async findByIdOrFail(id: string): Promise<WithId<Post>> {
-        return postsQueryRepository.findByIdOrFail(id);
+        return postsRepository.findByIdOrFail(id);
     },
 
     async create(dto: PostInputDto): Promise<string> {

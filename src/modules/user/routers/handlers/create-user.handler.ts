@@ -1,9 +1,9 @@
 import {Request, Response} from "express";
 import {errorsHandler} from "../../../../core/errors/errors.handler";
 import {HttpStatus} from "../../../../core/types/http-statuses";
-import {mapToUserOutput} from "../mapers/map-to-user-output.util";
 import {usersService} from "../../application/usersService";
 import {UserInputDto} from "../input/user.input-dto";
+import {usersQueryRepository} from "../../repositories/users.query.repository";
 
 export async function createUserHandler(
     req: Request<{}, {}, UserInputDto>,
@@ -13,7 +13,9 @@ export async function createUserHandler(
         const createdUserId = await usersService.create(req.body);
 
         const createdUser = await usersService.findByIdOrFail(createdUserId);
-        const userOutput = mapToUserOutput(createdUser);
+        const userOutput = usersQueryRepository.mapToUserOutput(createdUser);
+
+        // const userOutput = mapToUserOutput(createdUser);
 
         res.status(HttpStatus.Created_201).send(userOutput);
     } catch (e: unknown) {

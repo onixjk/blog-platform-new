@@ -4,7 +4,7 @@ import {ObjectId, WithId} from "mongodb";
 import {RepositoryNotFoundError} from "../../../core/errors/repository-not-found.error";
 import {BlogQueryInput} from "../routers/input/blog-query.input";
 
-export const blogQueryRepository = {
+export const blogsQueryRepository = {
     async findMany(
         queryDto: BlogQueryInput
     ): Promise<{ items: WithId<Blog>[], totalCount: number }> {
@@ -33,15 +33,5 @@ export const blogQueryRepository = {
         const totalCount = await blogCollection.countDocuments(filter);
 
         return {items, totalCount};
-    },
-
-    async findByIdOrFail(id: string): Promise<WithId<Blog>> {
-        const blog = await blogCollection.findOne({_id: new ObjectId(id)});
-
-        if (!blog) {
-            throw new RepositoryNotFoundError('Blog not exist');
-        }
-
-        return blog;
     },
 }

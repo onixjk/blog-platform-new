@@ -3,24 +3,25 @@ import {UserQueryInput} from "../routers/input/user-query.input";
 import {User} from "../types/user";
 import {UserInputDto} from "../routers/input/user.input-dto";
 import {usersRepository} from "../repositories/user.repository";
-import {userQueryRepository} from "../repositories/user.query.repository";
+import {usersQueryRepository} from "../repositories/users.query.repository";
 import {IUserDB} from "../types/user.db.interface";
 import {bcryptService} from "../../../auth/adapters/bcrypt.service";
+import {IPagination} from "../types/pagination";
 
 export const usersService = {
     async findMany(
         queryDto: UserQueryInput
-    ): Promise<{ items: WithId<User>[], totalCount: number }> {
-        return userQueryRepository.findMany(queryDto);
+    ): Promise<IPagination<User[]>> {
+        return usersQueryRepository.findMany(queryDto);
     },
 
     async findByIdOrFail(id: string): Promise<WithId<User>> {
-        return userQueryRepository.findByIdOrFail(id);
+        return usersRepository.findByIdOrFail(id);
     },
 
     async create(dto: UserInputDto): Promise<string> {
 
-        const user = await userQueryRepository.findByLoginOrEmail(dto.login);
+        const user = await usersRepository.findByLoginOrEmail(dto.login);
 
         if (user?.login === dto.login) {
             throw new Error("Login already exist");

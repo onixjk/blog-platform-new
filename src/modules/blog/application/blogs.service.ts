@@ -4,17 +4,17 @@ import {WithId} from "mongodb";
 import {blogsRepository} from "../repositories/blogs.repository";
 import {BlogQueryInput} from "../routers/input/blog-query.input";
 import {postsService} from "../../post/application/posts.service";
-import {blogQueryRepository} from "../repositories/blog.query.repository";
+import {blogsQueryRepository} from "../repositories/blogs.query.repository";
 
 export const blogsService = {
     async findMany(
         queryDto: BlogQueryInput,
     ): Promise<{ items: WithId<Blog>[]; totalCount: number }> {
-        return blogQueryRepository.findMany(queryDto);
+        return blogsQueryRepository.findMany(queryDto);
     },
 
     async findByIdOrFail(id: string): Promise<WithId<Blog>> {
-        return blogQueryRepository.findByIdOrFail(id);
+        return blogsRepository.findByIdOrFail(id);
     },
 
     async create(dto: BlogInputDto): Promise<string> {

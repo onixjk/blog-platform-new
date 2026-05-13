@@ -7,6 +7,16 @@ import {PostInputDto} from "../routers/input/post.input-dto";
 
 export const postsRepository = {
 
+    async findByIdOrFail(id: string): Promise<WithId<Post>> {
+        const res = await postCollection.findOne({_id: new ObjectId(id)});
+
+        if (!res) {
+            throw new RepositoryNotFoundError('Post not exist');
+        }
+
+        return res;
+    },
+
     async create(newPost: Post): Promise<string> {
         const insertResult = await postCollection.insertOne(newPost);
 
