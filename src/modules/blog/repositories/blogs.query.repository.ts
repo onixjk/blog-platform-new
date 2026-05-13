@@ -10,14 +10,7 @@ export const blogsQueryRepository = {
     async findMany(
         queryDto: BlogQueryInput
     ): Promise<BlogListPaginatedOutput> {
-        const {
-            pageNumber,
-            pageSize,
-            sortBy,
-            sortDirection,
-            searchNameTerm: searchNameTerm,
-        } = queryDto;
-
+        const {pageNumber, pageSize, sortBy, sortDirection, searchNameTerm: searchNameTerm} = queryDto;
         const skip = (pageNumber - 1) * pageSize;
         const filter: any = {};
 
