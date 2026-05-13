@@ -21,14 +21,12 @@ export function paginationAndSortingValidation<T extends string>(
 
     return [
         query('pageNumber')
-            .exists().trim().isLength({min: 1}).withMessage("не один")
             .default(DEFAULT_PAGE_NUMBER)
             .isInt({ min: 1 })
             .withMessage('Page number must be a positive integer')
             .toInt(),
 
         query('pageSize')
-            .exists().trim().isLength({min: 1}).withMessage("не один")
             .default(DEFAULT_PAGE_SIZE)
             .isInt({ min: 1, max: 100 })
             .withMessage('Page size must be between 1 and 100')
