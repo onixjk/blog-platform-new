@@ -17,7 +17,7 @@ export async function createBlogPostHandler(
 
         await postsService.findByIdOrFail(createdPostId);
 
-        const postOutput = postsQueryRepository.findById(createdPostId);
+        const postOutput = await postsQueryRepository.findById(createdPostId);
 
         res.status(HttpStatus.Created_201).send(postOutput);
     } catch (e: unknown) {
