@@ -5,11 +5,12 @@ import {blogsRepository} from "../repositories/blogs.repository";
 import {BlogQueryInput} from "../routers/input/blog-query.input";
 import {postsService} from "../../post/application/posts.service";
 import {blogsQueryRepository} from "../repositories/blogs.query.repository";
+import {BlogListPaginatedOutput} from "../routers/output/blog-list-paginated.output.ts";
 
 export const blogsService = {
     async findMany(
         queryDto: BlogQueryInput,
-    ): Promise<{ items: WithId<Blog>[]; totalCount: number }> {
+    ): Promise<BlogListPaginatedOutput> {
         return blogsQueryRepository.findMany(queryDto);
     },
 

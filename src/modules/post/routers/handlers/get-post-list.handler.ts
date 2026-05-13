@@ -3,9 +3,8 @@ import {errorsHandler} from "../../../../core/errors/errors.handler";
 import {PostQueryInput} from "../input/post-query.input";
 import {matchedData} from "express-validator";
 import {setDefaultSortAndPaginationIfNotExist} from "../../../../core/helpers/set-default-sort-and-pagination";
-import {postsService} from "../../application/posts.service";
-import {mapToPostListPaginatedOutput} from "../mapers/map-to-post-list-paginated-output.util";
 import {HttpStatus} from "../../../../core/types/http-statuses";
+import {postsQueryRepository} from "../../repositories/posts.query.repository";
 
 export async function getPostListHandler(
     req: Request,
@@ -19,13 +18,7 @@ export async function getPostListHandler(
 
         const queryInput = setDefaultSortAndPaginationIfNotExist(sanitizedQuery);
 
-        const {items, totalCount} = await postsService.findMany(queryInput);
-
-        const postsListOutput = mapToPostListPaginatedOutput(items, {
-            pageNumber: queryInput.pageNumber,
-            pageSize: queryInput.pageSize,
-            totalCount,
-        });
+        const postsListOutput = await postsQueryRepository.findMany(queryInput);
 
         res.status(HttpStatus.Ok_200).send(postsListOutput)
     } catch (e: unknown) {

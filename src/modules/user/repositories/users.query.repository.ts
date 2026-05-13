@@ -37,7 +37,6 @@ export const usersQueryRepository = {
             totalCount: totalCount,
             items: users.map((user) => this.mapToUserOutput(user)),
         }
-        // return {items, totalCount};
     },
 
     mapToUserOutput(user: WithId<User>): UserOutput {

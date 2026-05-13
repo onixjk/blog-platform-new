@@ -1,27 +1,10 @@
 import {WithId} from "mongodb";
-
-import {PostQueryInput} from "../routers/input/post-query.input";
 import {postsRepository} from "../repositories/posts.repository";
-import {blogsRepository} from "../../blog/repositories/blogs.repository";
 import {blogsService} from "../../blog/application/blogs.service";
 import {PostInputDto} from "../routers/input/post.input-dto";
 import {Post} from "../types/post";
-import {BlogPostInputDto} from "../routers/input/blog-post.input-dto";
-import {postsQueryRepository} from "../repositories/posts.query.repository";
 
 export const postsService = {
-    async findMany(
-        queryDto: PostQueryInput
-    ): Promise<{ items: WithId<Post>[], totalCount: number }> {
-        return postsQueryRepository.findMany(queryDto);
-    },
-
-    async findPostsByBlog(
-        queryDto: PostQueryInput,
-        blogId: string,
-    ): Promise<{ items: WithId<Post>[]; totalCount: number }> {
-        return postsQueryRepository.findPostsByBlog(queryDto, blogId);
-    },
 
     async findByIdOrFail(id: string): Promise<WithId<Post>> {
         return postsRepository.findByIdOrFail(id);

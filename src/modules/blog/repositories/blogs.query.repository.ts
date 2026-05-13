@@ -1,13 +1,12 @@
-import {Blog} from "../types/blog";
 import {blogCollection} from "../../../db/mongo.db";
-import {ObjectId, WithId} from "mongodb";
-import {RepositoryNotFoundError} from "../../../core/errors/repository-not-found.error";
 import {BlogQueryInput} from "../routers/input/blog-query.input";
+import {mapToBlogListPaginatedOutput} from "../routers/mapers/map-to-blog-list-paginated-output.util";
+import {BlogListPaginatedOutput} from "../routers/output/blog-list-paginated.output.ts";
 
 export const blogsQueryRepository = {
     async findMany(
         queryDto: BlogQueryInput
-    ): Promise<{ items: WithId<Blog>[], totalCount: number }> {
+    ): Promise<BlogListPaginatedOutput> {
         const {
             pageNumber,
             pageSize,
@@ -32,6 +31,10 @@ export const blogsQueryRepository = {
 
         const totalCount = await blogCollection.countDocuments(filter);
 
-        return {items, totalCount};
+        return mapToBlogListPaginatedOutput(items, {
+            pageNumber: queryDto.pageNumber,
+            pageSize: queryDto.pageSize,
+            totalCount,
+        });
     },
 }

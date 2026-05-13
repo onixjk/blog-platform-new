@@ -1,21 +1,14 @@
-import {Post} from "../types/post";
 import {postCollection} from "../../../db/mongo.db";
-import {ObjectId, WithId} from "mongodb";
-import {RepositoryNotFoundError} from "../../../core/errors/repository-not-found.error";
 import {PostQueryInput} from "../routers/input/post-query.input";
+import {PostListPaginatedOutput} from "../routers/output/post-list-paginated.output.ts";
+import {mapToPostListPaginatedOutput} from "../routers/mapers/map-to-post-list-paginated-output.util";
 
 export const postsQueryRepository = {
 
     async findMany(
         queryDto: PostQueryInput
-    ): Promise<{ items: WithId<Post>[], totalCount: number }> {
-        const {
-            pageNumber,
-            pageSize,
-            sortBy,
-            sortDirection,
-        } = queryDto;
-
+    ): Promise<PostListPaginatedOutput> {
+        const {pageNumber, pageSize, sortBy, sortDirection} = queryDto;
         const skip = (pageNumber - 1) * pageSize;
         const filter: any = {};
 
@@ -28,27 +21,44 @@ export const postsQueryRepository = {
 
         const totalCount = await postCollection.countDocuments(filter);
 
-        return {items, totalCount};
+        return mapToPostListPaginatedOutput(items, {
+            pageNumber: queryDto.pageNumber,
+            pageSize: queryDto.pageSize,
+            totalCount,
+        });
     },
 
     async findPostsByBlog(
         queryDto: PostQueryInput,
         blogId: string,
-    ): Promise<{ items: WithId<Post>[], totalCount: number }> {
+    ): Promise<PostListPaginatedOutput> {
         const {pageNumber, pageSize, sortBy, sortDirection} = queryDto;
-        const filter = {'blogId': blogId};
         const skip = (pageNumber - 1) * pageSize;
+        const filter = {'blogId': blogId};
 
-        const [items, totalCount] = await Promise.all([
-            postCollection
-                .find(filter)
-                .sort({[sortBy]: sortDirection})
-                .skip(skip)
-                .limit(pageSize)
-                .toArray(),
-            postCollection.countDocuments(filter),
-        ]);
+        // const [items, totalCount] = await Promise.all([
+        //     postCollection
+        //         .find(filter)
+        //         .sort({[sortBy]: sortDirection})
+        //         .skip(skip)
+        //         .limit(pageSize)
+        //         .toArray(),
+        //     postCollection.countDocuments(filter),
+        // ]);
 
-        return {items, totalCount};
+        const items = await postCollection
+            .find(filter)
+            .sort({[sortBy]: sortDirection})
+            .skip(skip)
+            .limit(pageSize)
+            .toArray();
+
+        const totalCount = await postCollection.countDocuments(filter)
+
+        return mapToPostListPaginatedOutput(items, {
+            pageNumber: queryDto.pageNumber,
+            pageSize: queryDto.pageSize,
+            totalCount,
+        });
     },
 }
