@@ -7,6 +7,6 @@ export function setDefaultSortAndPaginationIfNotExist<P = string>(
     return {
         ...paginationAndSortingDefault,
         ...query,
-        sortBy: (query.sortBy ?? paginationAndSortingDefault.sortBy) as P,
+        sortBy: (query.sortBy || paginationAndSortingDefault.sortBy) as P,
     };
 }
