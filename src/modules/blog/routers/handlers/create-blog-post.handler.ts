@@ -4,7 +4,6 @@ import {HttpStatus} from "../../../../core/types/http-statuses";
 import {postsService} from "../../../post/application/posts.service";
 import {mapToPostOutput} from "../../../post/routers/mapers/map-to-post-output.util";
 import {BlogPostInputDto} from "../../../post/routers/input/blog-post.input-dto";
-import {blogsService} from "../../application/blogs.service";
 
 export async function createBlogPostHandler(
     req: Request<{blogId: string}, {}, BlogPostInputDto>,

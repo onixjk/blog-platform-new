@@ -1,6 +1,6 @@
 import {User} from "../types/user";
 import {userCollection} from "../../../db/mongo.db";
-import {WithId} from "mongodb";
+import {ObjectId, WithId} from "mongodb";
 import {UserQueryInput} from "../routers/input/user-query.input";
 import {UserOutput} from "../routers/output/user-output";
 import {IPagination} from "../types/pagination";
@@ -9,7 +9,6 @@ export const usersQueryRepository = {
 
     async findMany(
         queryDto: UserQueryInput
-    // ): Promise<{ items: WithId<User>[], totalCount: number }> {
     ): Promise<IPagination<User[]>> {
         const {
             pageNumber,
@@ -37,6 +36,12 @@ export const usersQueryRepository = {
             totalCount: totalCount,
             items: users.map((user) => this.mapToUserOutput(user)),
         }
+    },
+
+    async findById(id: string): Promise<UserOutput | null> {
+        const user = await userCollection.findOne({_id: new ObjectId(id)});
+
+        return user ? this.mapToUserOutput(user) : null;
     },
 
     mapToUserOutput(user: WithId<User>): UserOutput {

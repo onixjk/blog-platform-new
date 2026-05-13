@@ -12,10 +12,9 @@ export async function createUserHandler(
     try {
         const createdUserId = await usersService.create(req.body);
 
-        const createdUser = await usersService.findByIdOrFail(createdUserId);
-        const userOutput = usersQueryRepository.mapToUserOutput(createdUser);
+        await usersService.findByIdOrFail(createdUserId);
 
-        // const userOutput = mapToUserOutput(createdUser);
+        const userOutput = await usersQueryRepository.findById(createdUserId)
 
         res.status(HttpStatus.Created_201).send(userOutput);
     } catch (e: unknown) {
