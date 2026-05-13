@@ -10,11 +10,24 @@ export function setDefaultSortAndPaginationIfNotExist<P = string>(
     //     sortBy: (query.sortBy ?? paginationAndSortingDefault.sortBy) as P,
     // };
 
-    // Принудительно приводим к числам, если значения пришли строками из query, либо берем дефолты
+    // // Принудительно приводим к числам, если значения пришли строками из query, либо берем дефолты
+    // const pageNumber = Number(query.pageNumber) || paginationAndSortingDefault.pageNumber;
+    // const pageSize = Number(query.pageSize) || paginationAndSortingDefault.pageSize;
+    //
+    // // Используем || вместо ?? чтобы отсечь пустые строки ""
+    // const sortBy = (query.sortBy || paginationAndSortingDefault.sortBy) as P;
+    // const sortDirection = query.sortDirection || paginationAndSortingDefault.sortDirection;
+    //
+    // return {
+    //     pageNumber,
+    //     pageSize,
+    //     sortBy,
+    //     sortDirection,
+    // };
+
+    // Оператор || вместо ?? принудительно заменит пустую строку "" на дефолтное значение
     const pageNumber = Number(query.pageNumber) || paginationAndSortingDefault.pageNumber;
     const pageSize = Number(query.pageSize) || paginationAndSortingDefault.pageSize;
-
-    // Используем || вместо ?? чтобы отсечь пустые строки ""
     const sortBy = (query.sortBy || paginationAndSortingDefault.sortBy) as P;
     const sortDirection = query.sortDirection || paginationAndSortingDefault.sortDirection;
 
