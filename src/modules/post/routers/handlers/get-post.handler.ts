@@ -2,6 +2,7 @@ import {Request, Response} from 'express';
 import {errorsHandler} from "../../../../core/errors/errors.handler";
 import {HttpStatus} from "../../../../core/types/http-statuses";
 import {postsQueryRepository} from "../../repositories/posts.query.repository";
+import {postsService} from "../../application/posts.service";
 
 export async function getPostHandler(
     req: Request<{ id: string }>,
@@ -10,7 +11,7 @@ export async function getPostHandler(
     try {
         const id = req.params.id;
 
-        // await postsService.findByIdOrFail(id);
+        await postsService.findByIdOrFail(id);
 
         const postOutput = postsQueryRepository.findById(id)
 
