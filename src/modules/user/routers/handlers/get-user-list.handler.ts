@@ -4,7 +4,7 @@ import {HttpStatus} from "../../../../core/types/http-statuses";
 import {matchedData} from "express-validator";
 import {setDefaultSortAndPaginationIfNotExist} from "../../../../core/helpers/set-default-sort-and-pagination";
 import {UserQueryInput} from "../input/user-query.input";
-import {usersService} from "../../application/usersService";
+import {usersQueryRepository} from "../../repositories/users.query.repository";
 
 export async function getUserListHandler(
     req: Request,
@@ -18,7 +18,7 @@ export async function getUserListHandler(
 
         const queryInput = setDefaultSortAndPaginationIfNotExist(sanitizedQuery);
 
-        const usersListOutput = await usersService.findMany(queryInput);
+        const usersListOutput = await usersQueryRepository.findMany(queryInput);
 
         res.status(HttpStatus.Ok_200).send(usersListOutput)
     } catch (e: unknown) {
