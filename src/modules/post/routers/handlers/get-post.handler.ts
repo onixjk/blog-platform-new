@@ -13,7 +13,7 @@ export async function getPostHandler(
 
         await postsService.findByIdOrFail(id);
 
-        const postOutput = postsQueryRepository.findById(id)
+        const postOutput = await postsQueryRepository.findById(id)
 
         res.status(HttpStatus.Ok_200).send(postOutput);
     } catch (e: unknown) {
