@@ -13,7 +13,7 @@ export async function getBlogHandler(
 
         await blogsService.findByIdOrFail(id);
 
-        const blogOutput = blogsQueryRepository.findById(id);
+        const blogOutput = await blogsQueryRepository.findById(id);
 
         res.status(HttpStatus.Ok_200).send(blogOutput);
     } catch (e: unknown) {

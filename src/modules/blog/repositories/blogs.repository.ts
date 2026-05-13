@@ -3,7 +3,6 @@ import {ObjectId, WithId} from "mongodb";
 import {BlogInputDto} from "../routers/input/blog.input-dto";
 import {Blog} from "../types/blog";
 import {RepositoryNotFoundError} from "../../../core/errors/repository-not-found.error";
-import {BlogQueryInput} from "../routers/input/blog-query.input";
 
 export const blogsRepository = {
 
