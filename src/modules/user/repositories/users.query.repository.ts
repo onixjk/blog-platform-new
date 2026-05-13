@@ -1,26 +1,22 @@
 import {User} from "../types/user";
 import {userCollection} from "../../../db/mongo.db";
-import {ObjectId, WithId} from "mongodb";
+import {ObjectId} from "mongodb";
 import {UserQueryInput} from "../routers/input/user-query.input";
 import {UserOutput} from "../routers/output/user-output";
 import {IPagination} from "../types/pagination";
+import {mapToUserListPaginatedOutput} from "../routers/mapers/map-to-user-list-paginated-output.util";
+import {mapToUserOutput} from "../routers/mapers/map-to-user-output.util";
 
 export const usersQueryRepository = {
 
     async findMany(
         queryDto: UserQueryInput
     ): Promise<IPagination<User[]>> {
-        const {
-            pageNumber,
-            pageSize,
-            sortBy,
-            sortDirection,
-        } = queryDto;
-
+        const {pageNumber, pageSize, sortBy, sortDirection} = queryDto;
         const skip = (pageNumber - 1) * pageSize;
         const filter: any = {};
 
-        const users = await userCollection
+        const items = await userCollection
             .find(filter)
             .sort({[sortBy]: sortDirection})
             .skip(skip)
@@ -29,27 +25,16 @@ export const usersQueryRepository = {
 
         const totalCount = await userCollection.countDocuments(filter);
 
-        return {
-            pagesCount: Math.ceil(totalCount / pageSize),
-            page: pageNumber,
-            pageSize: pageSize,
-            totalCount: totalCount,
-            items: users.map((user) => this.mapToUserOutput(user)),
-        }
+        return mapToUserListPaginatedOutput(items, {
+            pageNumber: queryDto.pageNumber,
+            pageSize: queryDto.pageSize,
+            totalCount,
+        });
     },
 
     async findById(id: string): Promise<UserOutput | null> {
         const user = await userCollection.findOne({_id: new ObjectId(id)});
 
-        return user ? this.mapToUserOutput(user) : null;
+        return user ? mapToUserOutput(user) : null;
     },
-
-    mapToUserOutput(user: WithId<User>): UserOutput {
-        return {
-            id: user._id.toString(),
-            login: user.login,
-            email: user.email,
-            createdAt: user.createdAt.toString(),
-        }
-    }
 }
