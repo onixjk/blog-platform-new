@@ -22,14 +22,14 @@ const emailValidation = body('email')
     .matches(/^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/)
     .withMessage('Invalid login format, must match the pattern')
 
-export const userInputValidation = [
-    loginValidation,
-    passwordValidation,
-    emailValidation
-];
-
 export const loginOrEmailValidation = body('loginOrEmail')
     .exists().withMessage('Login or email is required')
     .isString().withMessage('Login or email should be string')
     .trim()
     .notEmpty().withMessage('Login or email cannot be empty');
+
+export const userInputValidation = [
+    loginValidation,
+    passwordValidation,
+    emailValidation
+];

@@ -10,7 +10,6 @@ export async function createTokenHandler(
 ) {
     try {
         const {loginOrEmail, password} = req.body;
-
         const accessToken = await authService.loginUser(loginOrEmail, password);
 
         if (!accessToken) {
