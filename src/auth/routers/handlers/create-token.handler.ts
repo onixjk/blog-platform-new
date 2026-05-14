@@ -5,16 +5,17 @@ import {authService} from "../../application/authService";
 import {HttpStatus} from "../../../core/types/http-statuses";
 
 export async function createTokenHandler(
-    req: Request<{},{}, LoginInputDto>,
+    req: Request<{}, {}, LoginInputDto>,
     res: Response,
-){
+) {
     try {
-        const { loginOrEmail, password } = req.body;
+        const {loginOrEmail, password} = req.body;
 
         const accessToken = await authService.loginUser(loginOrEmail, password);
 
-        if (!accessToken)
+        if (!accessToken) {
             return res.sendStatus(HttpStatus.Unauthorized_401);
+        }
 
         return res.status(HttpStatus.NoContent_204);
     } catch (e: unknown) {
