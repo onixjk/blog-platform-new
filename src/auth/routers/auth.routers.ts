@@ -6,7 +6,7 @@ import {createTokenHandler} from "./handlers/create-token.handler";
 export const authRouter = Router({});
 
 authRouter
-    .post('/auth/login',
+    .post('/login',
         userInputValidation,
         inputValidationResultMiddleware,
         createTokenHandler

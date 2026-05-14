@@ -1,4 +1,3 @@
-import {usersQueryRepository} from "../../modules/user/repositories/users.query.repository";
 import {bcryptService} from "../adapters/bcrypt.service";
 import {usersRepository} from "../../modules/user/repositories/user.repository";
 
