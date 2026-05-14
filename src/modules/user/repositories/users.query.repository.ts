@@ -17,8 +17,8 @@ export const usersQueryRepository = {
         const filter: any = {};
 
         const conditions = [
-            searchLoginTerm ? {login : {$regex: searchLoginTerm, $options: 'i'}} : null,
-            searchEmailTerm ? {email : {$regex: searchEmailTerm, $options: 'i'}} : null,
+            searchLoginTerm ? {login: {$regex: searchLoginTerm, $options: 'i'}} : null,
+            searchEmailTerm ? {email: {$regex: searchEmailTerm, $options: 'i'}} : null,
         ].filter(Boolean)
 
         if (conditions.length > 0) {
