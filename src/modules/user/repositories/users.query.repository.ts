@@ -15,18 +15,14 @@ export const usersQueryRepository = {
         const {pageNumber, pageSize, sortBy, sortDirection, searchLoginTerm, searchEmailTerm} = queryDto;
         const skip = (pageNumber - 1) * pageSize;
         const filter: any = {};
-        const searchConditions: string | any[] = [];
 
-        if (searchLoginTerm) {
-            searchConditions.push({ login: {$regex: searchLoginTerm, $options: 'i'} })
-        }
+        const conditions = [
+            searchLoginTerm ? {name : {$regex: searchLoginTerm, $options: 'i'}} : null,
+            searchEmailTerm ? {email : {$regex: searchEmailTerm, $options: 'i'}} : null,
+        ].filter(Boolean)
 
-        if (searchEmailTerm) {
-            searchConditions.push({ email: {$regex: searchEmailTerm, $options: 'i'} });
-        }
-
-        if (searchConditions.length > 0) {
-            filter.$or = searchConditions;
+        if (conditions.length > 0) {
+            filter.$or = conditions;
         }
 
         const items = await userCollection
