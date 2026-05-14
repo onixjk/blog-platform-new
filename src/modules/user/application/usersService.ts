@@ -19,6 +19,10 @@ export const usersService = {
         return usersRepository.findByIdOrFail(id);
     },
 
+    async findByLoginOrEmail(loginOrEmail: string): Promise<WithId<IUserDB> | null> {
+        return usersRepository.findByLoginOrEmail(loginOrEmail);
+    },
+
     async create(dto: UserInputDto): Promise<string> {
 
         const userWithLogin = await usersRepository.findByLoginOrEmail(dto.login);
