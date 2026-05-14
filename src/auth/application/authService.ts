@@ -26,6 +26,5 @@ export const authService = {
         if (!user) return false;
 
         return bcryptService.checkPassword(password, user.passwordHash);
-
     },
 }
