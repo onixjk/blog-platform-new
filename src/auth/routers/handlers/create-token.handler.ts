@@ -17,7 +17,7 @@ export async function createTokenHandler(
             return res.sendStatus(HttpStatus.Unauthorized_401);
         }
 
-        return res.status(HttpStatus.NoContent_204);
+        res.status(HttpStatus.NoContent_204);
     } catch (e: unknown) {
         errorsHandler(e, res);
     }
