@@ -16,7 +16,7 @@ export async function createTokenHandler(
         if (!accessToken)
             return res.sendStatus(HttpStatus.Unauthorized_401);
 
-        return res.status(HttpStatus.Ok_200).send({ accessToken });
+        return res.status(HttpStatus.NoContent_204).send({ accessToken });
     } catch (e: unknown) {
         errorsHandler(e, res);
     }
