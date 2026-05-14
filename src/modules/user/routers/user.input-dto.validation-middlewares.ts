@@ -27,3 +27,9 @@ export const userInputValidation = [
     passwordValidation,
     emailValidation
 ];
+
+export const loginOrEmailValidation = body('loginOrEmail')
+    .exists().withMessage('Login or email is required')
+    .isString().withMessage('Login or email should be string')
+    .trim()
+    .notEmpty().withMessage('Login or email cannot be empty');
