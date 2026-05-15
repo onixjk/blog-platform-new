@@ -12,9 +12,8 @@ export async function createTokenHandler(
         const {loginOrEmail, password} = req.body;
         const accessToken = await authService.loginUser(loginOrEmail, password);
 
-        if (!accessToken) {
-            return res.sendStatus(HttpStatus.Unauthorized_401);
-        }
+        if (!accessToken)
+            res.sendStatus(HttpStatus.Unauthorized_401);
 
         res.sendStatus(HttpStatus.NoContent_204);
     } catch (e: unknown) {

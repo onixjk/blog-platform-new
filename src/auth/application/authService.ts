@@ -6,10 +6,7 @@ export const authService = {
         loginOrEmail: string,
         password: string,
     ): Promise<{ accessToken: string } | null> {
-        const isCorrectCredentials = await this.checkUserCredentials(
-            loginOrEmail,
-            password,
-        );
+        const isCorrectCredentials = await this.checkUserCredentials(loginOrEmail, password);
 
         if (!isCorrectCredentials) {
             return null;
