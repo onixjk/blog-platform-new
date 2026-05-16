@@ -4,7 +4,7 @@ import {LoginInputDto} from "../../types/login.input-dto";
 import {authService} from "../../application/authService";
 import {HttpStatus} from "../../../core/types/http-statuses";
 
-export async function createTokenHandler(
+export async function loginUserHandler(
     req: Request<{}, {}, LoginInputDto>,
     res: Response,
 ) {
