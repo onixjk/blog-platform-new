@@ -21,7 +21,6 @@ export async function loginUserHandler(
 
         return res.status(HttpStatuses.Ok_200).send({ accessToken: result.data!.accessToken });
     } catch (e: unknown) {
-        // console.error(" РЕАЛЬНАЯ ОШИБКА 500:", e);
         errorsHandler(e, res);
     }
 }
