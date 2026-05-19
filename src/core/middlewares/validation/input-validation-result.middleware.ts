@@ -1,7 +1,7 @@
 import {ValidationErrorType} from "../../types/validationError";
 import {FieldValidationError, ValidationError, validationResult} from "express-validator";
 import {NextFunction, Request, Response} from "express";
-import {HttpStatus} from "../../types/http-statuses";
+import {HttpStatuses} from "../../types/http-statuses";
 
 export const createErrorMessages = (
     errors: ValidationErrorType[],
@@ -18,7 +18,7 @@ const formatValidationError = (error: ValidationError): ValidationErrorType => {
     const expressError = error as FieldValidationError;
 
     return {
-        status: HttpStatus.BadRequest_400,
+        status: HttpStatuses.BadRequest_400,
         source: expressError.path,
         detail: expressError.msg,
     };
@@ -34,7 +34,7 @@ export const inputValidationResultMiddleware = (
         .array({onlyFirstError: true});
 
     if (errors.length > 0) {
-        res.status(HttpStatus.BadRequest_400).json(createErrorMessages(errors));
+        res.status(HttpStatuses.BadRequest_400).json(createErrorMessages(errors));
         return;
     }
     next();

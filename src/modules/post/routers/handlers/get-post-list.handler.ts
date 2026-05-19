@@ -3,7 +3,7 @@ import {errorsHandler} from "../../../../core/errors/errors.handler";
 import {PostQueryInput} from "../input/post-query.input";
 import {matchedData} from "express-validator";
 import {setDefaultSortAndPaginationIfNotExist} from "../../../../core/helpers/set-default-sort-and-pagination";
-import {HttpStatus} from "../../../../core/types/http-statuses";
+import {HttpStatuses} from "../../../../core/types/http-statuses";
 import {postsQueryRepository} from "../../repositories/posts.query.repository";
 
 export async function getPostListHandler(
@@ -20,7 +20,7 @@ export async function getPostListHandler(
 
         const postsListOutput = await postsQueryRepository.findMany(queryInput);
 
-        res.status(HttpStatus.Ok_200).send(postsListOutput)
+        res.status(HttpStatuses.Ok_200).send(postsListOutput)
     } catch (e: unknown) {
         errorsHandler(e, res);
     }

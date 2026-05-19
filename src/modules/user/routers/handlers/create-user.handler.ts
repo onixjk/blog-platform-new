@@ -1,6 +1,6 @@
 import {Request, Response} from "express";
 import {errorsHandler} from "../../../../core/errors/errors.handler";
-import {HttpStatus} from "../../../../core/types/http-statuses";
+import {HttpStatuses} from "../../../../core/types/http-statuses";
 import {usersService} from "../../application/usersService";
 import {UserInputDto} from "../input/user.input-dto";
 import {usersQueryRepository} from "../../repositories/users.query.repository";
@@ -16,7 +16,7 @@ export async function createUserHandler(
 
         const userOutput = await usersQueryRepository.findById(createdUserId)
 
-        res.status(HttpStatus.Created_201).send(userOutput);
+        res.status(HttpStatuses.Created_201).send(userOutput);
     } catch (e: unknown) {
         errorsHandler(e, res);
     }

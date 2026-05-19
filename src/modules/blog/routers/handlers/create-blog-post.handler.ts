@@ -1,6 +1,6 @@
 import {Request, Response} from "express";
 import {errorsHandler} from "../../../../core/errors/errors.handler";
-import {HttpStatus} from "../../../../core/types/http-statuses";
+import {HttpStatuses} from "../../../../core/types/http-statuses";
 import {postsService} from "../../../post/application/posts.service";
 import {BlogPostInputDto} from "../../../post/routers/input/blog-post.input-dto";
 import {postsQueryRepository} from "../../../post/repositories/posts.query.repository";
@@ -19,7 +19,7 @@ export async function createBlogPostHandler(
 
         const postOutput = await postsQueryRepository.findById(createdPostId);
 
-        res.status(HttpStatus.Created_201).send(postOutput);
+        res.status(HttpStatuses.Created_201).send(postOutput);
     } catch (e: unknown) {
         errorsHandler(e, res);
     }

@@ -2,7 +2,7 @@ import {Request, Response} from "express";
 import {errorsHandler} from "../../../core/errors/errors.handler";
 import {LoginInputDto} from "../../types/login.input-dto";
 import {authService} from "../../application/authService";
-import {HttpStatus} from "../../../core/types/http-statuses";
+import {HttpStatuses} from "../../../core/types/http-statuses";
 
 export async function loginUserHandler(
     req: Request<{}, {}, LoginInputDto>,
@@ -13,9 +13,9 @@ export async function loginUserHandler(
         const accessToken = await authService.loginUser(loginOrEmail, password);
 
         if (!accessToken)
-            res.sendStatus(HttpStatus.Unauthorized_401);
+            res.sendStatus(HttpStatuses.Unauthorized_401);
 
-        res.sendStatus(HttpStatus.NoContent_204);
+        res.status(HttpStatuses.NoContent_204).send(accessToken);
     } catch (e: unknown) {
         errorsHandler(e, res);
     }

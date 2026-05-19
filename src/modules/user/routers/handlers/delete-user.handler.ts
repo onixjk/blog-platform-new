@@ -1,6 +1,6 @@
 import {Request, Response} from 'express';
 import {errorsHandler} from "../../../../core/errors/errors.handler";
-import {HttpStatus} from "../../../../core/types/http-statuses";
+import {HttpStatuses} from "../../../../core/types/http-statuses";
 import {usersService} from "../../application/usersService";
 
 export async function deleteUserHandler(
@@ -12,7 +12,7 @@ export async function deleteUserHandler(
 
         await usersService.delete(id);
 
-        res.sendStatus(HttpStatus.NoContent_204);
+        res.sendStatus(HttpStatuses.NoContent_204);
     } catch (e: unknown) {
         errorsHandler(e, res);
     }

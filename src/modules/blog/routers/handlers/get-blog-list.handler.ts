@@ -3,7 +3,7 @@ import {BlogQueryInput} from "../input/blog-query.input";
 import {matchedData} from "express-validator";
 import {setDefaultSortAndPaginationIfNotExist} from "../../../../core/helpers/set-default-sort-and-pagination";
 import {errorsHandler} from "../../../../core/errors/errors.handler";
-import {HttpStatus} from "../../../../core/types/http-statuses";
+import {HttpStatuses} from "../../../../core/types/http-statuses";
 import {blogsQueryRepository} from "../../repositories/blogs.query.repository";
 
 export async function getBlogListHandler(
@@ -20,7 +20,7 @@ export async function getBlogListHandler(
 
         const blogsListOutput = await blogsQueryRepository.findMany(queryInput);
 
-        res.status(HttpStatus.Ok_200).send(blogsListOutput);
+        res.status(HttpStatuses.Ok_200).send(blogsListOutput);
     } catch (e: unknown) {
         errorsHandler(e, res);
     }

@@ -1,7 +1,7 @@
 import request from "supertest";
 import express from "express";
 import {setupApp} from "../../src/setup-app";
-import {HttpStatus} from "../../src/core/types/http-statuses";
+import {HttpStatuses} from "../../src/core/types/http-statuses";
 
 describe('/blog', () => {
 
@@ -15,13 +15,13 @@ describe('/blog', () => {
     it('should return 404', async () => {
         await request(app)
             .get('/blog')
-            .expect(HttpStatus.NotFound_404)
+            .expect(HttpStatuses.NotFound_404)
     });
 
     it('should return 404', async () => {
         await request(app)
             .get('/blog')
-            .expect(HttpStatus.NotFound_404)
+            .expect(HttpStatuses.NotFound_404)
     });
 
 

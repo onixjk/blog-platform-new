@@ -1,5 +1,5 @@
 import {Request, Response} from 'express';
-import {HttpStatus} from "../../../../core/types/http-statuses";
+import {HttpStatuses} from "../../../../core/types/http-statuses";
 import {errorsHandler} from "../../../../core/errors/errors.handler";
 import {blogsQueryRepository} from "../../repositories/blogs.query.repository";
 import {blogsService} from "../../application/blogs.service";
@@ -15,7 +15,7 @@ export async function getBlogHandler(
 
         const blogOutput = await blogsQueryRepository.findById(id);
 
-        res.status(HttpStatus.Ok_200).send(blogOutput);
+        res.status(HttpStatuses.Ok_200).send(blogOutput);
     } catch (e: unknown) {
         errorsHandler(e, res);
     }

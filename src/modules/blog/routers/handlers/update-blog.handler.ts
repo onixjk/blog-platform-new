@@ -1,6 +1,6 @@
 import {Request, Response} from 'express';
 import {blogsService} from "../../application/blogs.service";
-import {HttpStatus} from "../../../../core/types/http-statuses";
+import {HttpStatuses} from "../../../../core/types/http-statuses";
 import {BlogInputDto} from "../input/blog.input-dto";
 import {errorsHandler} from "../../../../core/errors/errors.handler";
 
@@ -13,7 +13,7 @@ export async function updateBlogHandler(
 
         await blogsService.update(id, req.body);
 
-        res.sendStatus(HttpStatus.NoContent_204)
+        res.sendStatus(HttpStatuses.NoContent_204)
     } catch (e: unknown) {
         errorsHandler(e, res);
     }

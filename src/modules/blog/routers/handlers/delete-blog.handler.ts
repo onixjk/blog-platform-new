@@ -1,5 +1,5 @@
 import {Request, Response} from 'express';
-import {HttpStatus} from "../../../../core/types/http-statuses";
+import {HttpStatuses} from "../../../../core/types/http-statuses";
 import {errorsHandler} from "../../../../core/errors/errors.handler";
 import {blogsService} from "../../application/blogs.service";
 
@@ -12,7 +12,7 @@ export async function deleteBlogHandler(
 
         await blogsService.delete(id);
 
-        res.sendStatus(HttpStatus.NoContent_204);
+        res.sendStatus(HttpStatuses.NoContent_204);
     } catch (e: unknown) {
         errorsHandler(e, res);
     }

@@ -1,7 +1,7 @@
 import {Request, Response} from 'express';
 import {errorsHandler} from "../../../../core/errors/errors.handler";
 import {PostQueryInput} from "../../../post/routers/input/post-query.input";
-import {HttpStatus} from "../../../../core/types/http-statuses";
+import {HttpStatuses} from "../../../../core/types/http-statuses";
 import {matchedData} from "express-validator";
 import {setDefaultSortAndPaginationIfNotExist} from "../../../../core/helpers/set-default-sort-and-pagination";
 import {blogsService} from "../../application/blogs.service";
@@ -27,7 +27,7 @@ export async function getBlogPostListHandler(
             blogId,
         );
 
-        res.status(HttpStatus.Ok_200).send(postListOutput);
+        res.status(HttpStatuses.Ok_200).send(postListOutput);
     } catch (e: unknown) {
         errorsHandler(e, res);
     }

@@ -1,5 +1,5 @@
 import {Router, Request, Response} from "express";
-import {HttpStatus} from "../../../core/types/http-statuses";
+import {HttpStatuses} from "../../../core/types/http-statuses";
 import {blogCollection, postCollection, userCollection} from "../../../db/mongo.db";
 
 export const testingRouter = Router();
@@ -10,8 +10,8 @@ testingRouter.delete('/all-data', async (req: Request, res: Response) => {
         await blogCollection.deleteMany({});
         await userCollection.deleteMany({});
 
-        res.sendStatus(HttpStatus.NoContent_204)
+        res.sendStatus(HttpStatuses.NoContent_204)
     } catch (e: unknown) {
-        res.sendStatus(HttpStatus.InternalServerError_500)
+        res.sendStatus(HttpStatuses.InternalServerError_500)
     }
 });
