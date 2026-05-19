@@ -6,6 +6,8 @@ import {UserOutput} from "../routers/output/user-output";
 import {IPagination} from "../types/pagination";
 import {mapToUserListPaginatedOutput} from "../routers/mapers/map-to-user-list-paginated-output.util";
 import {mapToUserOutput} from "../routers/mapers/map-to-user-output.util";
+import {MeOutput} from "../../../auth/output/me-output";
+import {mapToMeOutput} from "../../../auth/mapers/map-to-me-output.util";
 
 export const usersQueryRepository = {
 
@@ -45,5 +47,11 @@ export const usersQueryRepository = {
         const user = await userCollection.findOne({_id: new ObjectId(id)});
 
         return user ? mapToUserOutput(user) : null;
+    },
+
+    async findMeById(id: string): Promise<MeOutput | null> {
+        const user = await userCollection.findOne({_id: new ObjectId(id)});
+
+        return user ? mapToMeOutput(user) : null;
     },
 }

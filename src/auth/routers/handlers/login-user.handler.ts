@@ -1,6 +1,6 @@
 import {Request, Response} from "express";
 import {errorsHandler} from "../../../core/errors/errors.handler";
-import {LoginInputDto} from "../../types/login.input-dto";
+import {LoginInputDto} from "../../input/login.input-dto";
 import {authService} from "../../application/authService";
 import {HttpStatuses} from "../../../core/types/http-statuses";
 
