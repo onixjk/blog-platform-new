@@ -12,7 +12,7 @@ export const authService = {
         loginOrEmail: string,
         password: string,
     ): Promise<Result<{ accessToken: string } | null>> {
-        const result = await authService.checkUserCredentials(loginOrEmail, password);
+        const result = await this.checkUserCredentials(loginOrEmail, password);
 
         if (result.status !== ResultStatus.Success) {
             return {
