@@ -15,7 +15,7 @@ export async function loginUserHandler(
         if (!accessToken)
             res.sendStatus(HttpStatuses.Unauthorized_401);
 
-        res.status(HttpStatuses.NoContent_204).send(accessToken);
+        res.status(HttpStatuses.Ok_200).send(accessToken);
     } catch (e: unknown) {
         errorsHandler(e, res);
     }
