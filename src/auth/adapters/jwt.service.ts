@@ -3,9 +3,21 @@ import {appConfig} from "../../core/config/config";
 
 export const jwtService = {
     async createToken(userId: string): Promise<string> {
-        return jwt.sign({userId}, appConfig.AC_SECRET, {
-            expiresIn: appConfig.AC_TIME as any,
+
+        console.log("DEBUG JWT:", {
+            userId,
+            secret: appConfig.AC_SECRET,
+            time: appConfig.AC_TIME
         });
+
+        try {
+            return jwt.sign({userId}, appConfig.AC_SECRET, {
+                expiresIn: appConfig.AC_TIME as any,
+            });
+        } catch (error) {
+            console.error("КРИТИЧЕСКАЯ ОШИБКА В jwt.sign:", error);
+            throw error;
+        }
     },
 
     async decodeToken(token: string): Promise<any> {
