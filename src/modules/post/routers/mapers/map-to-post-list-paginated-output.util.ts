@@ -1,7 +1,7 @@
 import {WithId} from 'mongodb';
 import {PostOutput} from "../output/post-output";
 import {Post} from "../../types/post";
-import {PostListPaginatedOutput} from "../output/post-list-paginated.output.ts";
+import {PostListPaginatedOutput} from "../output/post-list-paginated.output";
 
 export function mapToPostListPaginatedOutput(
     posts: WithId<Post>[],
