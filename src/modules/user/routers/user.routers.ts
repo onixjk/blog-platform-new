@@ -6,7 +6,7 @@ import {
 import {UserSortField} from "./input/user-sort-field";
 import {getUserListHandler} from "./handlers/get-user-list.handler";
 import {inputValidationResultMiddleware} from "../../../core/middlewares/validation/input-validation-result.middleware";
-import {userInputValidation} from "./user.input-dto.validation-middlewares";
+import {userInputValidation} from "../middlewares/user.input-dto.validation-middlewares";
 import {createUserHandler} from "./handlers/create-user.handler";
 import {idValidation} from "../../../core/middlewares/validation/params-id.validation-middleware";
 import {deleteUserHandler} from "./handlers/delete-user.handler";
