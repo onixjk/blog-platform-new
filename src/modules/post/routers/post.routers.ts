@@ -10,7 +10,7 @@ import {
     paginationAndSortingValidation
 } from "../../../core/middlewares/validation/query-pagination-sorting.validation-middleware";
 import {PostSortField} from "./input/post-sort-field";
-import {postInputValidation} from "./post.input-dto.validation-middlewares";
+import {postInputValidation} from "../middlewares/post.input-dto.validation-middlewares";
 import {inputValidationResultMiddleware} from "../../../core/middlewares/validation/input-validation-result.middleware";
 
 export const postRouter = Router({});
