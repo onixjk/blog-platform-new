@@ -7,7 +7,7 @@ export const accessTokenGuard = async (req: Request, res: Response, next: NextFu
     if (!req.headers.authorization)
         return res.sendStatus(HttpStatuses.Unauthorized_401);
 
-    const [authType, token] = req.headers.authorization.split(' ')[1];
+    const [authType, token] = req.headers.authorization.split(' ');
 
     if (authType !== 'Bearer')
         return res.sendStatus(HttpStatuses.Unauthorized_401);

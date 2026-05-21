@@ -10,9 +10,10 @@ export async function createPostCommentHandler(
     res: Response
 ) {
     try {
-        const { postId } = req.params;
+        // const { postId } = req.params;
+        const userId = req.user!.id;
 
-        const commentData = { ...req.body, postId };
+        const commentData = { ...req.body, userId};
         const createdCommentId = await commentService.create(commentData);
 
         await commentService.findByIdOrFail(createdCommentId);

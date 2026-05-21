@@ -12,9 +12,11 @@ export const commentService = {
     async create(dto: CommentInputDto): Promise<string> {
         // const post = await postsService.findByIdOrFail(dto.postId);
 
+        const userId = dto.userId;
+
         const newComment: Comment = {
             content: dto.content,
-            commentatorInfo: {userId: "1", userLogin: "Login"},  //todo
+            commentatorInfo: dto.commentatorInfo,
             createdAt: new Date().toISOString(),
         }
 
