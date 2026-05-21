@@ -14,7 +14,7 @@ export let client: MongoClient;
 export let blogCollection: Collection<Blog>;
 export let postCollection: Collection<Post>;
 export let userCollection: Collection<IUserDB>;
-export let commentsCollection: Collection<Comment>;
+export let commentCollection: Collection<Comment>;
 
 // Подключения к бд
 export async function runDB(url: string): Promise<void> {
@@ -25,7 +25,7 @@ export async function runDB(url: string): Promise<void> {
     blogCollection = db.collection<Blog>(BLOG_COLLECTION_NAME);
     postCollection = db.collection<Post>(POST_COLLECTION_NAME);
     userCollection = db.collection<IUserDB>(USER_COLLECTION_NAME);
-    commentsCollection = db.collection<Comment>(COMMENTS_COLLECTION_NAME);
+    commentCollection = db.collection<Comment>(COMMENTS_COLLECTION_NAME);
 
     try {
         await client.connect();
