@@ -1,6 +1,6 @@
 import {postCollection} from "../../../db/mongo.db";
 import {PostQueryInput} from "../routers/input/post-query.input";
-import {PostListPaginatedOutput} from "../routers/output/post-list-paginated.output.ts";
+import {PostListPaginatedOutput} from "../routers/output/post-list-paginated.output";
 import {mapToPostListPaginatedOutput} from "../routers/mapers/map-to-post-list-paginated-output.util";
 import {ObjectId} from "mongodb";
 import {PostOutput} from "../routers/output/post-output";
