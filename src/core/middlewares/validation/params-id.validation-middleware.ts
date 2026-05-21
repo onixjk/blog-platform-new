@@ -15,3 +15,11 @@ export const blogIdValidation = param('blogId')
     .withMessage('ID must be a string')
     .isMongoId()
     .withMessage('Invalid format ObjectId');
+
+export const postIdValidation = param('postId')
+    .exists()
+    .withMessage('ID is required')
+    .isString()
+    .withMessage('ID must be a string')
+    .isMongoId()
+    .withMessage('Invalid format ObjectId');

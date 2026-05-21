@@ -5,13 +5,15 @@ import {getPostHandler} from "./handlers/get-post.handler";
 import {createPostHandler} from "./handlers/create-post.handler";
 import {updatePostHandler} from "./handlers/update-post.handler";
 import {deletePostHandler} from "./handlers/delete-post.handler";
-import {idValidation} from "../../../core/middlewares/validation/params-id.validation-middleware";
+import {idValidation, postIdValidation} from "../../../core/middlewares/validation/params-id.validation-middleware";
 import {
     paginationAndSortingValidation
 } from "../../../core/middlewares/validation/query-pagination-sorting.validation-middleware";
 import {PostSortField} from "./input/post-sort-field";
 import {postInputValidation} from "../middlewares/post.input-dto.validation-middlewares";
 import {inputValidationResultMiddleware} from "../../../core/middlewares/validation/input-validation-result.middleware";
+import {CommentSortField} from "../../comment/routers/input/comment-sort-field";
+import {getPostCommentListHandler} from "./handlers/get-post-comments-list.handler";
 
 export const postRouter = Router({});
 
@@ -26,6 +28,13 @@ postRouter
         idValidation,
         inputValidationResultMiddleware,
         getPostHandler
+    )
+
+    .get('/:postId/comments',
+        postIdValidation,
+        paginationAndSortingValidation(CommentSortField),
+        inputValidationResultMiddleware,
+        getPostCommentListHandler,
     )
 
     .post('',
