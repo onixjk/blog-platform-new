@@ -6,9 +6,9 @@ import {updateCommentHandler} from "./handlers/update-comment.handler";
 import {deleteCommentHandler} from "./handlers/delete-comment.handler";
 import {commentInputValidation} from "../middlewares/comment.input-dto.validation-middlewares";
 
-export const postRouter = Router({});
+export const commentRouter = Router({});
 
-postRouter
+commentRouter
     .get('/:id',
         idValidation,
         inputValidationResultMiddleware,

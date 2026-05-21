@@ -7,6 +7,7 @@ import {postRouter} from "./modules/post/routers/post.routers";
 import cors from 'cors';
 import {userRouter} from "./modules/user/routers/user.routers";
 import {authRouter} from "./auth/routers/auth.routers";
+import {commentRouter} from "./modules/comment/routers/comment.router";
 
 export const setupApp = (app: Express) => {
 
@@ -16,7 +17,7 @@ export const setupApp = (app: Express) => {
     app.use(BLOGS_PATH, blogRouter)
     app.use(POSTS_PATH, postRouter)
     app.use(USERS_PATH, userRouter)
-    app.use(COMMENTS_PATH, userRouter)
+    app.use(COMMENTS_PATH, commentRouter)
     app.use(TESTING_PATH, testingRouter)
     app.use(AUTH_PATH, authRouter)
 
