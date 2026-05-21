@@ -6,7 +6,7 @@ import {CommentListPaginatedOutput} from "../routers/output/comment-list-paginat
 import {CommentOutput} from "../routers/output/comment-output";
 import {mapToCommentOutput} from "../routers/mapers/map-to-comment-output.util";
 
-export const commentsQueryRepository = {
+export const commentQueryRepository = {
 
     // async findMany(
     //     queryDto: CommentQueryInput

@@ -1,0 +1,28 @@
+import {Request, Response} from "express";
+import {HttpStatuses} from "../../../../core/types/http-statuses";
+import {errorsHandler} from "../../../../core/errors/errors.handler";
+import {PostCommentInputDto} from "../../../comment/routers/input/post-comment.input-dto";
+import {commentService} from "../../../comment/application/comment.service";
+import {commentQueryRepository} from "../../../comment/repositories/comment.query.repository";
+
+export async function createPostCommentHandler(
+    req: Request<{postId: string}, {}, PostCommentInputDto>,
+    res: Response
+) {
+    try {
+        const { postId } = req.params;
+
+        const commentData = { ...req.body, postId };
+        const createdCommentId = await commentService.create(commentData);
+
+        await commentService.findByIdOrFail(createdCommentId);
+
+        const commentOutput = await commentQueryRepository.findById(createdCommentId);
+
+        res.status(HttpStatuses.Created_201).send(commentOutput);
+    } catch (e: unknown) {
+        errorsHandler(e, res);
+    }
+}
+
+                        //todo jwt

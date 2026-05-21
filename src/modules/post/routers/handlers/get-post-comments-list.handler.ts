@@ -5,7 +5,7 @@ import {HttpStatuses} from "../../../../core/types/http-statuses";
 import {errorsHandler} from "../../../../core/errors/errors.handler";
 import {CommentQueryInput} from "../../../comment/routers/input/comment-query.input";
 import {postsService} from "../../application/posts.service";
-import {commentsQueryRepository} from "../../../comment/repositories/commensts.query.repository";
+import {commentQueryRepository} from "../../../comment/repositories/commensts.query.repository";
 
 export async function getPostCommentListHandler(
     req: Request<{ postId: string }, {}, {}, {}>,
@@ -22,7 +22,7 @@ export async function getPostCommentListHandler(
 
         const queryInput = setDefaultSortAndPaginationIfNotExist(sanitizedQuery);
 
-        const commentsListOutput = await commentsQueryRepository.findCommentByPost(
+        const commentsListOutput = await commentQueryRepository.findCommentByPost(
             queryInput,
             postId,
         );
