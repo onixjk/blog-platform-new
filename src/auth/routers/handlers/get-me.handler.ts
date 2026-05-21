@@ -2,7 +2,7 @@ import {Request, Response} from 'express';
 import {HttpStatuses} from "../../../core/types/http-statuses";
 import {usersQueryRepository} from "../../../modules/user/repositories/users.query.repository";
 
-export async function getCurrentUserHandler(
+export async function getMeHandler(
     req: Request,
     res: Response
 ) {
