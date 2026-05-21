@@ -1,6 +1,5 @@
 import {WithId} from "mongodb";
 import {CommentInputDto} from "../routers/input/comment.input-dto";
-import {postsService} from "../../post/application/posts.service";
 import {Comment} from "../types/comment";
 import {commentRepository} from "../repositories/comment.repository";
 
@@ -23,7 +22,7 @@ export const commentService = {
     },
 
     async update(id: string, dto: CommentInputDto): Promise<void> {
-        const post = await postsService.findByIdOrFail(dto.postId);
+        // const post = await postsService.findByIdOrFail(dto.postId);
 
         await commentRepository.update(id, dto);
         return;
