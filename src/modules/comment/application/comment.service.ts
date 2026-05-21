@@ -2,6 +2,7 @@ import {WithId} from "mongodb";
 import {CommentInputDto} from "../routers/input/comment.input-dto";
 import {Comment} from "../types/comment";
 import {commentRepository} from "../repositories/comment.repository";
+import {usersService} from "../../user/application/usersService";
 
 export const commentService = {
 
@@ -12,11 +13,14 @@ export const commentService = {
     async create(dto: CommentInputDto): Promise<string> {
         // const post = await postsService.findByIdOrFail(dto.postId);
 
-        const userId = dto.userId;
+        const user = await usersService.findByIdOrFail(dto.userId);
 
         const newComment: Comment = {
             content: dto.content,
-            commentatorInfo: dto.commentatorInfo,
+            commentatorInfo: {
+                userId: dto.userId,
+                userLogin: user.login
+            },
             createdAt: new Date().toISOString(),
         }
 
