@@ -1,5 +1,5 @@
 import {ObjectId, WithId} from "mongodb";
-import {commentCollection, postCollection} from "../../../db/mongo.db";
+import {commentCollection} from "../../../db/mongo.db";
 import {RepositoryNotFoundError} from "../../../core/errors/repository-not-found.error";
 import {Comment} from "../types/comment";
 import {CommentInputDto} from "../routers/input/comment.input-dto";
@@ -56,7 +56,7 @@ export const commentRepository = {
     // },
 
     async delete(id: string): Promise<void> {
-        const deleteResult = await postCollection.deleteOne({_id: new ObjectId(id)});
+        const deleteResult = await commentCollection.deleteOne({_id: new ObjectId(id)});
 
         if (deleteResult.deletedCount < 1) {
             throw new RepositoryNotFoundError("Post not exist");
