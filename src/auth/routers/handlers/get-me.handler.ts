@@ -8,7 +8,9 @@ export async function getMeHandler(
 ) {
     const userId = req.user?.id as string;
 
-    if (!userId) return res.sendStatus(HttpStatuses.Unauthorized_401);
+    if (!userId)
+        return res.sendStatus(HttpStatuses.Unauthorized_401);
+
     const me = await usersQueryRepository.findMeById(userId);
 
     return res.status(HttpStatuses.Ok_200).send(me);
