@@ -12,6 +12,7 @@ authRouter
         accessTokenGuard,
         getCurrentUserHandler,
     )
+
     .post('/login',
         loginOrEmailValidation,
         inputValidationResultMiddleware,
