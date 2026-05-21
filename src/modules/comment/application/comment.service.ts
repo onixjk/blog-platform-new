@@ -3,6 +3,7 @@ import {CommentInputDto} from "../routers/input/comment.input-dto";
 import {Comment} from "../types/comment";
 import {commentRepository} from "../repositories/comment.repository";
 import {usersService} from "../../user/application/usersService";
+import {postsService} from "../../post/application/posts.service";
 
 export const commentService = {
 
@@ -11,11 +12,13 @@ export const commentService = {
     },
 
     async create(dto: CommentInputDto): Promise<string> {
-        // const post = await postsService.findByIdOrFail(dto.postId);
+
+        await postsService.findByIdOrFail(dto.postId);
 
         const user = await usersService.findByIdOrFail(dto.userId);
 
         const newComment: Comment = {
+            postId: dto.postId,
             content: dto.content,
             commentatorInfo: {
                 userId: dto.userId,
