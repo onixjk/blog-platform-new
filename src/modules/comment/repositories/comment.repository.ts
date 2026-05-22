@@ -3,17 +3,32 @@ import {commentCollection} from "../../../db/mongo.db";
 import {RepositoryNotFoundError} from "../../../core/errors/repository-not-found.error";
 import {Comment} from "../types/comment";
 import {CommentUpdateDto} from "../routers/input/comment-update.dto";
+import {ResultStatus} from "../../../core/result/resultCode";
+import {Result} from "../../../core/result/result.type";
+import {IUserDB} from "../../user/types/user.db.interface";
 
 export const commentRepository = {
 
     async findByIdOrFail(id: string): Promise<WithId<Comment>> {
-        const res = await commentCollection.findOne({_id: new ObjectId(id)});
+        const comment = await commentCollection.findOne({_id: new ObjectId(id)});
 
-        if (!res) {
+        if (!comment) {
             throw new RepositoryNotFoundError('Comment not exist');
+
+            // return {
+            //     status: ResultStatus.NotFound,
+            //     data: null,
+            //     errorMessage: 'Not Found',
+            //     extensions: [{field: null, message: 'Comment not exist'}],
+            // }
         }
 
-        return res;
+        return comment;
+        // return {
+        //     status: ResultStatus.Success,
+        //     data: comment,
+        //     extensions: [],
+        // };
     },
 
     async create(newComment: Comment): Promise<string> {
