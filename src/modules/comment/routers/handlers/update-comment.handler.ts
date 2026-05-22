@@ -10,8 +10,12 @@ export async function updateCommentHandler(
 ) {
     try {
         const commentId = req.params.id;
+        // const userId = req.user!.id;
 
-        await commentService.update(commentId, req.body);
+        await commentService.update(
+            commentId,
+            // userId,
+            req.body);
 
         res.sendStatus(HttpStatuses.NoContent_204)
     } catch (e: unknown) {

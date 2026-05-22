@@ -23,10 +23,15 @@ export const commentRepository = {
         return insertResult.insertedId.toString()
     },
 
-    async update(commentId: string, dto: CommentInputDto): Promise<void> {
-        const comment = await commentRepository.findByIdOrFail(commentId);
+    async update(
+        commentId: string,
+        // userId: string,
+        dto: CommentInputDto
+    ): Promise<void> {
+        const comment = await this.findByIdOrFail(commentId);
 
         if (comment.commentatorInfo.userId !== dto.commentatorInfo.userId) {
+        // if (comment.commentatorInfo.userId !== userId) {
             throw new ForbiddenError("Access denied"); //todo
         }
 
