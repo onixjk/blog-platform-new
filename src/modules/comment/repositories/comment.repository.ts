@@ -63,8 +63,14 @@ export const commentRepository = {
     //     return;
     // },
 
-    async delete(id: string): Promise<void> {
-        const deleteResult = await commentCollection.deleteOne({_id: new ObjectId(id)});
+    async delete(commentId: string, userId: string): Promise<void> {
+        const comment = await this.findByIdOrFail(commentId);
+
+        if (comment.commentatorInfo.userId !== userId) {
+            throw new ForbiddenError("Access denied"); //todo
+        }
+
+        const deleteResult = await commentCollection.deleteOne({_id: new ObjectId(commentId)});
 
         if (deleteResult.deletedCount < 1) {
             throw new RepositoryNotFoundError("Post not exist");

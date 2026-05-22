@@ -8,9 +8,10 @@ export async function deleteCommentHandler(
     res: Response
 ) {
     try {
-        const id = req.params.id;
+        const commentId = req.params.id;
+        const userId = req.user!.id;
 
-        await commentService.delete(id);
+        await commentService.delete(commentId, userId);
 
         res.sendStatus(HttpStatuses.NoContent_204);
     } catch (e: unknown) {

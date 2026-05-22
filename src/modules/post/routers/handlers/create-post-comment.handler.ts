@@ -25,5 +25,3 @@ export async function createPostCommentHandler(
         errorsHandler(e, res);
     }
 }
-
-                        //todo jwt

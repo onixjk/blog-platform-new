@@ -37,8 +37,8 @@ export const commentService = {
         return;
     },
 
-    async delete(id: string): Promise<void> {
-        await commentRepository.delete(id);
+    async delete(id: string, userId: string): Promise<void> {
+        await commentRepository.delete(id, userId);
         return;
     },
 
