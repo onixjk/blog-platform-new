@@ -30,15 +30,10 @@ export const commentService = {
         return commentRepository.create(newComment);
     },
 
-    async update(commentId: string,
-                 // userId: string,
-                 dto: CommentInputDto): Promise<void> {
+    async update(commentId: string, userId: string, dto: CommentInputDto): Promise<void> {
         // const post = await postsService.findByIdOrFail(dto.postId);
 
-        await commentRepository.update(
-            commentId,
-            // userId,
-            dto);
+        await commentRepository.update(commentId, userId, dto);
         return;
     },
 
