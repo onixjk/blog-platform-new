@@ -2,8 +2,9 @@ import {ObjectId, WithId} from "mongodb";
 import {commentCollection} from "../../../db/mongo.db";
 import {RepositoryNotFoundError} from "../../../core/errors/repository-not-found.error";
 import {Comment} from "../types/comment";
-import {CommentInputDto} from "../routers/input/comment.input-dto";
 import {ForbiddenError} from "../../../core/errors/repository-forbidden.error";
+import {CommentInputDto} from "../routers/input/comment-input.dto";
+import {CommentUpdateDto} from "../routers/input/comment-update.dto";
 
 export const commentRepository = {
 
@@ -23,17 +24,16 @@ export const commentRepository = {
         return insertResult.insertedId.toString()
     },
 
-    async update(commentId: string, userId: string, dto: CommentInputDto
-    ): Promise<void> {
-        const comment = await this.findByIdOrFail(commentId);
+    async update(dto: CommentUpdateDto): Promise<void> {
+        const comment = await this.findByIdOrFail(dto.commentId);
 
-        if (comment.commentatorInfo.userId !== userId) {
-            throw new ForbiddenError("Access denied"); //todo
+        if (comment.commentatorInfo.userId !== dto.userId) {
+            throw new ForbiddenError("Access denied");                //todo
         }
 
         const updateResult = await commentCollection.updateOne(
             {
-                _id: new ObjectId(commentId)
+                _id: new ObjectId(dto.commentId)
             },
             {
                 $set: {
@@ -48,26 +48,11 @@ export const commentRepository = {
         return;
     },
 
-    // async updateAllBlogNames(blogId: string, blogName: string): Promise<void> {
-    //     await postCollection.updateMany(
-    //         {
-    //             blogId: blogId
-    //         },
-    //         {
-    //             $set: {
-    //                 blogName: blogName,
-    //             }
-    //         }
-    //     );
-    //
-    //     return;
-    // },
-
     async delete(commentId: string, userId: string): Promise<void> {
         const comment = await this.findByIdOrFail(commentId);
 
         if (comment.commentatorInfo.userId !== userId) {
-            throw new ForbiddenError("Access denied"); //todo
+            throw new ForbiddenError("Access denied");                //todo
         }
 
         const deleteResult = await commentCollection.deleteOne({_id: new ObjectId(commentId)});
@@ -79,9 +64,8 @@ export const commentRepository = {
         return;
     },
 
-    // async deleteAllByPostId(postId: string): Promise<void> {
-    //     await commentCollection.deleteMany({postId: postId});
-    //
-    //     return;
-    // }
+    async deleteAllByPostId(postId: string): Promise<void> {
+        await commentCollection.deleteMany({postId: postId});
+        return;
+    }
 }

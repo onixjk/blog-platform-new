@@ -1,12 +1,12 @@
 import {Request, Response} from "express";
 import {HttpStatuses} from "../../../../core/types/http-statuses";
 import {errorsHandler} from "../../../../core/errors/errors.handler";
-import {PostCommentInputDto} from "../../../comment/routers/input/post-comment.input-dto";
+import {CommentInputDto} from "../../../comment/routers/input/comment-input.dto";
 import {commentService} from "../../../comment/application/comment.service";
 import {commentQueryRepository} from "../../../comment/repositories/comment.query.repository";
 
 export async function createPostCommentHandler(
-    req: Request<{postId: string}, {}, PostCommentInputDto>,
+    req: Request<{postId: string}, {}, CommentInputDto>,
     res: Response
 ) {
     try {

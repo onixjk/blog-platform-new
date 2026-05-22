@@ -3,6 +3,7 @@ import {postsRepository} from "../repositories/posts.repository";
 import {blogsService} from "../../blog/application/blogs.service";
 import {PostInputDto} from "../routers/input/post.input-dto";
 import {Post} from "../types/post";
+import {commentService} from "../../comment/application/comment.service";
 
 export const postsService = {
 
@@ -39,6 +40,7 @@ export const postsService = {
     },
 
     async delete(id: string): Promise<void> {
+        await commentService.deleteAllByPostId(id)
         await postsRepository.delete(id);
         return;
     },

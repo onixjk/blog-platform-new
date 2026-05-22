@@ -1,9 +1,11 @@
 import {WithId} from "mongodb";
-import {CommentInputDto} from "../routers/input/comment.input-dto";
+import {CommentCreateDto} from "../routers/input/comment-create.dto";
 import {Comment} from "../types/comment";
 import {commentRepository} from "../repositories/comment.repository";
 import {usersService} from "../../user/application/usersService";
 import {postsService} from "../../post/application/posts.service";
+import {CommentInputDto} from "../routers/input/comment-input.dto";
+import {CommentUpdateDto} from "../routers/input/comment-update.dto";
 
 export const commentService = {
 
@@ -11,7 +13,7 @@ export const commentService = {
         return commentRepository.findByIdOrFail(id);
     },
 
-    async create(dto: CommentInputDto): Promise<string> {
+    async create(dto: CommentCreateDto): Promise<string> {
 
         await postsService.findByIdOrFail(dto.postId);
 
@@ -30,10 +32,8 @@ export const commentService = {
         return commentRepository.create(newComment);
     },
 
-    async update(commentId: string, userId: string, dto: CommentInputDto): Promise<void> {
-        // const post = await postsService.findByIdOrFail(dto.postId);
-
-        await commentRepository.update(commentId, userId, dto);
+    async update(dto: CommentUpdateDto): Promise<void> {
+        await commentRepository.update(dto);
         return;
     },
 
@@ -42,8 +42,8 @@ export const commentService = {
         return;
     },
 
-    // async deleteAllByPostId(postId: string): Promise<void> {
-    //     await commentRepository.deleteAllByPostId(postId);
-    //     return;
-    // }
+    async deleteAllByPostId(postId: string): Promise<void> {
+        await commentRepository.deleteAllByPostId(postId);
+        return;
+    }
 }
