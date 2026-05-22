@@ -4,8 +4,8 @@ import {Comment} from "../types/comment";
 import {commentRepository} from "../repositories/comment.repository";
 import {usersService} from "../../user/application/usersService";
 import {postsService} from "../../post/application/posts.service";
-import {CommentInputDto} from "../routers/input/comment-input.dto";
 import {CommentUpdateDto} from "../routers/input/comment-update.dto";
+import {ForbiddenError} from "../../../core/errors/repository-forbidden.error";
 
 export const commentService = {
 
@@ -33,12 +33,24 @@ export const commentService = {
     },
 
     async update(dto: CommentUpdateDto): Promise<void> {
+        const comment = await this.findByIdOrFail(dto.commentId);
+
+        if (comment.commentatorInfo.userId !== dto.userId) {
+            throw new ForbiddenError("Access denied");                //todo
+        }
+
         await commentRepository.update(dto);
         return;
     },
 
     async delete(id: string, userId: string): Promise<void> {
-        await commentRepository.delete(id, userId);
+        const comment = await this.findByIdOrFail(id);
+
+        if (comment.commentatorInfo.userId !== userId) {
+            throw new ForbiddenError("Access denied");                //todo
+        }
+
+        await commentRepository.delete(id);
         return;
     },
 

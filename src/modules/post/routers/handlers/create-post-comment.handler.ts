@@ -16,8 +16,6 @@ export async function createPostCommentHandler(
         const commentData = { ...req.body, userId, postId};
         const createdCommentId = await commentService.create(commentData);
 
-        await commentService.findByIdOrFail(createdCommentId);
-
         const commentOutput = await commentQueryRepository.findById(createdCommentId);
 
         res.status(HttpStatuses.Created_201).send(commentOutput);

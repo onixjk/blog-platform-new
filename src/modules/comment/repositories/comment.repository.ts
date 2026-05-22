@@ -2,8 +2,6 @@ import {ObjectId, WithId} from "mongodb";
 import {commentCollection} from "../../../db/mongo.db";
 import {RepositoryNotFoundError} from "../../../core/errors/repository-not-found.error";
 import {Comment} from "../types/comment";
-import {ForbiddenError} from "../../../core/errors/repository-forbidden.error";
-import {CommentInputDto} from "../routers/input/comment-input.dto";
 import {CommentUpdateDto} from "../routers/input/comment-update.dto";
 
 export const commentRepository = {
@@ -25,11 +23,6 @@ export const commentRepository = {
     },
 
     async update(dto: CommentUpdateDto): Promise<void> {
-        const comment = await this.findByIdOrFail(dto.commentId);
-
-        if (comment.commentatorInfo.userId !== dto.userId) {
-            throw new ForbiddenError("Access denied");                //todo
-        }
 
         const updateResult = await commentCollection.updateOne(
             {
@@ -48,12 +41,7 @@ export const commentRepository = {
         return;
     },
 
-    async delete(commentId: string, userId: string): Promise<void> {
-        const comment = await this.findByIdOrFail(commentId);
-
-        if (comment.commentatorInfo.userId !== userId) {
-            throw new ForbiddenError("Access denied");                //todo
-        }
+    async delete(commentId: string): Promise<void> {
 
         const deleteResult = await commentCollection.deleteOne({_id: new ObjectId(commentId)});
 
