@@ -22,10 +22,16 @@ export const commentRepository = {
         return insertResult.insertedId.toString()
     },
 
-    async update(id: string, dto: CommentInputDto): Promise<void> {
+    async update(commentId: string, userId: string, dto: CommentInputDto): Promise<void> {
+        const comment = await commentRepository.findByIdOrFail(commentId);
+
+        if (comment.commentatorInfo.userId !== userId) {
+            throw new RepositoryNotFoundError("Access denied"); //todo
+        }
+
         const updateResult = await commentCollection.updateOne(
             {
-                _id: new ObjectId(id)
+                _id: new ObjectId(commentId)
             },
             {
                 $set: {
