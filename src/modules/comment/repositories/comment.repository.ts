@@ -3,6 +3,7 @@ import {commentCollection} from "../../../db/mongo.db";
 import {RepositoryNotFoundError} from "../../../core/errors/repository-not-found.error";
 import {Comment} from "../types/comment";
 import {CommentInputDto} from "../routers/input/comment.input-dto";
+import {ForbiddenError} from "../../../core/errors/repository-forbidden.error";
 
 export const commentRepository = {
 
@@ -22,11 +23,11 @@ export const commentRepository = {
         return insertResult.insertedId.toString()
     },
 
-    async update(commentId: string, userId: string, dto: CommentInputDto): Promise<void> {
+    async update(commentId: string, dto: CommentInputDto): Promise<void> {
         const comment = await commentRepository.findByIdOrFail(commentId);
 
-        if (comment.commentatorInfo.userId !== userId) {
-            throw new RepositoryNotFoundError("Access denied"); //todo
+        if (comment.commentatorInfo.userId !== dto.commentatorInfo.userId) {
+            throw new ForbiddenError("Access denied"); //todo
         }
 
         const updateResult = await commentCollection.updateOne(
