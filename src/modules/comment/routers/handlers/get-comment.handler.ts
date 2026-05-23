@@ -15,7 +15,7 @@ export async function getCommentHandler(
 
         const commentOutput = await commentQueryRepository.findById(id)
 
-        res.status(HttpStatuses.Ok_200).send(commentOutput);
+        res.status(HttpStatuses.Ok_200).send(commentOutput.data);
     } catch (e: unknown) {
         errorsHandler(e, res);
     }
