@@ -17,14 +17,13 @@ export async function createPostCommentHandler(
         const commentData = {...req.body, userId, postId};
         const result = await commentService.create(commentData);
 
-        const commentOutput = await commentQueryRepository.findById(result!.data);
-
         if (result.status !== ResultStatus.Success) {
             return res
                 .status(resultCodeToHttpException(result.status))
                 .send(result.extensions);
         }
 
+        const commentOutput = await commentQueryRepository.findById(result!.data);
         // res.status(HttpStatuses.Created_201).send(commentOutput);
         return res
             .status(resultCodeToHttpException(result.status))
