@@ -6,6 +6,7 @@ import {usersService} from "../../user/application/usersService";
 import {CommentUpdateDto} from "../routers/input/comment-update.dto";
 import {Result} from "../../../core/result/result.type";
 import {ResultStatus} from "../../../core/result/resultCode";
+import {postsService} from "../../post/application/posts.service";
 
 export const commentService = {
 
@@ -17,7 +18,7 @@ export const commentService = {
         // Promise<string>
         Promise<Result<string>>
     {
-        // const postResult = await postsService.findByIdOrFail(dto.postId);
+        await postsService.findByIdOrFail(dto.postId);
 
         const user = await usersService.findByIdOrFail(dto.userId);
 
