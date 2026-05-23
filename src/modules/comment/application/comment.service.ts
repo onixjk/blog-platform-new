@@ -9,8 +9,8 @@ import {ResultStatus} from "../../../core/result/resultCode";
 
 export const commentService = {
 
-    async findByIdOrFail(id: string): Promise<WithId<Comment>> {
-        return commentRepository.findByIdOrFail(id);
+    async findById(id: string): Promise<Result<WithId<Comment> | null>> {
+        return commentRepository.findById(id);
     },
 
     async create(dto: CommentCreateDto):
@@ -35,11 +35,19 @@ export const commentService = {
     },
 
     async update(dto: CommentUpdateDto): Promise<Result> {
-        const comment = await this.findByIdOrFail(dto.commentId);
+        const commentResult = await this.findById(dto.commentId);
 
-        if (comment.commentatorInfo.userId !== dto.userId) {
+        if (commentResult.status === ResultStatus.NotFound || !commentResult.data) {
+            return {
+                status: ResultStatus.NotFound,
+                data: null,
+                errorMessage: 'NotFound',
+                extensions: [{field: null, message: 'Comment not exist'}],
+            }
+        }
+
+        if (commentResult.data.commentatorInfo.userId !== dto.userId) {
             // throw new ForbiddenError("Access denied");
-
             return {
                 status: ResultStatus.Unauthorized,
                 data: null,
@@ -51,17 +59,25 @@ export const commentService = {
         return await commentRepository.update(dto);
     },
 
-    async delete(id: string, userId: string): Promise<Result> {
-        const comment = await this.findByIdOrFail(id);
+    async delete(id: string, userId: string): Promise<Result<WithId<Comment> | null>> {
+        const commentResult = await this.findById(id);
 
-        if (comment.commentatorInfo.userId !== userId) {
-            // throw new ForbiddenError("Access denied");
-
+        if (commentResult.status === ResultStatus.NotFound || !commentResult.data) {
             return {
-                status: ResultStatus.Unauthorized,
+                status: ResultStatus.NotFound,
                 data: null,
-                errorMessage: 'Unauthorized',
-                extensions: [{field: null, message: 'User is not authorized'}],
+                errorMessage: 'Not Found',
+                extensions: [{ field: null, message: 'Comment doesn\'t exist' }],
+            };
+        }
+
+        if (commentResult.data.commentatorInfo.userId !== userId) {
+            // throw new ForbiddenError("Access denied");
+            return {
+                status: ResultStatus.Forbidden,
+                data: null,
+                errorMessage: 'Forbidden',
+                extensions: [{field: null, message: 'You try to delete someone else\'s comment'}],
             }
         }
 

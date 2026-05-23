@@ -25,9 +25,9 @@ export async function createPostCommentHandler(
 
         const commentOutput = await commentQueryRepository.findById(result!.data);
 
-        if (!commentOutput || commentOutput.status !== ResultStatus.Success) {
-            return res.sendStatus(HttpStatuses.NotFound_404);
-        }
+        // if (!commentOutput || commentOutput.status !== ResultStatus.Success) {
+        //     return res.sendStatus(HttpStatuses.NotFound_404);
+        // }
 
         // res.status(HttpStatuses.Created_201).send(commentOutput);
         return res
