@@ -23,8 +23,6 @@ export async function updateCommentHandler(
                 .send(result.extensions);
         }
 
-        // res.sendStatus(HttpStatuses.NoContent_204)
-
         return res.sendStatus(resultCodeToHttpException(result.status))
     } catch (e: unknown) {
         errorsHandler(e, res);

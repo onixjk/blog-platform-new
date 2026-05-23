@@ -14,11 +14,17 @@ export const commentService = {
         return commentRepository.findById(id);
     },
 
-    async create(dto: CommentCreateDto):
-        // Promise<string>
-        Promise<Result<string>>
-    {
-        await postsService.findByIdOrFail(dto.postId);
+    async create(dto: CommentCreateDto): Promise<Result<string | null>> {
+        const postResult = await postsService.findById(dto.postId);
+
+        if (postResult.status === ResultStatus.NotFound || !postResult.data) {
+            return {
+                status: ResultStatus.NotFound,
+                data: null,
+                errorMessage: 'NotFound',
+                extensions: [{field: null, message: 'Comment not exist'}],
+            }
+        }
 
         const user = await usersService.findByIdOrFail(dto.userId);
 
@@ -48,7 +54,6 @@ export const commentService = {
         }
 
         if (commentResult.data.commentatorInfo.userId !== dto.userId) {
-            // throw new ForbiddenError("Access denied");
             return {
                 status: ResultStatus.Forbidden,
                 data: null,
@@ -73,7 +78,6 @@ export const commentService = {
         }
 
         if (commentResult.data.commentatorInfo.userId !== userId) {
-            // throw new ForbiddenError("Access denied");
             return {
                 status: ResultStatus.Forbidden,
                 data: null,

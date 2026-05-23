@@ -10,9 +10,7 @@ import {Result} from "../../../core/result/result.type";
 
 export const commentQueryRepository = {
 
-    async findById(id: string):
-        // Promise<CommentOutput | null>
-        Promise<Result<CommentOutput | null>>
+    async findById(id: string): Promise<Result<CommentOutput | null>>
     {
         const comment = await commentCollection.findOne({_id: new ObjectId(id)});
 
@@ -25,7 +23,6 @@ export const commentQueryRepository = {
             }
         }
 
-        // return comment ? mapToCommentOutput(comment) : null;
         return {
             status: ResultStatus.Success,
             data: mapToCommentOutput(comment),
@@ -36,7 +33,7 @@ export const commentQueryRepository = {
     async findCommentByPost(
         queryDto: CommentQueryInput,
         postId: string,
-    ): Promise<CommentListPaginatedOutput> {
+    ): Promise<Result<CommentListPaginatedOutput>> {
         const {pageNumber, pageSize, sortBy, sortDirection} = queryDto;
         const skip = (pageNumber - 1) * pageSize;
         const filter = {'postId': postId};
@@ -49,11 +46,16 @@ export const commentQueryRepository = {
             .toArray();
 
         const totalCount = await commentCollection.countDocuments(filter)
-
-        return mapToCommentListPaginatedOutput(items, {
+        const paginatedData = mapToCommentListPaginatedOutput(items, {
             pageNumber: queryDto.pageNumber,
             pageSize: queryDto.pageSize,
             totalCount,
         });
+
+        return {
+            status: ResultStatus.Success,
+            data: paginatedData,
+            extensions: []
+        };
     },
 }

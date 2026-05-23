@@ -1,11 +1,31 @@
 import {ObjectId, WithId} from "mongodb";
 import {postCollection} from "../../../db/mongo.db";
-import {PostQueryInput} from "../routers/input/post-query.input";
 import {RepositoryNotFoundError} from "../../../core/errors/repository-not-found.error";
 import {Post} from "../types/post";
 import {PostInputDto} from "../routers/input/post.input-dto";
+import {Result} from "../../../core/result/result.type";
+import {ResultStatus} from "../../../core/result/resultCode";
 
 export const postsRepository = {
+
+    async findById(id: string): Promise<Result<WithId<Post> | null>> {
+        const post = await postCollection.findOne({_id: new ObjectId(id)});
+
+        if (!post) {
+            return {
+                status: ResultStatus.NotFound,
+                data: null,
+                errorMessage: 'Not Found',
+                extensions: [{field: null, message: 'Post not exist'}],
+            }
+        }
+
+        return {
+            status: ResultStatus.Success,
+            data: post,
+            extensions: [],
+        };
+    },
 
     async findByIdOrFail(id: string): Promise<WithId<Post>> {
         const res = await postCollection.findOne({_id: new ObjectId(id)});

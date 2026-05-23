@@ -23,13 +23,8 @@ export async function createPostCommentHandler(
                 .send(result.extensions);
         }
 
-        const commentOutput = await commentQueryRepository.findById(result!.data);
+        const commentOutput = await commentQueryRepository.findById(result.data!);
 
-        // if (!commentOutput || commentOutput.status !== ResultStatus.Success) {
-        //     return res.sendStatus(HttpStatuses.NotFound_404);
-        // }
-
-        // res.status(HttpStatuses.Created_201).send(commentOutput);
         return res
             .status(resultCodeToHttpException(result.status))
             .send(commentOutput.data);

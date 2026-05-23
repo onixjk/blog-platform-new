@@ -4,8 +4,13 @@ import {blogsService} from "../../blog/application/blogs.service";
 import {PostInputDto} from "../routers/input/post.input-dto";
 import {Post} from "../types/post";
 import {commentService} from "../../comment/application/comment.service";
+import {Result} from "../../../core/result/result.type";
 
 export const postsService = {
+
+    async findById(id: string): Promise<Result<WithId<Post> | null>> {
+        return postsRepository.findById(id);
+    },
 
     async findByIdOrFail(id: string): Promise<WithId<Post>> {
         return postsRepository.findByIdOrFail(id);

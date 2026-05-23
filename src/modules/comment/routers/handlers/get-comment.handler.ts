@@ -19,12 +19,9 @@ export async function getCommentHandler(
                 .send(result.extensions);
         }
 
-        // res.status(HttpStatuses.Ok_200).send(result.data);
-
         return res
             .status(resultCodeToHttpException(result.status))
             .send(result.data);
-
     } catch (e: unknown) {
         errorsHandler(e, res);
     }

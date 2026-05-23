@@ -20,7 +20,6 @@ export async function deleteCommentHandler(
                 .send(result.extensions);
         }
 
-        // res.sendStatus(HttpStatuses.NoContent_204);
         return res.sendStatus(resultCodeToHttpException(result.status))
 
     } catch (e: unknown) {
