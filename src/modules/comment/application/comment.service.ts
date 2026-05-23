@@ -49,9 +49,9 @@ export const commentService = {
         if (commentResult.data.commentatorInfo.userId !== dto.userId) {
             // throw new ForbiddenError("Access denied");
             return {
-                status: ResultStatus.Forbidden,
+                status: ResultStatus.Unauthorized,
                 data: null,
-                errorMessage: 'Forbidden',
+                errorMessage: 'Unauthorized',
                 extensions: [{field: null, message: 'You try to update someone else\'s comment'}],
             }
         }
