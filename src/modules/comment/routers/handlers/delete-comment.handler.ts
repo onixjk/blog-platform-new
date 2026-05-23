@@ -14,7 +14,7 @@ export async function deleteCommentHandler(
 
         const result = await commentService.delete(commentId, userId);
 
-        if (result.status !== ResultStatus.Success) {
+        if (result.status !== ResultStatus.NoContent) {
             return res
                 .status(resultCodeToHttpException(result.status))
                 .send(result.extensions);
