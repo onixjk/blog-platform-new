@@ -27,7 +27,7 @@ export async function createPostCommentHandler(
         // res.status(HttpStatuses.Created_201).send(commentOutput);
         return res
             .status(resultCodeToHttpException(result.status))
-            .send(commentOutput);
+            .send(commentOutput.data);
 
     // } catch (e: unknown) {
     //     errorsHandler(e, res);
