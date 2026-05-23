@@ -1,7 +1,6 @@
 import {Request, Response} from "express";
 import {HttpStatuses} from "../../../../core/types/http-statuses";
 import {errorsHandler} from "../../../../core/errors/errors.handler";
-import {commentService} from "../../application/comment.service";
 import {commentQueryRepository} from "../../repositories/comment.query.repository";
 
 export async function getCommentHandler(
