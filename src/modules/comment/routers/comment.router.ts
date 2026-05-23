@@ -12,7 +12,7 @@ export const commentRouter = Router({});
 commentRouter
     .get('/:id',
         idValidation,
-        // inputValidationResultMiddleware,
+        inputValidationResultMiddleware,
         getCommentHandler
     )
 
@@ -21,13 +21,13 @@ commentRouter
         idValidation,
         accessTokenGuard,
         commentInputValidation,
-        // inputValidationResultMiddleware,
+        inputValidationResultMiddleware,
         updateCommentHandler,
     )
 
     .delete('/:id',
         idValidation,
         accessTokenGuard,
-        // inputValidationResultMiddleware,
+        inputValidationResultMiddleware,
         deleteCommentHandler,
     );

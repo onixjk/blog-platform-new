@@ -10,7 +10,7 @@ export async function createPostCommentHandler(
     req: Request<{ postId: string }, {}, CommentInputDto>,
     res: Response
 ) {
-    // try {
+    try {
         const {postId} = req.params;
         const userId = req.user!.id;
 
@@ -28,8 +28,7 @@ export async function createPostCommentHandler(
         return res
             .status(resultCodeToHttpException(result.status))
             .send(commentOutput.data);
-
-    // } catch (e: unknown) {
-    //     errorsHandler(e, res);
-    // }
+    } catch (e: unknown) {
+        errorsHandler(e, res);
+    }
 }
