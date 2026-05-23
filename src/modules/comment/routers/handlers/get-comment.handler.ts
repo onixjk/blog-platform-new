@@ -11,8 +11,6 @@ export async function getCommentHandler(
     try {
         const id = req.params.id;
 
-        await commentService.findByIdOrFail(id);
-
         const commentOutput = await commentQueryRepository.findById(id)
 
         res.status(HttpStatuses.Ok_200).send(commentOutput.data);
