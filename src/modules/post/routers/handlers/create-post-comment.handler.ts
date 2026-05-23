@@ -1,24 +1,35 @@
 import {Request, Response} from "express";
-import {HttpStatuses} from "../../../../core/types/http-statuses";
 import {errorsHandler} from "../../../../core/errors/errors.handler";
 import {CommentInputDto} from "../../../comment/routers/input/comment-input.dto";
 import {commentService} from "../../../comment/application/comment.service";
 import {commentQueryRepository} from "../../../comment/repositories/comment.query.repository";
+import {ResultStatus} from "../../../../core/result/resultCode";
+import {resultCodeToHttpException} from "../../../../core/result/resultCodeToHttpException";
 
 export async function createPostCommentHandler(
-    req: Request<{postId: string}, {}, CommentInputDto>,
+    req: Request<{ postId: string }, {}, CommentInputDto>,
     res: Response
 ) {
     try {
-        const { postId } = req.params;
+        const {postId} = req.params;
         const userId = req.user!.id;
 
-        const commentData = { ...req.body, userId, postId};
-        const createdCommentId = await commentService.create(commentData);
+        const commentData = {...req.body, userId, postId};
+        const result = await commentService.create(commentData);
 
-        const commentOutput = await commentQueryRepository.findById(createdCommentId);
+        const commentOutput = await commentQueryRepository.findById(result!.data);
 
-        res.status(HttpStatuses.Created_201).send(commentOutput);
+        if (result.status !== ResultStatus.Success) {
+            return res
+                .status(resultCodeToHttpException(result.status))
+                .send(result.extensions);
+        }
+
+        // res.status(HttpStatuses.Created_201).send(commentOutput);
+        return res
+            .status(resultCodeToHttpException(result.status))
+            .send(commentOutput);
+
     } catch (e: unknown) {
         errorsHandler(e, res);
     }

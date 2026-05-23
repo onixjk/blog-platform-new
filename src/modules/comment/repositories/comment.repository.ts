@@ -5,7 +5,6 @@ import {Comment} from "../types/comment";
 import {CommentUpdateDto} from "../routers/input/comment-update.dto";
 import {ResultStatus} from "../../../core/result/resultCode";
 import {Result} from "../../../core/result/result.type";
-import {IUserDB} from "../../user/types/user.db.interface";
 
 export const commentRepository = {
 
@@ -31,44 +30,77 @@ export const commentRepository = {
         // };
     },
 
-    async create(newComment: Comment): Promise<string> {
+    async create(newComment: Comment): Promise<Result<string>> {
         const insertResult = await commentCollection.insertOne(newComment);
 
-        return insertResult.insertedId.toString()
+        // return insertResult.insertedId.toString()
+
+        return {
+            status: ResultStatus.Created,
+            data: insertResult.insertedId.toString(),
+            extensions: [],
+        }
     },
 
-    async update(dto: CommentUpdateDto): Promise<void> {
-
+    async update(dto: CommentUpdateDto):
+    // Promise<void>
+        Promise<Result> {
         const updateResult = await commentCollection.updateOne(
-            {
-                _id: new ObjectId(dto.commentId)
-            },
-            {
-                $set: {
-                    content: dto.content,
-                }
-            }
+            {_id: new ObjectId(dto.commentId)},
+            {$set: {content: dto.content,}}
         );
 
         if (updateResult.matchedCount < 1) {
-            throw new RepositoryNotFoundError("Comment doesn't exist");
+            // throw new RepositoryNotFoundError("Comment doesn't exist");
+            return {
+                status: ResultStatus.NotFound,
+                data: null,
+                errorMessage: 'Not Found',
+                extensions: [{field: null, message: 'Comment doesn\'t exist'}],
+            }
         }
-        return;
-    },
 
-    async delete(commentId: string): Promise<void> {
+        return {
+            status: ResultStatus.NoContent,
+            data: null,
+            extensions: [],
+        }
+    }
+    ,
+
+    async delete(commentId: string):
+    // Promise<void>
+        Promise<Result> {
 
         const deleteResult = await commentCollection.deleteOne({_id: new ObjectId(commentId)});
 
         if (deleteResult.deletedCount < 1) {
-            throw new RepositoryNotFoundError("Post not exist");
+            // throw new RepositoryNotFoundError("Post not exist");
+
+            return {
+                status: ResultStatus.NotFound,
+                data: null,
+                errorMessage: 'Not Found',
+                extensions: [{field: null, message: 'Comment doesn\'t exist'}],
+            }
         }
 
-        return;
+        return {
+            status: ResultStatus.NoContent,
+            data: null,
+            extensions: [],
+        }
     },
 
-    async deleteAllByPostId(postId: string): Promise<void> {
+    async deleteAllByPostId(postId: string):
+    // Promise<void>
+        Promise<Result> {
         await commentCollection.deleteMany({postId: postId});
-        return;
+
+        return {
+            status: ResultStatus.NoContent,
+            data: null,
+            extensions: [],
+        };
     }
 }

@@ -5,6 +5,10 @@ export const resultCodeToHttpException = (resultCode: ResultStatus): number => {
     switch (resultCode) {
         case ResultStatus.Success:
             return HttpStatuses.Ok_200;
+        case ResultStatus.Created:
+            return HttpStatuses.Created_201;
+        case ResultStatus.NoContent:
+            return HttpStatuses.NoContent_204;
         case ResultStatus.BadRequest:
             return HttpStatuses.BadRequest_400;
         case ResultStatus.Unauthorized:

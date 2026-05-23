@@ -1,7 +1,8 @@
 import {Request, Response} from "express";
-import {HttpStatuses} from "../../../../core/types/http-statuses";
 import {errorsHandler} from "../../../../core/errors/errors.handler";
 import {commentService} from "../../application/comment.service";
+import {ResultStatus} from "../../../../core/result/resultCode";
+import {resultCodeToHttpException} from "../../../../core/result/resultCodeToHttpException";
 
 export async function deleteCommentHandler(
     req: Request<{ id: string }>,
@@ -11,9 +12,17 @@ export async function deleteCommentHandler(
         const commentId = req.params.id;
         const userId = req.user!.id;
 
-        await commentService.delete(commentId, userId);
+        const result = await commentService.delete(commentId, userId);
 
-        res.sendStatus(HttpStatuses.NoContent_204);
+        if (result.status !== ResultStatus.Success) {
+            return res
+                .status(resultCodeToHttpException(result.status))
+                .send(result.extensions);
+        }
+
+        // res.sendStatus(HttpStatuses.NoContent_204);
+        return res.sendStatus(resultCodeToHttpException(result.status))
+
     } catch (e: unknown) {
         errorsHandler(e, res);
     }

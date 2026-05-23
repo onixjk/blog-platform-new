@@ -1,8 +1,9 @@
 import {Request, Response} from "express";
-import {HttpStatuses} from "../../../../core/types/http-statuses";
 import {errorsHandler} from "../../../../core/errors/errors.handler";
 import {commentService} from "../../application/comment.service";
 import {CommentInputDto} from "../input/comment-input.dto";
+import {ResultStatus} from "../../../../core/result/resultCode";
+import {resultCodeToHttpException} from "../../../../core/result/resultCodeToHttpException";
 
 export async function updateCommentHandler(
     req: Request<{ id: string }, {}, CommentInputDto>,
@@ -14,9 +15,16 @@ export async function updateCommentHandler(
 
         const commentData = {commentId, userId, ...req.body}
 
-        await commentService.update(commentData);
+        const result = await commentService.update(commentData);
 
-        res.sendStatus(HttpStatuses.NoContent_204)
+        if (result.status !== ResultStatus.Success) {
+            return res
+                .status(resultCodeToHttpException(result.status))
+                .send(result.extensions);
+        }
+
+        // res.sendStatus(HttpStatuses.NoContent_204)
+        return res.sendStatus(resultCodeToHttpException(result.status))
     } catch (e: unknown) {
         errorsHandler(e, res);
     }
