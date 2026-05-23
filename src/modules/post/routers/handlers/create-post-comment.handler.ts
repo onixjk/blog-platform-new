@@ -17,7 +17,7 @@ export async function createPostCommentHandler(
         const commentData = {...req.body, userId, postId};
         const result = await commentService.create(commentData);
 
-        if (result.status !== ResultStatus.Success) {
+        if (result.status !== ResultStatus.Created) {
             return res
                 .status(resultCodeToHttpException(result.status))
                 .send(result.extensions);
