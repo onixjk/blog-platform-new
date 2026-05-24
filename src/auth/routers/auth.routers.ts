@@ -8,7 +8,7 @@ import {getMeHandler} from "./handlers/get-me.handler";
 export const authRouter = Router({});
 
 authRouter
-    .get('/auth/me',
+    .get('/me',
         accessTokenGuard,
         getMeHandler,
     )
