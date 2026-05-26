@@ -2,7 +2,7 @@ import {ObjectId, WithId} from "mongodb";
 import {postCollection} from "../../../db/mongo.db";
 import {RepositoryNotFoundError} from "../../../core/errors/repository-not-found.error";
 import {Post} from "../types/post";
-import {PostInputDto} from "../routers/input/post.input-dto";
+import {PostInputDto} from "../routes/input/post.input-dto";
 import {Result} from "../../../core/result/result.type";
 import {ResultStatus} from "../../../core/result/resultCode";
 

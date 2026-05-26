@@ -2,7 +2,7 @@ import {Request, Response} from "express";
 import {matchedData} from "express-validator";
 import {setDefaultSortAndPaginationIfNotExist} from "../../../../core/helpers/set-default-sort-and-pagination";
 import {errorsHandler} from "../../../../core/errors/errors.handler";
-import {CommentQueryInput} from "../../../comment/routers/input/comment-query.input";
+import {CommentQueryInput} from "../../../comment/routes/input/comment-query.input";
 import {postsService} from "../../application/posts.service";
 import {commentQueryRepository} from "../../../comment/repositories/comment.query.repository";
 import {ResultStatus} from "../../../../core/result/resultCode";

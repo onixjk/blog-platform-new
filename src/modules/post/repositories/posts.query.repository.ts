@@ -1,10 +1,10 @@
 import {postCollection} from "../../../db/mongo.db";
-import {PostQueryInput} from "../routers/input/post-query.input";
-import {PostListPaginatedOutput} from "../routers/output/post-list-paginated.output";
-import {mapToPostListPaginatedOutput} from "../routers/mapers/map-to-post-list-paginated-output.util";
+import {PostQueryInput} from "../routes/input/post-query.input";
+import {PostListPaginatedOutput} from "../routes/output/post-list-paginated.output";
+import {mapToPostListPaginatedOutput} from "../routes/mapers/map-to-post-list-paginated-output.util";
 import {ObjectId} from "mongodb";
-import {PostOutput} from "../routers/output/post-output";
-import {mapToPostOutput} from "../routers/mapers/map-to-post-output.util";
+import {PostOutput} from "../routes/output/post-output";
+import {mapToPostOutput} from "../routes/mapers/map-to-post-output.util";
 
 export const postsQueryRepository = {
 

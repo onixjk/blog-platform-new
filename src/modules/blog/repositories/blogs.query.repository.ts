@@ -1,10 +1,10 @@
 import {blogCollection} from "../../../db/mongo.db";
-import {BlogQueryInput} from "../routers/input/blog-query.input";
-import {mapToBlogListPaginatedOutput} from "../routers/mapers/map-to-blog-list-paginated-output.util";
-import {BlogListPaginatedOutput} from "../routers/output/blog-list-paginated.output.ts";
+import {BlogQueryInput} from "../routes/input/blog-query.input";
+import {mapToBlogListPaginatedOutput} from "../routes/mapers/map-to-blog-list-paginated-output.util";
+import {BlogListPaginatedOutput} from "../routes/output/blog-list-paginated.output.ts";
 import {ObjectId} from "mongodb";
-import {mapToBlogOutput} from "../routers/mapers/map-to-blog-output.util";
-import {BlogOutput} from "../routers/output/blog-output";
+import {mapToBlogOutput} from "../routes/mapers/map-to-blog-output.util";
+import {BlogOutput} from "../routes/output/blog-output";
 
 export const blogsQueryRepository = {
     async findMany(

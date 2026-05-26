@@ -1,7 +1,7 @@
 import {ObjectId, WithId} from "mongodb";
 import {commentCollection} from "../../../db/mongo.db";
 import {Comment} from "../types/comment";
-import {CommentUpdateDto} from "../routers/input/comment-update.dto";
+import {CommentUpdateDto} from "../routes/input/comment-update.dto";
 import {ResultStatus} from "../../../core/result/resultCode";
 import {Result} from "../../../core/result/result.type";
 

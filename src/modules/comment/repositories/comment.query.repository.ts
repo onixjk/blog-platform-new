@@ -1,10 +1,10 @@
 import {commentCollection} from "../../../db/mongo.db";
 import {ObjectId} from "mongodb";
-import {mapToCommentListPaginatedOutput} from "../routers/mapers/map-to-comment-list-paginated-output.util";
-import {CommentQueryInput} from "../routers/input/comment-query.input";
-import {CommentListPaginatedOutput} from "../routers/output/comment-list-paginated.output";
-import {CommentOutput} from "../routers/output/comment-output";
-import {mapToCommentOutput} from "../routers/mapers/map-to-comment-output.util";
+import {mapToCommentListPaginatedOutput} from "../routes/mapers/map-to-comment-list-paginated-output.util";
+import {CommentQueryInput} from "../routes/input/comment-query.input";
+import {CommentListPaginatedOutput} from "../routes/output/comment-list-paginated.output";
+import {CommentOutput} from "../routes/output/comment-output";
+import {mapToCommentOutput} from "../routes/mapers/map-to-comment-output.util";
 import {ResultStatus} from "../../../core/result/resultCode";
 import {Result} from "../../../core/result/result.type";
 

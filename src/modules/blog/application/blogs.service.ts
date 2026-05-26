@@ -1,11 +1,11 @@
-import {BlogInputDto} from "../routers/input/blog.input-dto";
+import {BlogInputDto} from "../routes/input/blog.input-dto";
 import {Blog} from "../types/blog";
 import {WithId} from "mongodb";
 import {blogsRepository} from "../repositories/blogs.repository";
-import {BlogQueryInput} from "../routers/input/blog-query.input";
+import {BlogQueryInput} from "../routes/input/blog-query.input";
 import {postsService} from "../../post/application/posts.service";
 import {blogsQueryRepository} from "../repositories/blogs.query.repository";
-import {BlogListPaginatedOutput} from "../routers/output/blog-list-paginated.output.ts";
+import {BlogListPaginatedOutput} from "../routes/output/blog-list-paginated.output.ts";
 
 export const blogsService = {
     async findMany(

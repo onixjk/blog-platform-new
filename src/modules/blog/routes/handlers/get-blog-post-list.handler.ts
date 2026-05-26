@@ -1,6 +1,6 @@
 import {Request, Response} from 'express';
 import {errorsHandler} from "../../../../core/errors/errors.handler";
-import {PostQueryInput} from "../../../post/routers/input/post-query.input";
+import {PostQueryInput} from "../../../post/routes/input/post-query.input";
 import {HttpStatuses} from "../../../../core/types/http-statuses";
 import {matchedData} from "express-validator";
 import {setDefaultSortAndPaginationIfNotExist} from "../../../../core/helpers/set-default-sort-and-pagination";

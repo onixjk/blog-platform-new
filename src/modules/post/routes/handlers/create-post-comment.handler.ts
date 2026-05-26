@@ -1,6 +1,6 @@
 import {Request, Response} from "express";
 import {errorsHandler} from "../../../../core/errors/errors.handler";
-import {CommentInputDto} from "../../../comment/routers/input/comment-input.dto";
+import {CommentInputDto} from "../../../comment/routes/input/comment-input.dto";
 import {commentService} from "../../../comment/application/comment.service";
 import {commentQueryRepository} from "../../../comment/repositories/comment.query.repository";
 import {ResultStatus} from "../../../../core/result/resultCode";
