@@ -1,42 +1,9 @@
-// import request from "supertest";
-// import express from "express";
-// import {setupApp} from "../../src/setup-app";
-// import {HttpStatuses} from "../../src/core/types/http-statuses";
-
-// describe('/blog', () => {
-//
-//     const app = express();
-//     setupApp(app);
-//
-//     beforeAll(async () => {
-//         await request(app).delete(`/testing/all-data`);
-//     })
-//
-//     it('should return 404', async () => {
-//         await request(app)
-//             .get('/blog')
-//             .expect(HttpStatuses.NotFound_404)
-//     });
-//
-//     it('should return 404', async () => {
-//         await request(app)
-//             .get('/blog')
-//             .expect(HttpStatuses.NotFound_404)
-//     });
-//
-//
-//
-//
-// })
-
 import supertest from 'supertest';
 
 const baseUrl = 'http://localhost:5001';
 
 // ✅ Используем явный вызов через фабрику supertest
 const request = supertest(baseUrl);
-
-
 
 // Данные для административного доступа (Basic Auth)
 const adminAuth = { username: 'admin', password: 'qwerty' };
@@ -128,7 +95,7 @@ describe('Comprehensive API Integration Tests (Full Swagger Coverage)', () => {
     describe('Auth Operations', () => {
         it('POST /auth/login -> Успешный вход и генерация JWT (200)', async () => {
             const res = await request
-                .post('/auth/login') // На бэкенде это .post('/login') внутри префиксного файла
+                .post('/auth/login')
                 .send({
                     loginOrEmail: userCredentials.login,
                     password: userCredentials.password
@@ -141,7 +108,7 @@ describe('Comprehensive API Integration Tests (Full Swagger Coverage)', () => {
 
         it('GET /auth/me -> Успешное получение профиля с Bearer токеном (200)', async () => {
             const res = await request
-                .get('/auth/auth/me') // 👈 Стучимся по реальному сдвоенному пути бэкенда!
+                .get('/auth/me') // 👈 Чистый и правильный одинарный путь
                 .set('Authorization', `Bearer ${jwtToken}`);
 
             expect(res.statusCode).toBe(200);
@@ -150,7 +117,7 @@ describe('Comprehensive API Integration Tests (Full Swagger Coverage)', () => {
 
         it('GET /auth/me -> Ошибка 401 при отсутствии токена', async () => {
             const res = await request
-                .get('/auth/auth/me'); // 👈 И здесь тоже исправляем путь
+                .get('/auth/me'); // 👈 И здесь тоже одинарный путь
 
             expect(res.statusCode).toBe(401);
         });
@@ -380,9 +347,6 @@ describe('Comprehensive API Integration Tests (Full Swagger Coverage)', () => {
             const userExists = res.body.items.some((u: any) => u.id === createdUserId);
 
             expect(userExists).toBe(false);
-            // const res = await request
-            //     .get(`/blogs/${createdBlogId}`);
-            // expect(res.statusCode).toBe(404);
         });
     });
 });
