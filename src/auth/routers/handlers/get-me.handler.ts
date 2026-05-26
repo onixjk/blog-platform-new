@@ -13,5 +13,8 @@ export async function getMeHandler(
 
     const me = await usersQueryRepository.findMeById(userId);
 
+    if (!me)
+        return res.sendStatus(HttpStatuses.Unauthorized_401);
+
     return res.status(HttpStatuses.Ok_200).send(me);
 }
