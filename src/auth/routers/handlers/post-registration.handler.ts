@@ -18,6 +18,7 @@ export async function registrationHandler(
         if (result.status !== ResultStatus.NoContent)
             return res.status(resultCodeToHttpException(result.status)).send(result.extensions);
 
+        console.log(result.data)
         return res.status(HttpStatuses.NoContent_204).send(result.data);
     } catch (e: unknown) {
         errorsHandler(e, res);
