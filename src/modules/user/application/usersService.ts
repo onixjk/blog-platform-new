@@ -7,7 +7,6 @@ import {usersQueryRepository} from "../repositories/users.query.repository";
 import {IUserDB} from "../types/user.db.interface";
 import {bcryptService} from "../../../auth/adapters/bcrypt.service";
 import {IPagination} from "../types/pagination";
-import {randomUUID} from "node:crypto";
 
 export const usersService = {
     async findMany(
@@ -45,11 +44,11 @@ export const usersService = {
             passwordHash: passwordHash,
             email: dto.email,
             createdAt: new Date().toISOString(),
-            emailConfirmation: {
-                confirmationCode: randomUUID(),
-                expirationDate: new Date().toISOString(),
-                isConfirmed: false,
-            }
+            // emailConfirmation: {
+            //     confirmationCode: randomUUID(),
+            //     expirationDate: new Date().toISOString(),
+            //     isConfirmed: false,
+            // }
         }
 
         return usersRepository.create(newUser);

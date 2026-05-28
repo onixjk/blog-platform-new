@@ -8,6 +8,7 @@ import {jwtService} from "../adapters/jwt.service";
 import {nodemailerService} from "../adapters/nodemailer.service";
 import {randomUUID} from "node:crypto";
 import {emailExamples} from "../adapters/email-examples";
+import {usersRepository} from "../../modules/user/repositories/user.repository";
 
 
 export const authService = {
@@ -83,9 +84,11 @@ export const authService = {
             }
         }
 
+        const passwordHash = await bcryptService.generateHash(password);
+
         const newUser = {
             login: login,
-            password: password,
+            passwordHash: passwordHash,
             email: email,
             createdAt: new Date().toISOString(),
             emailConfirmation: {
@@ -95,7 +98,7 @@ export const authService = {
             }
         };
 
-        await usersService.create(newUser);
+        await usersRepository.create(newUser);
 
         nodemailerService
             .sendEmail(
