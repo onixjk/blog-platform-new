@@ -111,13 +111,13 @@ export const authService = {
             console.error('Критическая ошибка при отправке email на Vercel:', e);
         }
 
-        nodemailerService
-            .sendEmail(
-                newUser.email,
-                newUser.emailConfirmation.confirmationCode,
-                emailExamples.registrationEmail
-            )
-            .catch(er => console.error('error in send email:', er));
+        // nodemailerService
+        //     .sendEmail(
+        //         newUser.email,
+        //         newUser.emailConfirmation.confirmationCode,
+        //         emailExamples.registrationEmail
+        //     )
+        //     .catch(er => console.error('error in send email:', er));
         return {
             status: ResultStatus.NoContent,
             data: null,
