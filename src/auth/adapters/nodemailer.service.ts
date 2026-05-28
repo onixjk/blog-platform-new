@@ -10,7 +10,7 @@ export const nodemailerService = {
             service: "gmail",
             auth: {
                 user: "nkplwow@gmail.com",
-                pass: "DeveloperTesting",
+                pass: "klqhisiwjzzcbqnx",
             },
         });
 
@@ -20,8 +20,6 @@ export const nodemailerService = {
             subject: "Your code is here",
             html: template(code), // html body
         });
-
-        console.log(info);
 
         return !!info;
     },
