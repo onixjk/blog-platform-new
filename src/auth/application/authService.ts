@@ -93,7 +93,7 @@ export const authService = {
             createdAt: new Date().toISOString(),
             emailConfirmation: {
                 confirmationCode: randomUUID(),
-                expirationDate: new Date().toISOString(),
+                expirationDate: new Date(Date.now() + 60 * 60 * 1000).toISOString(),
                 isConfirmed: false,
             }
         };
