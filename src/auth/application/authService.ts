@@ -73,14 +73,15 @@ export const authService = {
         email: string
     ): Promise<Result<string | null>> {
 
-        const user = await usersService.findByLoginOrEmail(login)
+        const userByLogin = await usersService.findByLoginOrEmail(login)
+        const userByEmail = await usersService.findByLoginOrEmail(email)
 
-        if (user) {
+        if (userByLogin || userByEmail) {
             return {
                 status: ResultStatus.BadRequest,
                 errorMessage: 'Bad Request',
                 data: null,
-                extensions: [{field: 'loginOrEmail', message: 'Already Registered'}],
+                extensions: [{field: userByLogin? 'Login' : 'Email', message: 'Already Registered'}],
             }
         }
 
