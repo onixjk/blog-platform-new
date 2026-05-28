@@ -12,7 +12,7 @@ export async function createPostCommentHandler(
 ) {
     try {
         const {postId} = req.params;
-        const userId = req.user!.id;
+        const userId = req.user.id!;
 
         const commentData = {...req.body, userId, postId};
         const result = await commentService.create(commentData);

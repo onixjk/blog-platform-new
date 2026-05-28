@@ -5,6 +5,9 @@ import {IUserDB} from "../../modules/user/types/user.db.interface";
 import {WithId} from "mongodb";
 import {Result} from "../../core/result/result.type";
 import {jwtService} from "../adapters/jwt.service";
+import {nodemailerService} from "../adapters/nodemailer.service";
+import {randomUUID} from "node:crypto";
+import {emailExamples} from "../adapters/email-examples";
 
 
 export const authService = {
@@ -27,7 +30,7 @@ export const authService = {
 
         return {
             status: ResultStatus.Success,
-            data: { accessToken },
+            data: {accessToken},
             extensions: [],
         };
     },
@@ -62,4 +65,49 @@ export const authService = {
             extensions: [],
         };
     },
+
+    async registerUser(
+        login: string,
+        password: string,
+        email: string
+    ): Promise<Result<WithId<IUserDB> | null>> {
+
+        const user = await usersService.findByLoginOrEmail(login)
+
+        if (user) {
+            return {
+                status: ResultStatus.BadRequest,
+                errorMessage: 'Bad Request',
+                data: null,
+                extensions: [{field: 'loginOrEmail', message: 'Already Registered'}],
+            }
+        }
+
+        const newUser = {
+            login: login,
+            password: password,
+            email: email,
+            createdAt: new Date().toISOString(),
+            emailConfirmation: {
+                confirmationCode: randomUUID(),
+                expirationDate: new Date().toISOString(),
+                isConfirmed: false,
+            }
+        };
+
+        await usersService.create(newUser);
+
+        nodemailerService
+            .sendEmail(
+                newUser.email,
+                newUser.emailConfirmation.confirmationCode,
+                emailExamples.registrationEmail
+            )
+            .catch(er => console.error('error in send email:', er));
+        return {
+            status: ResultStatus.NoContent,
+            data: null,
+            extensions: [],
+        };
+    }
 }

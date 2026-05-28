@@ -10,7 +10,7 @@ export async function deleteCommentHandler(
 ) {
     try {
         const commentId = req.params.id;
-        const userId = req.user!.id;
+        const userId = req.user.id!;
 
         const result = await commentService.delete(commentId, userId);
 

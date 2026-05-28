@@ -1,0 +1,20 @@
+import {Request, Response} from "express";
+import {UserInputDto} from "../../../modules/user/routes/input/user.input-dto";
+import {authService} from "../../application/authService";
+import {HttpStatuses} from "../../../core/types/http-statuses";
+import {ResultStatus} from "../../../core/result/resultCode";
+import {resultCodeToHttpException} from "../../../core/result/resultCodeToHttpException";
+
+export async function registrationHandler(
+    req: Request<{}, {}, UserInputDto>,
+    res: Response,
+) {
+    const {login, password, email} = req.body;
+
+    const result = await authService.registerUser(login, password, email);
+
+    if (result.status !== ResultStatus.NoContent)
+        return res.status(resultCodeToHttpException(result.status)).send(result.extensions);
+
+    return res.sendStatus(HttpStatuses.NoContent_204)
+}

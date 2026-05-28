@@ -11,7 +11,7 @@ export async function updateCommentHandler(
 ) {
     try {
         const commentId = req.params.id;
-        const userId = req.user!.id;
+        const userId = req.user.id!;
 
         const commentData = {commentId, userId, ...req.body}
 
