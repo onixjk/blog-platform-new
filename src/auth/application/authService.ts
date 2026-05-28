@@ -81,7 +81,7 @@ export const authService = {
                 status: ResultStatus.BadRequest,
                 errorMessage: 'Bad Request',
                 data: null,
-                extensions: [{field: userByLogin? 'login' : 'email', message: 'Already Registered'}],
+                extensions: [{field: userByLogin ? 'login' : 'email', message: 'Already Registered'}],
             }
         }
 
