@@ -1,4 +1,3 @@
-import {appConfig} from "../../core/config/config";
 import nodemailer from "nodemailer";
 
 export const nodemailerService = {
@@ -10,8 +9,8 @@ export const nodemailerService = {
         let transporter = nodemailer.createTransport({
             service: "gmail",
             auth: {
-                user: appConfig.EMAIL,
-                pass: appConfig.EMAIL_PASS,
+                user: "nkplwow@gmail.com",
+                pass: "DeveloperTesting",
             },
         });
 
@@ -21,6 +20,8 @@ export const nodemailerService = {
             subject: "Your code is here",
             html: template(code), // html body
         });
+
+        console.log(info);
 
         return !!info;
     },
