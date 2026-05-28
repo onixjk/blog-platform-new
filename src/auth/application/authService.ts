@@ -71,7 +71,7 @@ export const authService = {
         login: string,
         password: string,
         email: string
-    ): Promise<Result<WithId<IUserDB> | null>> {
+    ): Promise<Result<string | null>> {
 
         const user = await usersService.findByLoginOrEmail(login)
 
@@ -98,7 +98,7 @@ export const authService = {
             }
         };
 
-        await usersRepository.create(newUser);
+        const createdId = await usersRepository.create(newUser);
 
         nodemailerService
             .sendEmail(
@@ -110,7 +110,7 @@ export const authService = {
 
         return {
             status: ResultStatus.NoContent,
-            data: null,
+            data: createdId,
             extensions: [],
         };
     }
