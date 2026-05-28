@@ -15,7 +15,7 @@ export const nodemailerService = {
         });
 
         let info = await transporter.sendMail({
-            from: '"Kek" <nkplwow@gmail.com>',
+            from: '"Kek 👻" <nkplwow@gmail.com>',
             to: email,
             subject: "Your code is here",
             html: template(code), // html body
