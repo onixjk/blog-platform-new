@@ -1,3 +1,3 @@
-export type registrationEmailResending = {
+export type RegistrationEmailResending = {
     email: string;
 }

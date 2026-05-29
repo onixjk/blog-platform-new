@@ -76,7 +76,7 @@ export const authService = {
         const userByLogin = await usersService.findByLoginOrEmail(login)
         const userByEmail = await usersService.findByLoginOrEmail(email)
 
-        if (userByLogin || userByEmail) {
+        if (!userByLogin || !userByEmail) {
             return {
                 status: ResultStatus.BadRequest,
                 errorMessage: 'Bad Request',
@@ -126,6 +126,50 @@ export const authService = {
         };
     },
 
+    async resendEmailConfirmationCode(email: string): Promise<Result<string | null>> {
+
+        const userByEmail = await usersService.findByLoginOrEmail(email)
+
+        if (!userByEmail) {
+            return {
+                status: ResultStatus.BadRequest,
+                errorMessage: 'Bad Request',
+                data: null,
+                extensions: [{field: 'email', message: 'Invalid email'}],
+            }
+        }
+
+        if (userByEmail.emailConfirmation.isConfirmed) {
+            return {
+                status: ResultStatus.BadRequest,
+                errorMessage: 'Bad Request',
+                data: null,
+                extensions: [{field: 'email', message: 'Email confirmed'}],
+            }
+        }
+
+        const confirmationCode = randomUUID()
+        const expirationDate = new Date(Date.now() + 60 * 60 * 1000).toISOString()
+
+        await usersRepository.updateEmailConfirmationCode(email, confirmationCode, expirationDate);
+
+        try {
+            await nodemailerService.sendEmail(
+                email,
+                confirmationCode,
+                emailExamples.registrationEmail
+            )
+        } catch (e) {
+            console.error('error in send email:', e);
+        }
+
+        return {
+            status: ResultStatus.NoContent,
+            data: null,
+            extensions: [],
+        };
+    },
+
     async confirmEmail(code: string): Promise<Result> {
 
         const result = await usersService.updateEmailConfirmationStatus(code);
@@ -135,7 +179,7 @@ export const authService = {
                 status: ResultStatus.BadRequest,
                 errorMessage: 'Bad Request',
                 data: null,
-                extensions: [{ field: 'code', message: 'Incorrect code' }],
+                extensions: [{field: 'code', message: 'Incorrect code'}],
 
             };
         }

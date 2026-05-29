@@ -3,6 +3,8 @@ import {userCollection} from "../../../db/mongo.db";
 import {RepositoryNotFoundError} from "../../../core/errors/repository-not-found.error";
 import {IUserDB} from "../types/user.db.interface";
 import {User} from "../types/user";
+import {ResultStatus} from "../../../core/result/resultCode";
+import {Result} from "../../../core/result/result.type";
 
 export const usersRepository = {
 
@@ -18,15 +20,38 @@ export const usersRepository = {
             {
                 'emailConfirmation.confirmationCode': code,
                 'emailConfirmation.isConfirmed': false,
-                'emailConfirmation.expirationDate': { $gt: new Date().toISOString() }
+                'emailConfirmation.expirationDate': {$gt: new Date().toISOString()}
             },
             {
-                $set: { 'emailConfirmation.isConfirmed': true }
+                $set: {'emailConfirmation.isConfirmed': true}
             },
             {
                 returnDocument: 'after'
             }
         );
+    },
+
+    async updateEmailConfirmationCode(
+        email: string,
+        confirmationCode: string,
+        expirationDate: string
+    ): Promise<Result> {
+
+        await userCollection.updateOne(
+            {email: email},
+            {
+                $set: {
+                    "emailConfirmation.confirmationCode": confirmationCode,
+                    "emailConfirmation.expirationDate": expirationDate,
+                }
+            }
+        );
+
+        return {
+            status: ResultStatus.NoContent,
+            data: null,
+            extensions: [],
+        }
     },
 
     async findByIdOrFail(id: string): Promise<WithId<User>> {
