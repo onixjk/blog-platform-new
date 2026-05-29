@@ -124,5 +124,10 @@ export const authService = {
             data: createdId,
             extensions: [],
         };
-    }
+    },
+
+    async confirmEmail(code: string): Promise<Result> {
+
+        return usersService.updateEmailConfirmationStatus(code);
+    },
 }

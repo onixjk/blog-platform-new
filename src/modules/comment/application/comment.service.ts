@@ -42,9 +42,10 @@ export const commentService = {
     },
 
     async update(dto: CommentUpdateDto): Promise<Result> {
-        const commentResult = await this.findById(dto.commentId);
+        
+        const result = await this.findById(dto.commentId);
 
-        if (commentResult.status === ResultStatus.NotFound || !commentResult.data) {
+        if (result.status === ResultStatus.NotFound || !result.data) {
             return {
                 status: ResultStatus.NotFound,
                 data: null,
@@ -53,7 +54,7 @@ export const commentService = {
             }
         }
 
-        if (commentResult.data.commentatorInfo.userId !== dto.userId) {
+        if (result.data.commentatorInfo.userId !== dto.userId) {
             return {
                 status: ResultStatus.Forbidden,
                 data: null,

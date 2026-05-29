@@ -12,6 +12,23 @@ export const usersRepository = {
         });
     },
 
+    async updateEmailConfirmationStatus(code: string): Promise<WithId<IUserDB> | null> {
+
+        return await userCollection.findOneAndUpdate(
+            {
+                'emailConfirmation.confirmationCode': code,
+                'emailConfirmation.isConfirmed': false,
+                'emailConfirmation.expirationDate': { $gt: new Date().toISOString() }
+            },
+            {
+                $set: { 'emailConfirmation.isConfirmed': true }
+            },
+            {
+                returnDocument: 'after'
+            }
+        );
+    },
+
     async findByIdOrFail(id: string): Promise<WithId<User>> {
         const res = await userCollection.findOne({_id: new ObjectId(id)});
 

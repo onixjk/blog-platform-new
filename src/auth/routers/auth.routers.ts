@@ -10,6 +10,7 @@ import {getMeHandler} from "./handlers/get-me.handler";
 import {registrationHandler} from "./handlers/post-registration.handler";
 import {registrationConfirmationHandler} from "./handlers/post-registration-confirmation.handler";
 import {registrationEmailResendingHandler} from "./handlers/post-registration-email-resending.handler";
+import {confirmationCodeInputValidation} from "../middlewares/confirmation-code.input-dto.validation-middleware";
 
 export const authRouter = Router({});
 
@@ -32,6 +33,8 @@ authRouter
     )
 
     .post('/registration-confirmation',
+        confirmationCodeInputValidation,
+        inputValidationResultMiddleware,
         registrationConfirmationHandler
     )
 

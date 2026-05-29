@@ -4,6 +4,7 @@ import {commentService} from "../../application/comment.service";
 import {CommentInputDto} from "../input/comment-input.dto";
 import {ResultStatus} from "../../../../core/result/resultCode";
 import {resultCodeToHttpException} from "../../../../core/result/resultCodeToHttpException";
+import {HttpStatuses} from "../../../../core/types/http-statuses";
 
 export async function updateCommentHandler(
     req: Request<{ id: string }, {}, CommentInputDto>,
@@ -23,7 +24,7 @@ export async function updateCommentHandler(
                 .send(result.extensions);
         }
 
-        return res.sendStatus(resultCodeToHttpException(result.status))
+        return res.sendStatus(HttpStatuses.NoContent_204)
     } catch (e: unknown) {
         errorsHandler(e, res);
     }

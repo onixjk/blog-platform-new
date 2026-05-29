@@ -1,19 +1,14 @@
 import {WithId} from "mongodb";
-import {UserQueryInput} from "../routes/input/user-query.input";
 import {User} from "../types/user";
 import {UserInputDto} from "../routes/input/user.input-dto";
 import {usersRepository} from "../repositories/user.repository";
-import {usersQueryRepository} from "../repositories/users.query.repository";
 import {IUserDB} from "../types/user.db.interface";
 import {bcryptService} from "../../../auth/adapters/bcrypt.service";
-import {IPagination} from "../types/pagination";
+import {randomUUID} from "node:crypto";
+import {Result} from "../../../core/result/result.type";
+import {ResultStatus} from "../../../core/result/resultCode";
 
 export const usersService = {
-    async findMany(
-        queryDto: UserQueryInput
-    ): Promise<IPagination<User[]>> {
-        return usersQueryRepository.findMany(queryDto);
-    },
 
     async findByIdOrFail(id: string): Promise<WithId<User>> {
         return usersRepository.findByIdOrFail(id);
@@ -21,6 +16,28 @@ export const usersService = {
 
     async findByLoginOrEmail(loginOrEmail: string): Promise<WithId<IUserDB> | null> {
         return usersRepository.findByLoginOrEmail(loginOrEmail);
+    },
+
+    async updateEmailConfirmationStatus(code: string): Promise<Result> {
+
+        const result = await usersRepository.updateEmailConfirmationStatus(code);
+
+        if (!result) {
+            return {
+                status: ResultStatus.BadRequest,
+                errorMessage: 'Bad Request',
+                data: null,
+                extensions: [{ field: 'code', message: 'Incorrect code' }],
+
+            };
+        }
+
+        return {
+            status: ResultStatus.NoContent,
+            data: null,
+            extensions: [],
+
+        };
     },
 
     async create(dto: UserInputDto): Promise<string> {
@@ -44,11 +61,11 @@ export const usersService = {
             passwordHash: passwordHash,
             email: dto.email,
             createdAt: new Date().toISOString(),
-            // emailConfirmation: {
-            //     confirmationCode: randomUUID(),
-            //     expirationDate: new Date().toISOString(),
-            //     isConfirmed: false,
-            // }
+            emailConfirmation: {
+                confirmationCode: randomUUID(),
+                expirationDate: new Date().toISOString(),
+                isConfirmed: false,
+            }
         }
 
         return usersRepository.create(newUser);
