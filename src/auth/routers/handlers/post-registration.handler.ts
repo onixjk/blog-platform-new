@@ -20,7 +20,6 @@ export async function registrationHandler(
                 .status(resultCodeToHttpException(result.status))
                 .send({errorsMessages: result.extensions});
 
-        console.log(result.data)
         return res.status(HttpStatuses.NoContent_204).send(result.data);
     } catch (e: unknown) {
         errorsHandler(e, res);
