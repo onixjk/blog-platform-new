@@ -76,7 +76,7 @@ export const authService = {
         const userByLogin = await usersService.findByLoginOrEmail(login)
         const userByEmail = await usersService.findByLoginOrEmail(email)
 
-        if (!userByLogin || !userByEmail) {
+        if (userByLogin || userByEmail) {
             return {
                 status: ResultStatus.BadRequest,
                 errorMessage: 'Bad Request',
