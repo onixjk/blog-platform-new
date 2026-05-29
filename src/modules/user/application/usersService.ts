@@ -5,8 +5,6 @@ import {usersRepository} from "../repositories/user.repository";
 import {IUserDB} from "../types/user.db.interface";
 import {bcryptService} from "../../../auth/adapters/bcrypt.service";
 import {randomUUID} from "node:crypto";
-import {Result} from "../../../core/result/result.type";
-import {ResultStatus} from "../../../core/result/resultCode";
 
 export const usersService = {
 
@@ -18,26 +16,8 @@ export const usersService = {
         return usersRepository.findByLoginOrEmail(loginOrEmail);
     },
 
-    async updateEmailConfirmationStatus(code: string): Promise<Result> {
-
-        const result = await usersRepository.updateEmailConfirmationStatus(code);
-
-        if (!result) {
-            return {
-                status: ResultStatus.BadRequest,
-                errorMessage: 'Bad Request',
-                data: null,
-                extensions: [{ field: 'code', message: 'Incorrect code' }],
-
-            };
-        }
-
-        return {
-            status: ResultStatus.NoContent,
-            data: null,
-            extensions: [],
-
-        };
+    async updateEmailConfirmationStatus(code: string): Promise<WithId<IUserDB> | null> {
+        return usersRepository.updateEmailConfirmationStatus(code);
     },
 
     async create(dto: UserInputDto): Promise<string> {

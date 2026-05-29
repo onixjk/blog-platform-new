@@ -128,6 +128,23 @@ export const authService = {
 
     async confirmEmail(code: string): Promise<Result> {
 
-        return usersService.updateEmailConfirmationStatus(code);
+        const result = await usersService.updateEmailConfirmationStatus(code);
+
+        if (!result) {
+            return {
+                status: ResultStatus.BadRequest,
+                errorMessage: 'Bad Request',
+                data: null,
+                extensions: [{ field: 'code', message: 'Incorrect code' }],
+
+            };
+        }
+
+        return {
+            status: ResultStatus.NoContent,
+            data: null,
+            extensions: [],
+
+        };
     },
 }
