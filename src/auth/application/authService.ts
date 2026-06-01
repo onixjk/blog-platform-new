@@ -101,23 +101,23 @@ export const authService = {
 
         const createdId = await usersRepository.create(newUser);
 
-        try {
-            await nodemailerService.sendEmail(
-                newUser.email,
-                newUser.emailConfirmation.confirmationCode,
-                emailExamples.registrationEmail
-            )
-        } catch (e) {
-            console.error('error in send email:', e);
-        }
-
-        // nodemailerService
-        //     .sendEmail(
+        // try {
+        //     await nodemailerService.sendEmail(
         //         newUser.email,
         //         newUser.emailConfirmation.confirmationCode,
         //         emailExamples.registrationEmail
         //     )
-        //     .catch(er => console.error('error in send email:', er));
+        // } catch (e) {
+        //     console.error('error in send email:', e);
+        // }
+
+        await nodemailerService
+            .sendEmail(
+                newUser.email,
+                newUser.emailConfirmation.confirmationCode,
+                emailExamples.registrationEmail
+            )
+            .catch(er => console.error('error in send email:', er));
 
         return {
             status: ResultStatus.NoContent,
