@@ -111,8 +111,7 @@ export const authService = {
         //     console.error('error in send email:', e);
         // }
 
-        
-        await nodemailerService
+        nodemailerService
             .sendEmail(
                 newUser.email,
                 newUser.emailConfirmation.confirmationCode,
