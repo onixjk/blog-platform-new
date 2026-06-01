@@ -11,6 +11,7 @@ import {registrationHandler} from "./handlers/post-registration.handler";
 import {registrationConfirmationHandler} from "./handlers/post-registration-confirmation.handler";
 import {registrationEmailResendingHandler} from "./handlers/post-registration-email-resending.handler";
 import {confirmationCodeInputValidation} from "../middlewares/confirmation-code.input-dto.validation-middleware";
+import {emailInputValidation} from "../middlewares/email-resending.input-dto.validation-middleware";
 
 export const authRouter = Router({});
 
@@ -39,7 +40,7 @@ authRouter
     )
 
     .post('/registration-email-resending',
-        // loginOrEmailValidation,
+        emailInputValidation,
         inputValidationResultMiddleware,
         registrationEmailResendingHandler
     )
