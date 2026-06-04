@@ -35,6 +35,12 @@ export async function runDB(url: string): Promise<void> {
         await client.connect();
         await db.command({ping: 1});
         console.log('✅ Connected to the database');
+
+        await tokensCollection.createIndex(
+            { expireDate: 1 },
+            { expireAfterSeconds: 0 }
+        );
+        console.log('✅ TTL index for tokensCollection created/verified');
     } catch (e) {
         await client.close();
         throw new Error(`❌ Database not connected: ${e}`);
