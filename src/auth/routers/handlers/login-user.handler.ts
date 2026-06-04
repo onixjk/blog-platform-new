@@ -12,7 +12,6 @@ export async function loginUserHandler(
 ) {
     try {
         const {loginOrEmail, password} = req.body;
-        const cookie_name = req.cookies.cookie_name
 
         const result = await authService.loginUser(loginOrEmail, password);
 
@@ -20,7 +19,7 @@ export async function loginUserHandler(
             return res.status(resultCodeToHttpException(result.status)).send(result.extensions);
         }
 
-        res.cookie(cookie_name, result.data!.refreshToken, {httpOnly: true,secure: true})
+        res.cookie('refreshToken', result.data!.refreshToken, {httpOnly: true,secure: true})
         res.status(HttpStatuses.Ok_200).send({accessToken: result.data!.accessToken});
     } catch (e: unknown) {
         errorsHandler(e, res);
