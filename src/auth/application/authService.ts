@@ -10,6 +10,7 @@ import {randomUUID} from "node:crypto";
 import {emailExamples} from "../adapters/email-examples";
 import {usersRepository} from "../../modules/user/repositories/user.repository";
 import {authRepository} from "../repositories/auth.repository";
+import {RefreshToken} from "../types/refresh-token";
 
 
 export const authService = {
@@ -31,7 +32,16 @@ export const authService = {
         const accessToken = await jwtService.createAccessToken(result.data!._id.toString());
         const refreshToken = await jwtService.createRefreshToken(result.data!._id.toString());
 
-        await this.saveRefreshToken(refreshToken);
+        const saveResult = await this.saveRefreshToken(refreshToken);
+
+        if (!saveResult) {
+            return {
+                status: ResultStatus.BadRequest,
+                errorMessage: 'Bad Request',
+                data: null,
+                extensions: [{field: null, message: 'Failed to save refresh token'}],
+            };
+        }
 
         return {
             status: ResultStatus.Success,
@@ -91,7 +101,7 @@ export const authService = {
 
         const passwordHash = await bcryptService.generateHash(password);
 
-        const newUser = {
+        const newUser: IUserDB = {
             login: login,
             passwordHash: passwordHash,
             email: email,
@@ -174,7 +184,6 @@ export const authService = {
                 errorMessage: 'Bad Request',
                 data: null,
                 extensions: [{field: 'code', message: 'Incorrect code'}],
-
             };
         }
 
@@ -186,7 +195,31 @@ export const authService = {
         };
     },
 
-    async saveRefreshToken(refreshToken: string): Promise<void> {
-        await authRepository.saveRefreshToken(refreshToken);
+    async saveRefreshToken(refreshToken: string): Promise<Result> {
+        const decodedToken = await jwtService.decodeToken(refreshToken);
+
+        if (!decodedToken || typeof decodedToken.exp !== 'number') {
+            return {
+                status: ResultStatus.BadRequest,
+                errorMessage: 'Bad Request',
+                data: null,
+                extensions: [{field: null, message: 'Can\'t decode token'}],
+            };
+        }
+
+        const newRefreshToken: RefreshToken = {
+            data: refreshToken,
+            expireDate: new Date(decodedToken.exp * 1000),
+            isValid: true,
+        }
+
+        await authRepository.saveRefreshToken(newRefreshToken);
+
+        return {
+            status: ResultStatus.NoContent,
+            data: null,
+            extensions: [],
+
+        };
     }
 }
