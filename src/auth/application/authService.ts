@@ -101,16 +101,6 @@ export const authService = {
 
         const createdId = await usersRepository.create(newUser);
 
-        // try {
-        //     await nodemailerService.sendEmail(
-        //         newUser.email,
-        //         newUser.emailConfirmation.confirmationCode,
-        //         emailExamples.registrationEmail
-        //     )
-        // } catch (e) {
-        //     console.error('error in send email:', e);
-        // }
-
         await nodemailerService
             .sendEmail(
                 newUser.email,
