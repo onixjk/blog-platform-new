@@ -2,9 +2,15 @@ import jwt from "jsonwebtoken";
 import {appConfig} from "../../core/config/config";
 
 export const jwtService = {
-    async createToken(userId: string): Promise<string> {
+    async createAccessToken(userId: string): Promise<string> {
         return jwt.sign({userId}, appConfig.AC_SECRET, {
             expiresIn: appConfig.AC_TIME as any,
+        });
+    },
+
+    async createRefreshToken(userId: string): Promise<string> {
+        return jwt.sign({userId}, appConfig.RT_SECRET, {
+            expiresIn: appConfig.RT_TIME as any,
         });
     },
 

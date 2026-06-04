@@ -4,6 +4,7 @@ import { SETTINGS } from './core/settings/settings';
 import { runDB } from './db/mongo.db';
 
 const app = express();
+
 setupApp(app);
 
 export const bootstrap = async () => {

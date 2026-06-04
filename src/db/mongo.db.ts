@@ -8,13 +8,15 @@ import {Comment} from "../modules/comment/types/comment";
 const BLOG_COLLECTION_NAME = 'blogs';
 const POST_COLLECTION_NAME = 'posts';
 const USER_COLLECTION_NAME = 'users';
-const COMMENTS_COLLECTION_NAME = 'users';
+const COMMENTS_COLLECTION_NAME = 'comments';
+const TOKENS_COLLECTION_NAME = 'tokens';
 
 export let client: MongoClient;
 export let blogCollection: Collection<Blog>;
 export let postCollection: Collection<Post>;
 export let userCollection: Collection<IUserDB>;
 export let commentCollection: Collection<Comment>;
+export let tokensCollection: Collection<String>;
 
 // Подключения к бд
 export async function runDB(url: string): Promise<void> {
@@ -26,6 +28,7 @@ export async function runDB(url: string): Promise<void> {
     postCollection = db.collection<Post>(POST_COLLECTION_NAME);
     userCollection = db.collection<IUserDB>(USER_COLLECTION_NAME);
     commentCollection = db.collection<Comment>(COMMENTS_COLLECTION_NAME);
+    tokensCollection = db.collection<String>(TOKENS_COLLECTION_NAME);
 
     try {
         await client.connect();

@@ -8,11 +8,13 @@ import cors from 'cors';
 import {userRouter} from "./modules/user/routes/user.routers";
 import {authRouter} from "./auth/routers/auth.routers";
 import {commentRouter} from "./modules/comment/routes/comment.router";
+import cookieParser from "cookie-parser";
 
 export const setupApp = (app: Express) => {
 
     app.use(cors());
     app.use(express.json());
+    app.use(cookieParser())
 
     app.use(BLOGS_PATH, blogRouter)
     app.use(POSTS_PATH, postRouter)

@@ -9,13 +9,14 @@ import {nodemailerService} from "../adapters/nodemailer.service";
 import {randomUUID} from "node:crypto";
 import {emailExamples} from "../adapters/email-examples";
 import {usersRepository} from "../../modules/user/repositories/user.repository";
+import {authRepository} from "../repositories/auth.repository";
 
 
 export const authService = {
     async loginUser(
         loginOrEmail: string,
         password: string,
-    ): Promise<Result<{ accessToken: string } | null>> {
+    ): Promise<Result<{ accessToken: string, refreshToken: string } | null>> {
         const result = await authService.checkUserCredentials(loginOrEmail, password);
 
         if (result.status !== ResultStatus.Success) {
@@ -27,11 +28,14 @@ export const authService = {
             };
         }
 
-        const accessToken = await jwtService.createToken(result.data!._id.toString());
+        const accessToken = await jwtService.createAccessToken(result.data!._id.toString());
+        const refreshToken = await jwtService.createRefreshToken(result.data!._id.toString());
+
+        await this.saveRefreshToken(refreshToken);
 
         return {
             status: ResultStatus.Success,
-            data: {accessToken},
+            data: {accessToken, refreshToken},
             extensions: [],
         };
     },
@@ -181,4 +185,8 @@ export const authService = {
 
         };
     },
+
+    async saveRefreshToken(refreshToken: string): Promise<void> {
+        await authRepository.saveRefreshToken(refreshToken);
+    }
 }
