@@ -1,5 +1,5 @@
 export type RefreshToken = {
-    data: string;
+    refreshToken: string;
     expireDate: Date;
     isValid: boolean;
 }

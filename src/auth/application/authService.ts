@@ -208,7 +208,7 @@ export const authService = {
         }
 
         const newRefreshToken: RefreshToken = {
-            data: refreshToken,
+            refreshToken: refreshToken,
             expireDate: new Date(decodedToken.exp * 1000),
             isValid: true,
         }
@@ -219,7 +219,25 @@ export const authService = {
             status: ResultStatus.NoContent,
             data: null,
             extensions: [],
-
         };
-    }
+    },
+
+    async findRefreshToken(refreshToken: string): Promise<Result<RefreshToken | null>> {
+        const result = await authRepository.findRefreshToken(refreshToken);
+
+        if (!result) {
+            return {
+                status: ResultStatus.NotFound,
+                errorMessage: 'Not Found',
+                data: null,
+                extensions: [{field: 'refreshToken', message: 'Token not found'}],
+            };
+        }
+
+        return {
+            status: ResultStatus.Success,
+            data: result,
+            extensions: [],
+        };
+    },
 }

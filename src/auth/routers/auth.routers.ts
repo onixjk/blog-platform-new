@@ -5,7 +5,7 @@ import {
     loginOrEmailValidation,
     userInputValidation
 } from "../../modules/user/middlewares/user.input-dto.validation-middlewares";
-import {accessTokenGuard} from "../middlewares/access.token.guard";
+import {accessTokenGuard} from "../middlewares/access-token.guard";
 import {getMeHandler} from "./handlers/get-me.handler";
 import {registrationHandler} from "./handlers/post-registration.handler";
 import {registrationConfirmationHandler} from "./handlers/post-registration-confirmation.handler";

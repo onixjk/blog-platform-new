@@ -23,9 +23,18 @@ export const jwtService = {
         }
     },
 
-    async verifyToken(token: string): Promise<{ userId: string } | null> {
+    async verifyAccessToken(token: string): Promise<{ userId: string } | null> {
         try {
             return jwt.verify(token, appConfig.AC_SECRET) as { userId: string };
+        } catch (error) {
+            console.error("Token verify some error");
+            return null;
+        }
+    },
+
+    async verifyRefreshToken(token: string): Promise< { exp: number } | null> {
+        try {
+            return jwt.verify(token, appConfig.RT_SECRET) as { exp: number };
         } catch (error) {
             console.error("Token verify some error");
             return null;

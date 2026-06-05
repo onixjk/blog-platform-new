@@ -12,18 +12,17 @@ export const accessTokenGuard = async (req: Request, res: Response, next: NextFu
     if (authType !== 'Bearer')
         return res.sendStatus(HttpStatuses.Unauthorized_401);
 
-    const payload = await jwtService.verifyToken(token);
+    const payload = await jwtService.verifyAccessToken(token);
 
-    if (payload) {
-        const {userId} = payload;
-
-        req.user = {id: userId} as {id:string};
-        next();
-
+    if (!payload) {
+        res.sendStatus(HttpStatuses.Unauthorized_401);
         return;
     }
 
-    res.sendStatus(HttpStatuses.Unauthorized_401);
+    const {userId} = payload;
 
+    req.user = {id: userId} as { id: string };
+
+    next();
     return;
 };
