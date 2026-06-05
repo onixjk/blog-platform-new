@@ -32,9 +32,9 @@ export const jwtService = {
         }
     },
 
-    async verifyRefreshToken(token: string): Promise< { exp: number } | null> {
+    async verifyRefreshToken(token: string): Promise< { userId: string } | null> {
         try {
-            return jwt.verify(token, appConfig.RT_SECRET) as { exp: number };
+            return jwt.verify(token, appConfig.RT_SECRET) as { userId: string};
         } catch (error) {
             console.error("Token verify some error");
             return null;
