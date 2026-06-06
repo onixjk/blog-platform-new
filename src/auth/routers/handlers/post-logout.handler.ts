@@ -16,6 +16,5 @@ export async function logoutHandler(
     }
 
     res.clearCookie('refreshToken');
-
-    return res.sendStatus(HttpStatuses.NoContent_204);
+    res.sendStatus(HttpStatuses.NoContent_204);
 }
