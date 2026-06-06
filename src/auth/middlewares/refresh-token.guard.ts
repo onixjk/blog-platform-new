@@ -32,8 +32,8 @@ export const refreshTokenGuard = async (req: Request, res: Response, next: NextF
         return;
     }
 
-    // req.user = {id: userId} as { id: string };
-    req.user = {id: userId};
+    req.user = {id: userId} as { id: string };
+    // req.user = {id: userId};
 
     next();
     return;

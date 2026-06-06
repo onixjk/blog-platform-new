@@ -21,8 +21,8 @@ export const accessTokenGuard = async (req: Request, res: Response, next: NextFu
 
     const {userId} = payload;
 
-    // req.user = {id: userId} as { id: string };
-    req.user = {id: userId};
+    req.user = {id: userId} as { id: string };
+    // req.user = {id: userId};
 
     next();
     return;
