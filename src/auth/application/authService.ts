@@ -34,7 +34,7 @@ export const authService = {
 
         const saveResult = await this.saveRefreshToken(refreshToken);
 
-        if (!saveResult) {
+        if (saveResult.status !== ResultStatus.NoContent) {
             return {
                 status: ResultStatus.BadRequest,
                 errorMessage: 'Bad Request',
@@ -227,8 +227,8 @@ export const authService = {
 
         if (!result) {
             return {
-                status: ResultStatus.NotFound,
-                errorMessage: 'Not Found',
+                status: ResultStatus.Unauthorized,
+                errorMessage: 'Unauthorized',
                 data: null,
                 extensions: [{field: 'refreshToken', message: 'Token not found'}],
             };
@@ -238,6 +238,157 @@ export const authService = {
             status: ResultStatus.Success,
             data: result,
             extensions: [],
+        };
+    },
+
+    async generateAccessToken(userId: string): Promise<Result<string | null>> {
+
+        const result = await jwtService.createAccessToken(userId);
+
+        if (!result) {
+            return {
+                status: ResultStatus.Unauthorized,
+                data: null,
+                errorMessage: "Unauthorized",
+                extensions: [{field: 'accessToken', message: "Wrong userId"}]
+            };
+        }
+
+        return {
+            status: ResultStatus.Success,
+            data: result,
+            extensions: [],
+        };
+    },
+
+    async generateRefreshToken(userId: string): Promise<Result<string | null>> {
+
+        const result = await jwtService.createRefreshToken(userId);
+
+        if (!result) {
+            return {
+                status: ResultStatus.Unauthorized,
+                data: null,
+                errorMessage: "Unauthorized",
+                extensions: [{field: 'refreshToken', message: "Wrong userId"}]
+            };
+        }
+
+        return {
+            status: ResultStatus.Success,
+            data: result,
+            extensions: [],
+        };
+    },
+
+    async verifyRefreshToken(refreshToken: string): Promise<Result<string | null>> {
+
+        const result = await jwtService.verifyRefreshToken(refreshToken);
+
+        if (!result) {
+            return {
+                status: ResultStatus.Unauthorized,
+                data: result,
+                errorMessage: "Unauthorized",
+                extensions: [{field: 'verifyRefreshToken', message: "Wrong refreshToken"}]
+            };
+        }
+
+        return {
+            status: ResultStatus.Success,
+            data: result.userId,
+            extensions: [],
+        };
+    },
+
+    async setTokenValidToFalse(refreshToken: string): Promise<Result> {
+
+        const result = await authRepository.setTokenValidToFalse(refreshToken);
+
+        if (!result) {
+            return {
+                status: ResultStatus.NotFound,
+                data: null,
+                errorMessage: 'NotFound',
+                extensions: [{field: null, message: 'Comment not exist'}],
+            }
+        }
+
+        return {
+            status: ResultStatus.Success,
+            data: null,
+            extensions: [],
+        }
+    },
+
+    async refreshSession(refreshToken: string): Promise<Result<{
+        accessToken: string,
+        newRefreshToken: string
+    } | null>> {
+        const tokenRecord = await this.findRefreshToken(refreshToken);
+        if (tokenRecord.status !== ResultStatus.Success) {
+            return {
+                status: tokenRecord.status,
+                data: null,
+                errorMessage: tokenRecord.errorMessage,
+                extensions: tokenRecord.extensions
+            };
+        }
+
+        const userId = await this.verifyRefreshToken(refreshToken);
+        if (userId.status !== ResultStatus.Success) {
+            return {
+                status: userId.status,
+                data: null,
+                errorMessage: userId.errorMessage,
+                extensions: userId.extensions
+            };
+        }
+
+        const invalidateResult = await this.setTokenValidToFalse(refreshToken);
+        if (invalidateResult.status !== ResultStatus.Success) {
+            return {
+                status: invalidateResult.status,
+                data: null,
+                errorMessage: invalidateResult.errorMessage,
+                extensions: invalidateResult.extensions
+            };
+        }
+
+        const newAccessToken = await this.generateAccessToken(userId.data!);
+        if (newAccessToken.status !== ResultStatus.Success) {
+            return {
+                status: newAccessToken.status,
+                data: null,
+                errorMessage: newAccessToken.errorMessage,
+                extensions: newAccessToken.extensions
+            };
+        }
+
+        const newRefreshToken = await this.generateRefreshToken(userId.data!);
+        if (newRefreshToken.status !== ResultStatus.Success) {
+            return {
+                status: newRefreshToken.status,
+                data: null,
+                errorMessage: newRefreshToken.errorMessage,
+                extensions: newRefreshToken.extensions
+            };
+        }
+
+        const saveResult = await this.saveRefreshToken(newRefreshToken.data!);
+        if (saveResult.status !== ResultStatus.NoContent) {
+            return {
+                status: ResultStatus.BadRequest,
+                data: null,
+                errorMessage: saveResult.errorMessage,
+                extensions: saveResult.extensions
+            };
+        }
+
+        return {
+            status: ResultStatus.Success,
+            data: {accessToken: newAccessToken.data!, newRefreshToken: newRefreshToken.data!},
+            extensions: []
         };
     },
 }

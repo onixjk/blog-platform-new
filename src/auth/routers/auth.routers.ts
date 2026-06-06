@@ -13,6 +13,7 @@ import {registrationEmailResendingHandler} from "./handlers/post-registration-em
 import {confirmationCodeInputValidation} from "../middlewares/confirmation-code.input-dto.validation-middleware";
 import {emailInputValidation} from "../middlewares/email-resending.input-dto.validation-middleware";
 import {refreshTokenGuard} from "../middlewares/refresh-token.guard";
+import {refreshTokenHandler} from "./handlers/post-refresh-token.handler";
 
 export const authRouter = Router({});
 
@@ -48,7 +49,7 @@ authRouter
 
     .post('/refresh-token',
         refreshTokenGuard,
-
+        refreshTokenHandler
     )
 
     .post('/logout',

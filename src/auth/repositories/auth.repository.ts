@@ -9,6 +9,15 @@ export const authRepository = {
     },
 
     async findRefreshToken(refreshToken: string): Promise<WithId<RefreshToken> | null> {
-        return await tokensCollection.findOne({ data: refreshToken })
-    }
+        return await tokensCollection.findOne({refreshToken: refreshToken, isValid: true});
+    },
+
+    async setTokenValidToFalse(refreshToken: string): Promise<boolean> {
+        const result = await tokensCollection.updateOne(
+            {refreshToken: refreshToken},
+            {$set: {isValid: false}}
+        );
+
+        return result.matchedCount > 0;
+    },
 }

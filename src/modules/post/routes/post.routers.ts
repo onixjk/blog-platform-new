@@ -14,7 +14,7 @@ import {postInputValidation} from "../middlewares/post.input-dto.validation-midd
 import {inputValidationResultMiddleware} from "../../../core/middlewares/validation/input-validation-result.middleware";
 import {CommentSortField} from "../../comment/routes/input/comment-sort-field";
 import {getPostCommentListHandler} from "./handlers/get-post-comments-list.handler";
-import {accessTokenGuard} from "../../../auth/middlewares/access.token.guard";
+import {accessTokenGuard} from "../../../auth/middlewares/access-token.guard";
 import {commentInputValidation} from "../../comment/middlewares/comment.input-dto.validation-middlewares";
 import {createPostCommentHandler} from "./handlers/create-post-comment.handler";
 
