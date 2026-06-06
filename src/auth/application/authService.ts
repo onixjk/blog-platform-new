@@ -321,61 +321,20 @@ export const authService = {
         }
     },
 
-    async refreshSession(refreshToken: string): Promise<Result<{
-        accessToken: string,
-        newRefreshToken: string
-    } | null>> {
-        const tokenRecord = await this.findRefreshToken(refreshToken);
-        if (tokenRecord.status !== ResultStatus.Success) {
+    async createTokensPair(userId: string): Promise<Result<{ accessToken: string, newRefreshToken: string } | null>> {
+        const accessTokenResult = await this.generateAccessToken(userId);
+        const refreshTokenResult = await this.generateRefreshToken(userId);
+
+        if (accessTokenResult.status !== ResultStatus.Success || refreshTokenResult.status !== ResultStatus.Success) {
             return {
-                status: tokenRecord.status,
+                status: ResultStatus.Unauthorized,
                 data: null,
-                errorMessage: tokenRecord.errorMessage,
-                extensions: tokenRecord.extensions
+                errorMessage: "Failed to generate tokens",
+                extensions: []
             };
         }
 
-        const userId = await this.verifyRefreshToken(refreshToken);
-        if (userId.status !== ResultStatus.Success) {
-            return {
-                status: userId.status,
-                data: null,
-                errorMessage: userId.errorMessage,
-                extensions: userId.extensions
-            };
-        }
-
-        const invalidateResult = await this.setTokenValidToFalse(refreshToken);
-        if (invalidateResult.status !== ResultStatus.Success) {
-            return {
-                status: invalidateResult.status,
-                data: null,
-                errorMessage: invalidateResult.errorMessage,
-                extensions: invalidateResult.extensions
-            };
-        }
-
-        const newAccessToken = await this.generateAccessToken(userId.data!);
-        if (newAccessToken.status !== ResultStatus.Success) {
-            return {
-                status: newAccessToken.status,
-                data: null,
-                errorMessage: newAccessToken.errorMessage,
-                extensions: newAccessToken.extensions
-            };
-        }
-
-        const newRefreshToken = await this.generateRefreshToken(userId.data!);
-        if (newRefreshToken.status !== ResultStatus.Success) {
-            return {
-                status: newRefreshToken.status,
-                data: null,
-                errorMessage: newRefreshToken.errorMessage,
-                extensions: newRefreshToken.extensions
-            };
-        }
-
-        const saveResult = await this.saveRefreshToken(newRefreshToken.data!);
+        const saveResult = await this.saveRefreshToken(refreshTokenResult.data!);
         if (saveResult.status !== ResultStatus.NoContent) {
             return {
                 status: ResultStatus.BadRequest,
@@ -387,8 +346,39 @@ export const authService = {
 
         return {
             status: ResultStatus.Success,
-            data: {accessToken: newAccessToken.data!, newRefreshToken: newRefreshToken.data!},
+            data: { accessToken: accessTokenResult.data!, newRefreshToken: refreshTokenResult.data! },
             extensions: []
         };
+    },
+
+    async refreshSession(refreshToken: string): Promise<Result<{
+        accessToken: string,
+        newRefreshToken: string
+    } | null>> {
+
+        const tokenRecord = await this.findRefreshToken(refreshToken);
+        const userIdResult = await this.verifyRefreshToken(refreshToken);
+
+        if (tokenRecord.status !== ResultStatus.Success || userIdResult.status !== ResultStatus.Success) {
+            return {
+                status: userIdResult.status,
+                data: null,
+                errorMessage: userIdResult.errorMessage,
+                extensions: userIdResult.extensions
+            };
+        }
+
+        const invalidateResult = await this.setTokenValidToFalse(refreshToken);
+
+        if (invalidateResult.status !== ResultStatus.Success) {
+            return {
+                status: invalidateResult.status,
+                data: null,
+                errorMessage: invalidateResult.errorMessage,
+                extensions: invalidateResult.extensions
+            };
+        }
+
+        return this.createTokensPair(userIdResult.data!);
     },
 }
