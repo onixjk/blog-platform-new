@@ -320,17 +320,13 @@ export const authService = {
             extensions: [],
         }
     },
+
     async refreshSession(refreshToken: string): Promise<Result<{
         accessToken: string,
         newRefreshToken: string
     } | null>> {
-        console.log("=== [REFRESH TRACE] START ===");
-        console.log("=== [REFRESH TRACE] Received token from cookie:", refreshToken);
-
-        // Шаг 1: Поиск в БД
         const tokenRecord = await this.findRefreshToken(refreshToken);
         if (tokenRecord.status !== ResultStatus.Success) {
-            console.log("=== [REFRESH TRACE] FAILED AT STEP 1: findRefreshToken. Status:", tokenRecord.status, "Extensions:", tokenRecord.extensions);
             return {
                 status: tokenRecord.status,
                 data: null,
@@ -338,12 +334,9 @@ export const authService = {
                 extensions: tokenRecord.extensions
             };
         }
-        console.log("=== [REFRESH TRACE] STEP 1 SUCCESS: Token found in DB");
 
-        // Шаг 2: Верификация JWT
         const userId = await this.verifyRefreshToken(refreshToken);
         if (userId.status !== ResultStatus.Success) {
-            console.log("=== [REFRESH TRACE] FAILED AT STEP 2: verifyRefreshToken. Extensions:", userId.extensions);
             return {
                 status: userId.status,
                 data: null,
@@ -351,12 +344,9 @@ export const authService = {
                 extensions: userId.extensions
             };
         }
-        console.log("=== [REFRESH TRACE] STEP 2 SUCCESS: JWT is valid. User ID:", userId.data);
 
-        // Шаг 3: Инвалидация
         const invalidateResult = await this.setTokenValidToFalse(refreshToken);
         if (invalidateResult.status !== ResultStatus.Success) {
-            console.log("=== [REFRESH TRACE] FAILED AT STEP 3: setTokenValidToFalse");
             return {
                 status: invalidateResult.status,
                 data: null,
@@ -364,12 +354,9 @@ export const authService = {
                 extensions: invalidateResult.extensions
             };
         }
-        console.log("=== [REFRESH TRACE] STEP 3 SUCCESS: Old token invalidated");
 
-        // Шаг 4: Новый Access
         const newAccessToken = await this.generateAccessToken(userId.data!);
         if (newAccessToken.status !== ResultStatus.Success) {
-            console.log("=== [REFRESH TRACE] FAILED AT STEP 4: generateAccessToken");
             return {
                 status: newAccessToken.status,
                 data: null,
@@ -378,10 +365,8 @@ export const authService = {
             };
         }
 
-        // Шаг 5: Новый Refresh
         const newRefreshToken = await this.generateRefreshToken(userId.data!);
         if (newRefreshToken.status !== ResultStatus.Success) {
-            console.log("=== [REFRESH TRACE] FAILED AT STEP 5: generateRefreshToken");
             return {
                 status: newRefreshToken.status,
                 data: null,
@@ -390,10 +375,8 @@ export const authService = {
             };
         }
 
-        // Шаг 6: Сохранение нового в БД
         const saveResult = await this.saveRefreshToken(newRefreshToken.data!);
         if (saveResult.status !== ResultStatus.NoContent) {
-            console.log("=== [REFRESH TRACE] FAILED AT STEP 6: saveRefreshToken. Extensions:", saveResult.extensions);
             return {
                 status: ResultStatus.BadRequest,
                 data: null,
@@ -401,82 +384,11 @@ export const authService = {
                 extensions: saveResult.extensions
             };
         }
-        console.log("=== [REFRESH TRACE] STEP 6 SUCCESS: New token saved. FLOW COMPLETED.");
 
         return {
             status: ResultStatus.Success,
             data: {accessToken: newAccessToken.data!, newRefreshToken: newRefreshToken.data!},
             extensions: []
         };
-    }
-    // async refreshSession(refreshToken: string): Promise<Result<{
-    //     accessToken: string,
-    //     newRefreshToken: string
-    // } | null>> {
-    //     const tokenRecord = await this.findRefreshToken(refreshToken);
-    //     if (tokenRecord.status !== ResultStatus.Success) {
-    //         return {
-    //             status: tokenRecord.status,
-    //             data: null,
-    //             errorMessage: tokenRecord.errorMessage,
-    //             extensions: tokenRecord.extensions
-    //         };
-    //     }
-    //
-    //     const userId = await this.verifyRefreshToken(refreshToken);
-    //     if (userId.status !== ResultStatus.Success) {
-    //         return {
-    //             status: userId.status,
-    //             data: null,
-    //             errorMessage: userId.errorMessage,
-    //             extensions: userId.extensions
-    //         };
-    //     }
-    //
-    //     const invalidateResult = await this.setTokenValidToFalse(refreshToken);
-    //     if (invalidateResult.status !== ResultStatus.Success) {
-    //         return {
-    //             status: invalidateResult.status,
-    //             data: null,
-    //             errorMessage: invalidateResult.errorMessage,
-    //             extensions: invalidateResult.extensions
-    //         };
-    //     }
-    //
-    //     const newAccessToken = await this.generateAccessToken(userId.data!);
-    //     if (newAccessToken.status !== ResultStatus.Success) {
-    //         return {
-    //             status: newAccessToken.status,
-    //             data: null,
-    //             errorMessage: newAccessToken.errorMessage,
-    //             extensions: newAccessToken.extensions
-    //         };
-    //     }
-    //
-    //     const newRefreshToken = await this.generateRefreshToken(userId.data!);
-    //     if (newRefreshToken.status !== ResultStatus.Success) {
-    //         return {
-    //             status: newRefreshToken.status,
-    //             data: null,
-    //             errorMessage: newRefreshToken.errorMessage,
-    //             extensions: newRefreshToken.extensions
-    //         };
-    //     }
-    //
-    //     const saveResult = await this.saveRefreshToken(newRefreshToken.data!);
-    //     if (saveResult.status !== ResultStatus.NoContent) {
-    //         return {
-    //             status: ResultStatus.BadRequest,
-    //             data: null,
-    //             errorMessage: saveResult.errorMessage,
-    //             extensions: saveResult.extensions
-    //         };
-    //     }
-    //
-    //     return {
-    //         status: ResultStatus.Success,
-    //         data: {accessToken: newAccessToken.data!, newRefreshToken: newRefreshToken.data!},
-    //         extensions: []
-    //     };
-    // },
+    },
 }
