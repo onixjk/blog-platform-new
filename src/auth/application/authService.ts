@@ -325,6 +325,7 @@ export const authService = {
         accessToken: string,
         newRefreshToken: string
     } | null>> {
+        console.log("=== REFRESH FLOW START ===");
         const tokenRecord = await this.findRefreshToken(refreshToken);
         if (tokenRecord.status !== ResultStatus.Success) {
             return {
