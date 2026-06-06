@@ -40,6 +40,4 @@ export const jwtService = {
             return null;
         }
     }
-
-
 }
