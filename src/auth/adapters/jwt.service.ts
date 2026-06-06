@@ -4,13 +4,16 @@ import {appConfig} from "../../core/config/config";
 export const jwtService = {
     async createAccessToken(userId: string): Promise<string> {
         return jwt.sign({userId}, appConfig.AC_SECRET, {
-            expiresIn: appConfig.AC_TIME as any,
+            expiresIn: '1h',
+            // appConfig.AC_TIME as any,
+
         });
     },
 
     async createRefreshToken(userId: string): Promise<string> {
         return jwt.sign({userId}, appConfig.RT_SECRET, {
-            expiresIn: appConfig.RT_TIME as any,
+            expiresIn: '20d'
+                // appConfig.RT_TIME as any,
         });
     },
 
