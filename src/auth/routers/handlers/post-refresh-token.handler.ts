@@ -11,11 +11,11 @@ export async function refreshTokenHandler(
     const cookie_name = 'refreshToken'
     const refreshToken = req.cookies.refreshToken;
 
-    if (!refreshToken) {
+    if (!refreshToken)
         return res
             .status(resultCodeToHttpException(ResultStatus.Unauthorized))
             .send({errorsMessages: [{field: 'refreshToken', message: 'Refresh token is missing'}]});
-    }
+
 
     const result = await authService.refreshSession(refreshToken);
 
@@ -26,5 +26,5 @@ export async function refreshTokenHandler(
     }
 
     res.cookie(cookie_name, result.data!.newRefreshToken, {httpOnly: true, secure: true})
-    res.status(HttpStatuses.Ok_200).send({ accessToken: result.data!.accessToken });
+    res.status(HttpStatuses.Ok_200).send({accessToken: result.data!.accessToken});
 }

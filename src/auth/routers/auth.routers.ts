@@ -14,6 +14,7 @@ import {confirmationCodeInputValidation} from "../middlewares/confirmation-code.
 import {emailInputValidation} from "../middlewares/email-resending.input-dto.validation-middleware";
 import {refreshTokenGuard} from "../middlewares/refresh-token.guard";
 import {refreshTokenHandler} from "./handlers/post-refresh-token.handler";
+import {logoutHandler} from "./handlers/post-logout.handler";
 
 export const authRouter = Router({});
 
@@ -54,5 +55,5 @@ authRouter
 
     .post('/logout',
         refreshTokenGuard,
-
+        logoutHandler
     )

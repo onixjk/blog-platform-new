@@ -381,4 +381,24 @@ export const authService = {
 
         return this.createTokensPair(userIdResult.data!);
     },
+
+    async logout(refreshToken: string): Promise<Result> {
+
+        const invalidateResult = await this.setTokenValidToFalse(refreshToken);
+
+        if (invalidateResult.status !== ResultStatus.Success) {
+            return {
+                status: ResultStatus.Unauthorized,
+                data: null,
+                errorMessage: 'Session not found or already inactive',
+                extensions: []
+            };
+        }
+
+        return {
+            status: ResultStatus.NoContent,
+            data: null,
+            extensions: []
+        };
+    }
 }
