@@ -123,6 +123,123 @@ describe('Comprehensive API Integration Tests (Full Swagger Coverage)', () => {
         });
     });
 
+    // =========================================================================
+    // НОВЫЕ ТЕСТЫ: AUTH REFRESH & LOGOUT FLOW (СОГЛАСНО ОБНОВЛЕННОМУ SWAGGER)
+    // =========================================================================
+    describe('Auth Token Lifecycle (Refresh & Logout via Cookies)', () => {
+        // Локальный массив для хранения куки в рамках этого блока тестов
+        let localCookies: any[] = [];
+        // Локальная переменная для токена, чтобы TS гарантированно её видел
+        let localJwtToken: string = '';
+
+        // Вспомогательная функция с явной типизацией `: any`, чтобы убрать ошибку TS7006
+        const getRefreshTokenFromCookie = (res: any): string | null => {
+            const setCookieHeaders = res.headers['set-cookie'];
+            if (!setCookieHeaders) return null;
+
+            const refreshCookie = setCookieHeaders.find((cookie: string) => cookie.startsWith('refreshToken='));
+            if (!refreshCookie) return null;
+
+            // [0] гарантирует, что мы берем только 'refreshToken=значение_токена'
+            return refreshCookie.split(';')[0];
+        };
+
+        it('POST /auth/login -> Перехват и проверка http-only куки refreshToken', async () => {
+            const res: any = await request
+                .post('/auth/login')
+                .send({
+                    loginOrEmail: userCredentials.login,
+                    password: userCredentials.password
+                });
+
+            expect(res.statusCode).toBe(200);
+            expect(res.body).toHaveProperty('accessToken');
+
+            const refreshTokenCookie = getRefreshTokenFromCookie(res);
+            expect(refreshTokenCookie).not.toBeNull();
+
+            // Теперь это строка, и проверка подстроки сработает идеально
+            expect(refreshTokenCookie).toContain('refreshToken=');
+
+            // Сохраняем чистую строку куки для supertest
+            localJwtToken = res.body.accessToken;
+            localCookies = [refreshTokenCookie!];
+
+            try { jwtToken = res.body.accessToken; } catch (e) {}
+        });
+
+        it('POST /auth/refresh-token -> Ошибка 401, если кука refreshToken отсутствует', async () => {
+            const res: any = await request
+                .post('/auth/refresh-token')
+                .set('Cookie', []);
+
+            expect(res.statusCode).toBe(401);
+        });
+
+        it('POST /auth/refresh-token -> Ошибка 401 при отправке невалидной или измененной куки', async () => {
+            const res: any = await request
+                .post('/auth/refresh-token')
+                .set('Cookie', ['refreshToken=invalid_token_string_here']);
+
+            expect(res.statusCode).toBe(401);
+        });
+
+        it('POST /auth/refresh-token -> Успешный выпуск новой пары токенов (200)', async () => {
+            const res: any = await request
+                .post('/auth/refresh-token')
+                .set('Cookie', localCookies);
+
+            expect(res.statusCode).toBe(200);
+            expect(res.body).toHaveProperty('accessToken');
+
+            const newCookie = getRefreshTokenFromCookie(res);
+            expect(newCookie).not.toBeNull();
+
+            // Перезаписываем переменные актуальными значениями
+            localJwtToken = res.body.accessToken;
+            localCookies = [newCookie];
+
+            try { jwtToken = res.body.accessToken; } catch (e) { /* синхронизируем с глобальной переменной */ }
+        });
+
+        it('POST /auth/logout -> Ошибка 401 при попытке выхода без куки', async () => {
+            const res: any = await request
+                .post('/auth/logout')
+                .set('Cookie', []);
+
+            expect(res.statusCode).toBe(401);
+        });
+
+        it('POST /auth/logout -> Успешный выход из системы и отзыв токена (204)', async () => {
+            const res: any = await request
+                .post('/auth/logout')
+                .set('Cookie', localCookies);
+
+            expect(res.statusCode).toBe(204);
+            expect(res.body).toEqual({});
+        });
+
+        it('POST /auth/refresh-token -> Ошибка 401 после logout (токен успешно отозван базой)', async () => {
+            const res: any = await request
+                .post('/auth/refresh-token')
+                .set('Cookie', localCookies); // Кука использована повторно после выхода
+
+            expect(res.statusCode).toBe(401);
+        });
+
+        it('Восстановление сессии для последующих блоков (Comments / Cleanup)', async () => {
+            const res: any = await request
+                .post('/auth/login')
+                .send({
+                    loginOrEmail: userCredentials.login,
+                    password: userCredentials.password
+                });
+
+            expect(res.statusCode).toBe(200);
+            try { jwtToken = res.body.accessToken; } catch (e) { /* восстанавливаем токен для старых тестов */ }
+        });
+    });
+
     // ==========================================
     // 3. КОНТРОЛЛЕР: BLOGS MANAGEMENT
     // ==========================================
@@ -350,3 +467,83 @@ describe('Comprehensive API Integration Tests (Full Swagger Coverage)', () => {
         });
     });
 });
+
+
+// ==========================================
+// ДОПОЛНЕНИЕ ДЛЯ КОНТРОЛЛЕРА: AUTH OPERATIONS (Регистрация и подтверждение)
+// ==========================================
+describe('Registration & Confirmation Flow', () => {
+    const newUserCredentials = {
+        login: 'newtester',
+        password: 'securepassword123',
+        email: 'newtester@example.com'
+    };
+
+    const invalidConfirmationCode = 'invalid-code-12345';
+
+    it('POST /auth/registration -> Ошибка 400 при некорректных входных данных', async () => {
+        const res = await request
+            .post('/auth/registration')
+            .send({ login: '', password: '1', email: 'wrong-email-format' });
+
+        expect(res.statusCode).toBe(400);
+        expect(res.body).toHaveProperty('errorsMessages');
+        expect(Array.isArray(res.body.errorsMessages)).toBe(true);
+        expect(res.body.errorsMessages[0]).toEqual(expect.objectContaining({
+            message: expect.any(String),
+            field: expect.any(String)
+        }));
+    });
+
+    it('POST /auth/registration -> Успешная регистрация нового пользователя (204)', async () => {
+        const res = await request
+            .post('/auth/registration')
+            .send(newUserCredentials);
+
+        expect(res.statusCode).toBe(204);
+        expect(res.body).toEqual({});
+    });
+
+    it('POST /auth/registration -> Ошибка 400, если пользователь с таким логином или email уже существует', async () => {
+        const res = await request
+            .post('/auth/registration')
+            .send(newUserCredentials); // Повторная отправка тех же данных
+
+        expect(res.statusCode).toBe(400);
+        expect(res.body).toHaveProperty('errorsMessages');
+    });
+
+    it('POST /auth/registration-confirmation -> Ошибка 400 при отправке некорректного или истекшего кода', async () => {
+        const res = await request
+            .post('/auth/registration-confirmation')
+            .send({ code: invalidConfirmationCode });
+
+        expect(res.statusCode).toBe(400);
+        expect(res.body).toHaveProperty('errorsMessages');
+        expect(Array.isArray(res.body.errorsMessages)).toBe(true);
+    });
+
+    it('POST /auth/registration-email-resending -> Ошибка 400 при отправке некорректного формата email', async () => {
+        const res = await request
+            .post('/auth/registration-email-resending')
+            .send({ email: 'not-an-email' });
+
+        expect(res.statusCode).toBe(400);
+        expect(res.body).toHaveProperty('errorsMessages');
+    });
+
+    it('POST /auth/registration-email-resending -> Успешное переотправление кода на валидный неподтвержденный email (204)', async () => {
+        const res = await request
+            .post('/auth/registration-email-resending')
+            .send({ email: newUserCredentials.email });
+
+        expect(res.statusCode).toBe(204);
+        expect(res.body).toEqual({});
+    });
+
+    // 💡 Примечание: Для полноценного тестирования успешного подтверждения (204) на реальной базе
+    // обычно перехватывают отправленное письмо (например, через Mock-сервис почты или обращаются напрямую в БД/репозиторий),
+    // достают из него реальный code и передают его в POST /auth/registration-confirmation.
+});
+
+

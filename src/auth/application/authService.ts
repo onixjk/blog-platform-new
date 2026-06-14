@@ -357,9 +357,19 @@ export const authService = {
     } | null>> {
 
         const tokenRecord = await this.findRefreshToken(refreshToken);
+
+        if (tokenRecord.status !== ResultStatus.Success) {
+            return {
+                status: tokenRecord.status,
+                data: null,
+                errorMessage: tokenRecord.errorMessage,
+                extensions: tokenRecord.extensions
+            };
+        }
+
         const userIdResult = await this.verifyRefreshToken(refreshToken);
 
-        if (tokenRecord.status !== ResultStatus.Success || userIdResult.status !== ResultStatus.Success) {
+        if (userIdResult.status !== ResultStatus.Success) {
             return {
                 status: userIdResult.status,
                 data: null,
@@ -372,7 +382,7 @@ export const authService = {
 
         if (invalidateResult.status !== ResultStatus.Success) {
             return {
-                status: invalidateResult.status,
+                status: ResultStatus.Unauthorized,
                 data: null,
                 errorMessage: invalidateResult.errorMessage,
                 extensions: invalidateResult.extensions
