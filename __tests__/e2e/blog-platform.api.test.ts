@@ -504,6 +504,29 @@ describe('Registration & Confirmation Flow', () => {
         expect(res.body).toEqual({});
     });
 
+    // it('POST /auth/registration-confirmation -> Успешная активация аккаунта по коду из БД (204)', async () => {
+    //     // 1. Берем email пользователя, которого мы только что зарегистрировали в тесте выше
+    //     const registeredEmail = newUserCredentials.email;
+    //
+    //     // 2. Идем напрямую в коллекцию пользователей в БД и ищем запись
+    //     // (Замените usersCollection и структуру полей на те, что используются в вашем проекте)
+    //     const userInDb: any = await userCollection.findOne({ email: registeredEmail });
+    //
+    //     expect(userInDb).not.toBeNull();
+    //     // Обычно код подтверждения хранится в объекте типа confirmationCode или emailConfirmation
+    //     const realConfirmationCode = userInDb.emailConfirmation?.confirmationCode;
+    //
+    //     expect(realConfirmationCode).toBeDefined();
+    //
+    //     // 3. Отправляем реальный код на эндпоинт подтверждения
+    //     const res: any = await request
+    //         .post('/auth/registration-confirmation')
+    //         .send({ code: realConfirmationCode });
+    //
+    //     // 4. Теперь сервер обязан вернуть 204 No Content, так как код валидный
+    //     expect(res.statusCode).toBe(204);
+    // });
+
     it('POST /auth/registration -> Ошибка 400, если пользователь с таким логином или email уже существует', async () => {
         const res = await request
             .post('/auth/registration')

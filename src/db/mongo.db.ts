@@ -13,6 +13,7 @@ const COMMENTS_COLLECTION_NAME = 'comments';
 const TOKENS_COLLECTION_NAME = 'tokens';
 
 export let client: MongoClient;
+
 export let blogCollection: Collection<Blog>;
 export let postCollection: Collection<Post>;
 export let userCollection: Collection<IUserDB>;
