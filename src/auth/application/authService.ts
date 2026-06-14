@@ -310,7 +310,7 @@ export const authService = {
                 status: ResultStatus.NotFound,
                 data: null,
                 errorMessage: 'NotFound',
-                extensions: [{field: null, message: 'Comment not exist'}],
+                extensions: [{field: null, message: 'Refresh token not found'}],
             }
         }
 
