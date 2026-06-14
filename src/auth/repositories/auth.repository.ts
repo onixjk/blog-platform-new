@@ -13,9 +13,9 @@ export const authRepository = {
     },
 
     async setTokenValidToFalse(refreshToken: string): Promise<boolean> {
-        const result = await tokensCollection.updateOne(
-            {refreshToken: refreshToken},
-            {$set: {isValid: false}}
+        const result = await tokensCollection.updateMany(
+            { refreshToken: refreshToken },
+            { $set: { isValid: false } }
         );
 
         return result.matchedCount > 0;

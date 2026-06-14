@@ -127,12 +127,9 @@ describe('Comprehensive API Integration Tests (Full Swagger Coverage)', () => {
     // НОВЫЕ ТЕСТЫ: AUTH REFRESH & LOGOUT FLOW (СОГЛАСНО ОБНОВЛЕННОМУ SWAGGER)
     // =========================================================================
     describe('Auth Token Lifecycle (Refresh & Logout via Cookies)', () => {
-        // Локальный массив для хранения куки в рамках этого блока тестов
-        let localCookies: any[] = [];
-        // Локальная переменная для токена, чтобы TS гарантированно её видел
-        let localJwtToken: string = '';
+        let savedCookieString: string = '';
 
-        // Вспомогательная функция с явной типизацией `: any`, чтобы убрать ошибку TS7006
+        // Вспомогательная функция: извлекает только чистую строку 'refreshToken=значение'
         const getRefreshTokenFromCookie = (res: any): string | null => {
             const setCookieHeaders = res.headers['set-cookie'];
             if (!setCookieHeaders) return null;
@@ -140,9 +137,20 @@ describe('Comprehensive API Integration Tests (Full Swagger Coverage)', () => {
             const refreshCookie = setCookieHeaders.find((cookie: string) => cookie.startsWith('refreshToken='));
             if (!refreshCookie) return null;
 
-            // [0] гарантирует, что мы берем только 'refreshToken=значение_токена'
+            // Отсекаем параметры HttpOnly, Secure, Path, забирая только часть до первого ';'
             return refreshCookie.split(';')[0];
         };
+
+        it('POST /auth/login -> Дополнительная проверка: Ошибка 401 при неверном пароле', async () => {
+            const res: any = await request
+                .post('/auth/login')
+                .send({
+                    loginOrEmail: userCredentials.login,
+                    password: 'wrong-password-123'
+                });
+
+            expect(res.statusCode).toBe(401);
+        });
 
         it('POST /auth/login -> Перехват и проверка http-only куки refreshToken', async () => {
             const res: any = await request
@@ -155,16 +163,14 @@ describe('Comprehensive API Integration Tests (Full Swagger Coverage)', () => {
             expect(res.statusCode).toBe(200);
             expect(res.body).toHaveProperty('accessToken');
 
-            const refreshTokenCookie = getRefreshTokenFromCookie(res);
-            expect(refreshTokenCookie).not.toBeNull();
+            const tokenCookie = getRefreshTokenFromCookie(res);
+            expect(tokenCookie).not.toBeNull();
+            expect(tokenCookie).toContain('refreshToken=');
 
-            // Теперь это строка, и проверка подстроки сработает идеально
-            expect(refreshTokenCookie).toContain('refreshToken=');
+            // Сохраняем чистую куку в переменную
+            savedCookieString = tokenCookie!;
 
-            // Сохраняем чистую строку куки для supertest
-            localJwtToken = res.body.accessToken;
-            localCookies = [refreshTokenCookie!];
-
+            // Синхронизируем глобальный токен для ваших старых тестов (комментариев и т.д.)
             try { jwtToken = res.body.accessToken; } catch (e) {}
         });
 
@@ -187,7 +193,7 @@ describe('Comprehensive API Integration Tests (Full Swagger Coverage)', () => {
         it('POST /auth/refresh-token -> Успешный выпуск новой пары токенов (200)', async () => {
             const res: any = await request
                 .post('/auth/refresh-token')
-                .set('Cookie', localCookies);
+                .set('Cookie', [savedCookieString]);
 
             expect(res.statusCode).toBe(200);
             expect(res.body).toHaveProperty('accessToken');
@@ -195,11 +201,9 @@ describe('Comprehensive API Integration Tests (Full Swagger Coverage)', () => {
             const newCookie = getRefreshTokenFromCookie(res);
             expect(newCookie).not.toBeNull();
 
-            // Перезаписываем переменные актуальными значениями
-            localJwtToken = res.body.accessToken;
-            localCookies = [newCookie];
-
-            try { jwtToken = res.body.accessToken; } catch (e) { /* синхронизируем с глобальной переменной */ }
+            // Перезаписываем актуальные значения для следующих шагов
+            savedCookieString = newCookie!;
+            try { jwtToken = res.body.accessToken; } catch (e) {}
         });
 
         it('POST /auth/logout -> Ошибка 401 при попытке выхода без куки', async () => {
@@ -213,16 +217,19 @@ describe('Comprehensive API Integration Tests (Full Swagger Coverage)', () => {
         it('POST /auth/logout -> Успешный выход из системы и отзыв токена (204)', async () => {
             const res: any = await request
                 .post('/auth/logout')
-                .set('Cookie', localCookies);
+                .set('Cookie', [savedCookieString]);
 
             expect(res.statusCode).toBe(204);
             expect(res.body).toEqual({});
         });
 
         it('POST /auth/refresh-token -> Ошибка 401 после logout (токен успешно отозван базой)', async () => {
+            // Микропауза для стабильности MongoDB в окружении интеграционных тестов
+            await new Promise((resolve) => setTimeout(resolve, 50));
+
             const res: any = await request
                 .post('/auth/refresh-token')
-                .set('Cookie', localCookies); // Кука использована повторно после выхода
+                .set('Cookie', [savedCookieString]); // Отправляем заблокированный токен
 
             expect(res.statusCode).toBe(401);
         });
@@ -236,7 +243,7 @@ describe('Comprehensive API Integration Tests (Full Swagger Coverage)', () => {
                 });
 
             expect(res.statusCode).toBe(200);
-            try { jwtToken = res.body.accessToken; } catch (e) { /* восстанавливаем токен для старых тестов */ }
+            try { jwtToken = res.body.accessToken; } catch (e) {}
         });
     });
 

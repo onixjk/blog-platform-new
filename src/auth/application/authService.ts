@@ -356,7 +356,7 @@ export const authService = {
         newRefreshToken: string
     } | null>> {
 
-        const tokenRecord = await this.findRefreshToken(refreshToken);
+        const tokenRecord = await authService.findRefreshToken(refreshToken);
 
         if (tokenRecord.status !== ResultStatus.Success) {
             return {
@@ -367,7 +367,7 @@ export const authService = {
             };
         }
 
-        const userIdResult = await this.verifyRefreshToken(refreshToken);
+        const userIdResult = await authService.verifyRefreshToken(refreshToken);
 
         if (userIdResult.status !== ResultStatus.Success) {
             return {
@@ -378,7 +378,7 @@ export const authService = {
             };
         }
 
-        const invalidateResult = await this.setTokenValidToFalse(refreshToken);
+        const invalidateResult = await authService.setTokenValidToFalse(refreshToken);
 
         if (invalidateResult.status !== ResultStatus.Success) {
             return {
@@ -389,7 +389,7 @@ export const authService = {
             };
         }
 
-        return this.createTokensPair(userIdResult.data!);
+        return authService.createTokensPair(userIdResult.data!);
     },
 
     async logout(refreshToken: string): Promise<Result> {
