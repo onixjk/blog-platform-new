@@ -18,6 +18,7 @@ export const authService = {
         loginOrEmail: string,
         password: string,
     ): Promise<Result<{ accessToken: string, refreshToken: string } | null>> {
+
         const result = await authService.checkUserCredentials(loginOrEmail, password);
 
         if (result.status !== ResultStatus.Success) {
@@ -29,8 +30,15 @@ export const authService = {
             };
         }
 
-        const accessToken = await jwtService.createAccessToken(result.data!._id.toString());
-        const refreshToken = await jwtService.createRefreshToken(result.data!._id.toString());
+        const deviceId = randomUUID();
+
+        const [accessToken, refreshToken] = await Promise.all([
+            jwtService.createAccessToken(result.data!._id.toString()),
+            jwtService.createRefreshToken(result.data!._id.toString(), deviceId),
+        ]);
+
+        // const accessToken = await jwtService.createAccessToken(result.data!._id.toString());
+        // const refreshToken = await jwtService.createRefreshToken(result.data!._id.toString());
 
         const saveResult = await this.saveRefreshToken(refreshToken);
 
@@ -261,9 +269,9 @@ export const authService = {
         };
     },
 
-    async generateRefreshToken(userId: string): Promise<Result<string | null>> {
+    async generateRefreshToken(userId: string, deviceId: string): Promise<Result<string | null>> {
 
-        const result = await jwtService.createRefreshToken(userId);
+        const result = await jwtService.createRefreshToken(userId, deviceId);
 
         if (!result) {
             return {
@@ -281,14 +289,14 @@ export const authService = {
         };
     },
 
-    async verifyRefreshToken(refreshToken: string): Promise<Result<string | null>> {
+    async verifyRefreshToken(refreshToken: string): Promise<Result<{ userId: string, deviceId: string } | null>> {
 
         const result = await jwtService.verifyRefreshToken(refreshToken);
 
-        if (!result) {
+        if (!result || !result.userId || !result.deviceId) {
             return {
                 status: ResultStatus.Unauthorized,
-                data: result,
+                data: null,
                 errorMessage: "Unauthorized",
                 extensions: [{field: 'verifyRefreshToken', message: "Wrong refreshToken"}]
             };
@@ -296,7 +304,7 @@ export const authService = {
 
         return {
             status: ResultStatus.Success,
-            data: result.userId,
+            data: result,
             extensions: [],
         };
     },
@@ -321,9 +329,18 @@ export const authService = {
         }
     },
 
-    async createTokensPair(userId: string): Promise<Result<{ accessToken: string, newRefreshToken: string } | null>> {
-        const accessTokenResult = await this.generateAccessToken(userId);
-        const refreshTokenResult = await this.generateRefreshToken(userId);
+    async createTokensPair(userId: string, deviceId: string): Promise<Result<{
+        accessToken: string,
+        newRefreshToken: string
+    } | null>> {
+
+        const [accessTokenResult, refreshTokenResult] = await Promise.all([
+            this.generateAccessToken(userId),
+            this.generateRefreshToken(userId, deviceId),
+        ]);
+
+        // const accessTokenResult = await this.generateAccessToken(userId);
+        // const refreshTokenResult = await this.generateRefreshToken(userId, deviceId);
 
         if (accessTokenResult.status !== ResultStatus.Success || refreshTokenResult.status !== ResultStatus.Success) {
             return {
@@ -346,7 +363,7 @@ export const authService = {
 
         return {
             status: ResultStatus.Success,
-            data: { accessToken: accessTokenResult.data!, newRefreshToken: refreshTokenResult.data! },
+            data: {accessToken: accessTokenResult.data!, newRefreshToken: refreshTokenResult.data!},
             extensions: []
         };
     },
@@ -355,6 +372,17 @@ export const authService = {
         accessToken: string,
         newRefreshToken: string
     } | null>> {
+
+        const verifyRefreshTokenResult = await authService.verifyRefreshToken(refreshToken);
+
+        if (verifyRefreshTokenResult.status !== ResultStatus.Success) {
+            return {
+                status: verifyRefreshTokenResult.status,
+                data: null,
+                errorMessage: verifyRefreshTokenResult.errorMessage,
+                extensions: verifyRefreshTokenResult.extensions
+            };
+        }
 
         const tokenRecord = await authService.findRefreshToken(refreshToken);
 
@@ -367,14 +395,17 @@ export const authService = {
             };
         }
 
-        const userIdResult = await authService.verifyRefreshToken(refreshToken);
+        const tokensPairResult = await authService.createTokensPair(
+            verifyRefreshTokenResult.data!.userId,
+            verifyRefreshTokenResult.data!.deviceId
+        );
 
-        if (userIdResult.status !== ResultStatus.Success) {
+        if (tokensPairResult.status !== ResultStatus.Success) {
             return {
-                status: userIdResult.status,
+                status: tokensPairResult.status,
                 data: null,
-                errorMessage: userIdResult.errorMessage,
-                extensions: userIdResult.extensions
+                errorMessage: tokensPairResult.errorMessage,
+                extensions: tokensPairResult.extensions
             };
         }
 
@@ -389,7 +420,7 @@ export const authService = {
             };
         }
 
-        return authService.createTokensPair(userIdResult.data!);
+        return tokensPairResult;
     },
 
     async logout(refreshToken: string): Promise<Result> {

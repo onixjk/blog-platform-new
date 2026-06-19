@@ -1,6 +1,6 @@
 import {Router} from "express";
 import {inputValidationResultMiddleware} from "../../core/middlewares/validation/input-validation-result.middleware";
-import {loginUserHandler} from "./handlers/login-user.handler";
+import {loginUserHandler} from "./handlers/post-login-user.handler";
 import {
     loginOrEmailValidation,
     userInputValidation

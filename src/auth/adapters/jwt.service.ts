@@ -3,16 +3,19 @@ import {appConfig} from "../../core/config/config";
 
 export const jwtService = {
     async createAccessToken(userId: string): Promise<string> {
-        return jwt.sign({userId}, appConfig.AC_SECRET, {
-            expiresIn: appConfig.AC_TIME as any,
-
-        });
+        return jwt.sign(
+            {userId},
+            appConfig.AC_SECRET,
+            {expiresIn: appConfig.AC_TIME as any}
+        );
     },
 
-    async createRefreshToken(userId: string): Promise<string> {
-        return jwt.sign({userId}, appConfig.RT_SECRET, {
-            expiresIn: appConfig.RT_TIME as any,
-        });
+    async createRefreshToken(userId: string, deviceId: string): Promise<string> {
+        return jwt.sign(
+            {userId, deviceId},
+            appConfig.RT_SECRET,
+            {expiresIn: appConfig.RT_TIME as any}
+        );
     },
 
     async decodeToken(token: string): Promise<any> {
@@ -33,9 +36,9 @@ export const jwtService = {
         }
     },
 
-    async verifyRefreshToken(token: string): Promise< { userId: string } | null> {
+    async verifyRefreshToken(token: string): Promise<{ userId: string, deviceId: string} | null> {
         try {
-            return jwt.verify(token, appConfig.RT_SECRET) as { userId: string};
+            return jwt.verify(token, appConfig.RT_SECRET) as { userId: string, deviceId: string };
         } catch (error) {
             console.error("Token verify some error");
             return null;
