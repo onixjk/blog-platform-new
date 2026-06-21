@@ -13,7 +13,7 @@ export const authRepository = {
     },
 
     async setTokenValidToFalse(refreshToken: string): Promise<boolean> {
-        const result = await tokensCollection.updateMany(
+        const result = await tokensCollection.updateMany( // updateOne
             { refreshToken: refreshToken },
             { $set: { isValid: false } }
         );

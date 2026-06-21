@@ -17,11 +17,13 @@ export const authService = {
     async loginUser(
         loginOrEmail: string,
         password: string,
+        browserName: string,
+        clientIp: string,
     ): Promise<Result<{ accessToken: string, refreshToken: string } | null>> {
 
-        const result = await authService.checkUserCredentials(loginOrEmail, password);
+        const userCredentialsResult = await authService.checkUserCredentials(loginOrEmail, password);
 
-        if (result.status !== ResultStatus.Success) {
+        if (userCredentialsResult.status !== ResultStatus.Success) {
             return {
                 status: ResultStatus.Unauthorized,
                 data: null,
@@ -33,14 +35,14 @@ export const authService = {
         const deviceId = randomUUID();
 
         const [accessToken, refreshToken] = await Promise.all([
-            jwtService.createAccessToken(result.data!._id.toString()),
-            jwtService.createRefreshToken(result.data!._id.toString(), deviceId),
+            jwtService.createAccessToken(userCredentialsResult.data!._id.toString()),
+            jwtService.createRefreshToken(userCredentialsResult.data!._id.toString(), deviceId),
         ]);
 
-        // const accessToken = await jwtService.createAccessToken(result.data!._id.toString());
-        // const refreshToken = await jwtService.createRefreshToken(result.data!._id.toString());
+        // const accessToken = await jwtService.createAccessToken(userCredentialsResult.data!._id.toString());
+        // const refreshToken = await jwtService.createRefreshToken(userCredentialsResult.data!._id.toString());
 
-        const saveResult = await this.saveRefreshToken(refreshToken);
+        const saveResult = await this.createSession(refreshToken);
 
         if (saveResult.status !== ResultStatus.NoContent) {
             return {
@@ -203,7 +205,28 @@ export const authService = {
         };
     },
 
-    async saveRefreshToken(refreshToken: string): Promise<Result> {
+    async createSession(session: string): Promise<Result> {
+        const deviceId = this.uuidService.generate();
+        const tokens = this.createTokensPair()
+
+        const accessToken = generateAccessToken({ userId });
+        const refreshToken = generateRefreshToken({ userId, deviceId });
+
+        const expiredAt = this.jwtService.getExpirationDate(refreshToken);
+
+        await this.securityDevicesRepository.createSession({
+            userId,
+            deviceId,
+            ip: clientIp,
+            title: browserName,
+            expiredAt,
+            createdAt: new Date()
+        });
+
+        return { accessToken, refreshToken };
+
+//////////////////////////////////////////////////////////////////////////
+
         const decodedToken = await jwtService.decodeToken(refreshToken);
 
         if (!decodedToken || typeof decodedToken.exp !== 'number') {
@@ -331,7 +354,7 @@ export const authService = {
 
     async createTokensPair(userId: string, deviceId: string): Promise<Result<{
         accessToken: string,
-        newRefreshToken: string
+        refreshToken: string
     } | null>> {
 
         const [accessTokenResult, refreshTokenResult] = await Promise.all([
@@ -339,39 +362,35 @@ export const authService = {
             this.generateRefreshToken(userId, deviceId),
         ]);
 
-        // const accessTokenResult = await this.generateAccessToken(userId);
-        // const refreshTokenResult = await this.generateRefreshToken(userId, deviceId);
-
-        if (accessTokenResult.status !== ResultStatus.Success || refreshTokenResult.status !== ResultStatus.Success) {
+        if (accessTokenResult.status !== ResultStatus.Success || !accessTokenResult.data) {
             return {
                 status: ResultStatus.Unauthorized,
                 data: null,
-                errorMessage: "Failed to generate tokens",
+                errorMessage: "Failed to generate access token", // Уточняем ошибку
                 extensions: []
             };
         }
 
-        const saveResult = await this.saveRefreshToken(refreshTokenResult.data!);
-        if (saveResult.status !== ResultStatus.NoContent) {
+        if (refreshTokenResult.status !== ResultStatus.Success || !refreshTokenResult.data) {
             return {
-                status: ResultStatus.BadRequest,
+                status: ResultStatus.Unauthorized,
                 data: null,
-                errorMessage: saveResult.errorMessage,
-                extensions: saveResult.extensions
+                errorMessage: "Failed to generate refresh token", // Уточняем ошибку
+                extensions: []
             };
         }
 
         return {
             status: ResultStatus.Success,
-            data: {accessToken: accessTokenResult.data!, newRefreshToken: refreshTokenResult.data!},
+            data: {
+                accessToken: accessTokenResult.data,
+                refreshToken: refreshTokenResult.data
+            },
             extensions: []
         };
     },
 
-    async refreshSession(refreshToken: string): Promise<Result<{
-        accessToken: string,
-        newRefreshToken: string
-    } | null>> {
+    async refreshSession(refreshToken: string): Promise<Result<{ accessToken: string; refreshToken: string } | null>> {
 
         const verifyRefreshTokenResult = await authService.verifyRefreshToken(refreshToken);
 
@@ -435,6 +454,16 @@ export const authService = {
                 extensions: []
             };
         }
+
+        return {
+            status: ResultStatus.NoContent,
+            data: null,
+            extensions: []
+        };
+    },
+
+    async saveResult(refreshToken: string): Promise<Result> {
+
 
         return {
             status: ResultStatus.NoContent,

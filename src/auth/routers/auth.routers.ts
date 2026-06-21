@@ -15,6 +15,7 @@ import {emailInputValidation} from "../middlewares/email-resending.input-dto.val
 import {refreshTokenGuard} from "../middlewares/refresh-token.guard";
 import {refreshTokenHandler} from "./handlers/post-refresh-token.handler";
 import {logoutHandler} from "./handlers/post-logout.handler";
+import useragent from "express-useragent";
 
 export const authRouter = Router({});
 
@@ -27,6 +28,7 @@ authRouter
     .post('/login',
         loginOrEmailValidation,
         inputValidationResultMiddleware,
+        useragent.express(),
         loginUserHandler
     )
 

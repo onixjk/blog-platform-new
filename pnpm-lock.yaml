@@ -20,6 +20,9 @@ importers:
       express:
         specifier: ^5.2.1
         version: 5.2.1
+      express-useragent:
+        specifier: ^2.2.0
+        version: 2.2.0
       express-validator:
         specifier: ^7.3.2
         version: 7.3.2
@@ -1205,6 +1208,10 @@ packages:
   expect@30.4.1:
     resolution: {integrity: sha512-PMARsyh/JtqC20HoGqlFcIlQAyqUtW4PlI1rup1uhYJtKuwAjbvWi3GQMAn+STdHum/dk8xrKfUM1+5SAwpolA==}
     engines: {node: ^18.14.0 || ^20.0.0 || ^22.0.0 || >=24.0.0}
+
+  express-useragent@2.2.0:
+    resolution: {integrity: sha512-P67xFbgKVbVY1nOrMBLUNCxh72fnxAclIJ03HTw72AsVHqF4NXgWZrRREKQJz0eFrWLc1e2Yn2m1OblYxAqAGQ==}
+    engines: {node: '>=18'}
 
   express-validator@7.3.2:
     resolution: {integrity: sha512-ctLw1Vl6dXVH62dIQMDdTAQkrh480mkFuG6/SGXOaVlwPNukhRAe7EgJIMJ2TSAni8iwHBRp530zAZE5ZPF2IA==}
@@ -3639,6 +3646,8 @@ snapshots:
       jest-message-util: 30.4.1
       jest-mock: 30.4.1
       jest-util: 30.4.1
+
+  express-useragent@2.2.0: {}
 
   express-validator@7.3.2:
     dependencies:
