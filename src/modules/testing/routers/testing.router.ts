@@ -4,7 +4,7 @@ import {
     blogCollection,
     commentCollection,
     postCollection,
-    tokensCollection,
+    sessionCollection,
     userCollection
 } from "../../../db/mongo.db";
 
@@ -16,7 +16,7 @@ testingRouter.delete('/all-data', async (req: Request, res: Response) => {
         await blogCollection.deleteMany({});
         await userCollection.deleteMany({});
         await commentCollection.deleteMany({});
-        await tokensCollection.deleteMany({});
+        await sessionCollection.deleteMany({});
 
         res.sendStatus(HttpStatuses.NoContent_204)
     } catch (e: unknown) {
