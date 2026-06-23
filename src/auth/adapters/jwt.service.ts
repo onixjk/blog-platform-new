@@ -1,5 +1,9 @@
 import jwt from "jsonwebtoken";
 import {appConfig} from "../../core/config/config";
+import { promisify } from 'util';
+
+// Превращаем jwt.sign в асинхронную функцию
+const signJwtAsync = promisify(jwt.sign as any);
 
 export const jwtService = {
     // async createAccessToken(userId: string): Promise<string> {
