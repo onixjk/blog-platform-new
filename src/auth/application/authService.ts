@@ -42,12 +42,12 @@ export const authService = {
             clientIp: clientIp,
         }
 
-        const createSessionResult = await this.createSession(sessionDto);
+        const createSessionResult = await this._createSession(sessionDto);
 
         if (!createSessionResult.data) {
             return {
-                status: ResultStatus.BadRequest,
-                errorMessage: 'Bad Request',
+                status: ResultStatus.Unauthorized,
+                errorMessage: 'Unauthorized',
                 data: null,
                 extensions: [{field: null, message: 'Failed to save refresh token'}],
             };
@@ -81,9 +81,9 @@ export const authService = {
 
         if (!isPassCorrect)
             return {
-                status: ResultStatus.BadRequest,
+                status: ResultStatus.Unauthorized,
                 data: null,
-                errorMessage: 'Bad Request',
+                errorMessage: 'Unauthorized',
                 extensions: [{field: 'password', message: 'Wrong password'}],
             };
 
@@ -208,57 +208,6 @@ export const authService = {
         };
     },
 
-    async createSession(sessionDto: SessionDto): Promise<Result<TokensPair | null>> {
-        const deviceId = randomUUID();
-        const tokensPairResult = await this.createTokensPair(sessionDto.userId, deviceId)
-
-        if (!tokensPairResult.data) {
-            return {
-                status: ResultStatus.Unauthorized,
-                data: null,
-                errorMessage: 'Unauthorized',
-                extensions: [{field: 'refreshToken', message: 'Refresh token is invalid or expired'}]
-            };
-        }
-
-        const accessToken = tokensPairResult.data.accessToken;
-        const refreshToken = tokensPairResult.data.refreshToken;
-
-        const refreshTokenPayload = await jwtService.decodeToken(tokensPairResult.data.refreshToken);
-
-        if (!refreshTokenPayload ||
-            typeof refreshTokenPayload.exp !== 'number' ||
-            typeof refreshTokenPayload.iat !== 'number'
-        ) {
-            return {
-                status: ResultStatus.BadRequest,
-                errorMessage: 'Bad Request',
-                data: null,
-                extensions: [{field: null, message: 'Can\'t decode token'}],
-            };
-        }
-
-        const iat = refreshTokenPayload.iat;
-        const exp = refreshTokenPayload.exp;
-
-        const session: Session = {
-            user_id: sessionDto.userId,
-            device_id: deviceId,
-            iat: iat,
-            browserName: sessionDto.browserName,
-            ip: sessionDto.clientIp,
-            exp: exp,
-        }
-
-        await authRepository.saveSession(session);
-
-        return {
-            status: ResultStatus.Success,
-            data: {accessToken, refreshToken},
-            extensions: [],
-        };
-    },
-
     // async findRefreshToken(refreshToken: string): Promise<Result<RefreshToken | null>> {
     //     const result = await authRepository.findRefreshToken(refreshToken);
     //
@@ -298,14 +247,14 @@ export const authService = {
     //     }
     // },
 
-    async refreshSession(refreshTokenDto: string): Promise<Result<{
+    async refreshSession(refToken: string): Promise<Result<{
         accessToken: string;
         refreshToken: string
     } | null>> {
 
-        const verifyRefreshTokenResult = await jwtService.verifyRefreshToken(refreshTokenDto);
+        const verifyRefreshTokenResult = await jwtService.verifyRefreshToken(refToken);
 
-        if (!verifyRefreshTokenResult) {
+        if (!verifyRefreshTokenResult || typeof verifyRefreshTokenResult.iat === 'undefined') {
             return {
                 status: ResultStatus.Unauthorized,
                 data: null,
@@ -314,55 +263,136 @@ export const authService = {
             };
         }
 
-        const tokenRecord = await authRepository.findRefreshToken(refreshTokenDto);
+        const findSessionDto = {
+            deviceId: verifyRefreshTokenResult.deviceId,
+            iat: verifyRefreshTokenResult.iat.toString()
+        }
 
-        if (!tokenRecord) {
+        const sessionRecord = await authRepository.findRefreshToken(findSessionDto);
+
+        if (!sessionRecord) {
             return {
                 status: ResultStatus.Unauthorized,
                 errorMessage: 'Unauthorized',
                 data: null,
-                extensions: [{field: 'refreshToken', message: 'Token not found'}],
+                extensions: [{field: 'Session', message: 'Session not found'}],
             };
         }
 
-        const [accessToken, refreshToken] = await Promise.all([
-            jwtService.createAccessToken(verifyRefreshTokenResult.userId),
-            jwtService.createRefreshToken(verifyRefreshTokenResult.userId, verifyRefreshTokenResult.deviceId),
-        ]);
+        const tokensPairResult = await this._createTokensPair(
+            verifyRefreshTokenResult.userId,
+            verifyRefreshTokenResult.deviceId
+        );
 
-        if (!accessToken) {
+        if (!tokensPairResult.data) {
             return {
                 status: ResultStatus.Unauthorized,
-                errorMessage: 'Bad Request',
                 data: null,
-                extensions: [{field: 'Access Token', message: 'Failed to generate access token'}],
+                errorMessage: 'Unauthorized',
+                extensions: [{field: 'refreshToken', message: 'Refresh token is invalid or expired'}]
             };
         }
 
-        if (!refreshToken) {
+        const decodedToken = await jwtService.decodeToken(tokensPairResult.data.refreshToken);
+
+        if (!decodedToken || typeof decodedToken.iat !== 'number') {
             return {
                 status: ResultStatus.BadRequest,
                 errorMessage: 'Bad Request',
                 data: null,
-                extensions: [{field: 'Refresh Token', message: 'Failed to generate refresh token'}],
+                extensions: [{field: null, message: 'Can\'t decode token'}],
             };
         }
 
-        const invalidateResult = await authService.setTokenValidToFalse(refreshToken);
+        const deviceId = decodedToken.deviceId;
+        const iat = decodedToken.iat.toString();
 
-        if (invalidateResult.status !== ResultStatus.Success) {
+        const updateIatResult = await authRepository.updateIat(deviceId, iat);
+
+        if (!updateIatResult) {
             return {
                 status: ResultStatus.Unauthorized,
                 data: null,
-                errorMessage: invalidateResult.errorMessage,
-                extensions: invalidateResult.extensions
+                errorMessage: 'Unauthorized',
+                extensions: [{field: 'Iat', message: 'Can\'t update iat'}]
             };
         }
 
         return tokensPairResult;
     },
 
-    async createTokensPair(userId: string, deviceId: string): Promise<Result<TokensPair | null>> {
+    async logout(refreshToken: string): Promise<Result> {
+
+        // const invalidateResult = await this.setTokenValidToFalse(refreshToken);
+
+        // if (invalidateResult.status !== ResultStatus.Success) {
+        //     return {
+        //         status: ResultStatus.Unauthorized,
+        //         data: null,
+        //         errorMessage: 'Session not found or already inactive',
+        //         extensions: []
+        //     };
+        // }
+
+        return {
+            status: ResultStatus.NoContent,
+            data: null,
+            extensions: []
+        };
+    },
+
+    async _createSession(sessionDto: SessionDto): Promise<Result<TokensPair | null>> {
+        const deviceId = randomUUID();
+        const tokensPairResult = await this._createTokensPair(sessionDto.userId, deviceId)
+
+        if (!tokensPairResult.data) {
+            return {
+                status: ResultStatus.Unauthorized,
+                data: null,
+                errorMessage: 'Unauthorized',
+                extensions: [{field: 'refreshToken', message: 'Refresh token is invalid or expired'}]
+            };
+        }
+
+        const accessToken = tokensPairResult.data.accessToken;
+        const refreshToken = tokensPairResult.data.refreshToken;
+
+        const refreshTokenPayload = await jwtService.decodeToken(tokensPairResult.data.refreshToken);
+
+        if (!refreshTokenPayload ||
+            typeof refreshTokenPayload.exp !== 'number' ||
+            typeof refreshTokenPayload.iat !== 'number'
+        ) {
+            return {
+                status: ResultStatus.BadRequest,
+                errorMessage: 'Bad Request',
+                data: null,
+                extensions: [{field: null, message: 'Can\'t decode token'}],
+            };
+        }
+
+        const iat = refreshTokenPayload.iat.toString();
+        const exp = refreshTokenPayload.exp.toString();
+
+        const session: Session = {
+            user_id: sessionDto.userId,
+            device_id: deviceId,
+            iat: iat,
+            browserName: sessionDto.browserName,
+            ip: sessionDto.clientIp,
+            exp: exp,
+        }
+
+        await authRepository.saveSession(session);
+
+        return {
+            status: ResultStatus.Success,
+            data: {accessToken, refreshToken},
+            extensions: [],
+        };
+    },
+
+    async _createTokensPair(userId: string, deviceId: string): Promise<Result<TokensPair | null>> {
 
         const [accessToken, refreshToken] = await Promise.all([
             jwtService.createAccessToken(userId),
@@ -390,27 +420,6 @@ export const authService = {
         return {
             status: ResultStatus.Success,
             data: {accessToken, refreshToken},
-            extensions: []
-        };
-    },
-
-
-    async logout(refreshToken: string): Promise<Result> {
-
-        // const invalidateResult = await this.setTokenValidToFalse(refreshToken);
-
-        // if (invalidateResult.status !== ResultStatus.Success) {
-        //     return {
-        //         status: ResultStatus.Unauthorized,
-        //         data: null,
-        //         errorMessage: 'Session not found or already inactive',
-        //         extensions: []
-        //     };
-        // }
-
-        return {
-            status: ResultStatus.NoContent,
-            data: null,
             extensions: []
         };
     },

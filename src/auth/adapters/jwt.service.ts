@@ -1,6 +1,7 @@
-import jwt from "jsonwebtoken";
+import jwt, {JwtPayload} from "jsonwebtoken";
 import {appConfig} from "../../core/config/config";
-import { promisify } from 'util';
+import {promisify} from 'util';
+import {RefreshTokenPayload} from "../types/refresh-token-payload.interface";
 
 // Превращаем jwt.sign в асинхронную функцию
 const signJwtAsync = promisify(jwt.sign as any);
@@ -72,9 +73,14 @@ export const jwtService = {
         }
     },
 
-    async verifyRefreshToken(token: string): Promise<{ userId: string, deviceId: string } | null> {
+    async verifyRefreshToken(token: string): Promise<RefreshTokenPayload | null> {
         try {
-            return jwt.verify(token, appConfig.RT_SECRET) as { userId: string, deviceId: string };
+            const decoded = jwt.verify(token, appConfig.RT_SECRET);
+
+            if (typeof decoded === 'string')
+                return null;
+
+            return decoded as RefreshTokenPayload;
         } catch (error) {
             console.error("Token verify some error");
             return null;

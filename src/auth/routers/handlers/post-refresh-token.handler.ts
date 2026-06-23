@@ -19,12 +19,12 @@ export async function refreshTokenHandler(
 
     const result = await authService.refreshSession(refreshToken);
 
-    if (result.status !== ResultStatus.Success) {
+    if (result.status !== ResultStatus.Success || !result.data) {
         return res
             .status(resultCodeToHttpException(result.status))
             .send({errorsMessages: result.extensions});
     }
 
-    res.cookie(cookie_name, result.data!.refreshToken, {httpOnly: true, secure: true})
-    res.status(HttpStatuses.Ok_200).send({accessToken: result.data!.accessToken});
+    res.cookie(cookie_name, result.data.refreshToken, {httpOnly: true, secure: true})
+    res.status(HttpStatuses.Ok_200).send({accessToken: result.data.accessToken});
 }
