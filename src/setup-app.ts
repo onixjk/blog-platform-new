@@ -1,6 +1,14 @@
 
 import express, { Express } from "express";
-import {AUTH_PATH, BLOGS_PATH, COMMENTS_PATH, POSTS_PATH, TESTING_PATH, USERS_PATH} from "./core/paths/paths";
+import {
+    AUTH_PATH,
+    BLOGS_PATH,
+    COMMENTS_PATH,
+    POSTS_PATH,
+    SECURITY_PATH,
+    TESTING_PATH,
+    USERS_PATH
+} from "./core/paths/paths";
 import {blogRouter} from "./modules/blog/routes/blog.router";
 import {testingRouter} from "./modules/testing/routers/testing.router";
 import {postRouter} from "./modules/post/routes/post.routers";
@@ -22,6 +30,7 @@ export const setupApp = (app: Express) => {
     app.use(COMMENTS_PATH, commentRouter)
     app.use(TESTING_PATH, testingRouter)
     app.use(AUTH_PATH, authRouter)
+    app.use(SECURITY_PATH, authRouter)
 
 
     return app;

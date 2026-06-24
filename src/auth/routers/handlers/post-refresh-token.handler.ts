@@ -9,15 +9,13 @@ export async function refreshTokenHandler(
     res: Response,
 ) {
     const cookie_name = 'refreshToken'
-    const refreshToken = req.cookies.refreshToken;
+    const userId = req.user.id;
+    const deviceId = req.deviceId;
+    if (!userId || !deviceId) {
+        return res.sendStatus(HttpStatuses.Unauthorized_401);
+    }
 
-    if (!refreshToken)
-        return res
-            .status(resultCodeToHttpException(ResultStatus.Unauthorized))
-            .send({errorsMessages: [{field: 'refreshToken', message: 'Refresh token is missing'}]});
-
-
-    const result = await authService.refreshSession(refreshToken);
+    const result = await authService.refreshSession(userId, deviceId);
 
     if (result.status !== ResultStatus.Success || !result.data) {
         return res

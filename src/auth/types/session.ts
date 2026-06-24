@@ -4,5 +4,5 @@ export type Session = {
     iat: string;
     browserName: string;
     ip: string;
-    exp: string;
+    exp: Date;
 }

@@ -7,14 +7,17 @@ export async function logoutHandler(
     req: Request,
     res: Response,
 ) {
-    const refreshToken = req.cookies.refreshToken;
+    const deviceId = req.deviceId;
+    if (!deviceId) {
+        return res.sendStatus(HttpStatuses.Unauthorized_401);
+    }
 
-    const result = await authService.logout(refreshToken);
+    const result = await authService.deleteSession(deviceId);
 
     if (result.status !== ResultStatus.NoContent) {
         return res.sendStatus(HttpStatuses.Unauthorized_401);
     }
 
-    res.clearCookie('refreshToken');
+    res.clearCookie('refreshToken', { httpOnly: true, secure: true });
     res.sendStatus(HttpStatuses.NoContent_204);
 }

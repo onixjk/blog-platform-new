@@ -1,7 +1,6 @@
 import {sessionCollection} from "../../db/mongo.db";
 import {WithId} from "mongodb";
 import {Session} from "../types/session";
-import {FindSessionDto} from "../types/findSession.dto";
 
 export const authRepository = {
 
@@ -9,16 +8,25 @@ export const authRepository = {
         await sessionCollection.insertOne(session);
     },
 
-    async findRefreshToken(dto: FindSessionDto): Promise<WithId<Session> | null> {
-        return await sessionCollection.findOne({device_id: dto.deviceId, iat: dto.iat});
+    async findSession(deviceId: string): Promise<WithId<Session> | null> {
+        return await sessionCollection.findOne({device_id: deviceId});
     },
 
     async updateIat(deviceId: string, iat: string): Promise<boolean> {
-        const result = await sessionCollection.updateOne( // updateOne
+        const result = await sessionCollection.updateOne(
             { device_id: deviceId },
             { $set: { iat: iat } }
         );
 
         return result.matchedCount > 0;
+    },
+
+    async deleteSession(deviceId: string): Promise<boolean> {
+        const result = await sessionCollection.deleteOne({ device_id: deviceId });
+        return result.deletedCount > 0;
+    },
+
+    async findAllUserSessions(userId: string): Promise<WithId<Session>[]> {
+        return await sessionCollection.find({ user_id: userId }).toArray();
     },
 }

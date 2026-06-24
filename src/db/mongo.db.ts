@@ -5,12 +5,14 @@ import {Post} from "../modules/post/types/post";
 import {IUserDB} from "../modules/user/types/user.db.interface";
 import {Comment} from "../modules/comment/types/comment";
 import {Session} from "../auth/types/session";
+import {Device} from "../modules/device/types/device.";
 
 const BLOG_COLLECTION_NAME = 'blogs';
 const POST_COLLECTION_NAME = 'posts';
 const USER_COLLECTION_NAME = 'users';
 const COMMENTS_COLLECTION_NAME = 'comments';
 const SESSIONS_COLLECTION_NAME = 'sessions';
+const DEVICE_COLLECTION_NAME = 'devices';
 
 export let client: MongoClient;
 
@@ -19,6 +21,7 @@ export let postCollection: Collection<Post>;
 export let userCollection: Collection<IUserDB>;
 export let commentCollection: Collection<Comment>;
 export let sessionCollection: Collection<Session>;
+export let deviceCollection: Collection<Device>;
 
 // Подключения к бд
 export async function runDB(url: string): Promise<void> {
@@ -31,6 +34,7 @@ export async function runDB(url: string): Promise<void> {
     userCollection = db.collection<IUserDB>(USER_COLLECTION_NAME);
     commentCollection = db.collection<Comment>(COMMENTS_COLLECTION_NAME);
     sessionCollection = db.collection<Session>(SESSIONS_COLLECTION_NAME);
+    deviceCollection = db.collection<Device>(DEVICE_COLLECTION_NAME);
 
     try {
         await client.connect();

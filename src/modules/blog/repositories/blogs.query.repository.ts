@@ -7,9 +7,7 @@ import {mapToBlogOutput} from "../routes/mapers/map-to-blog-output.util";
 import {BlogOutput} from "../routes/output/blog-output";
 
 export const blogsQueryRepository = {
-    async findMany(
-        queryDto: BlogQueryInput
-    ): Promise<BlogListPaginatedOutput> {
+    async findMany(queryDto: BlogQueryInput): Promise<BlogListPaginatedOutput> {
         const {pageNumber, pageSize, sortBy, sortDirection, searchNameTerm: searchNameTerm} = queryDto;
         const skip = (pageNumber - 1) * pageSize;
         const filter: any = {};

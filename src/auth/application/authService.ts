@@ -13,6 +13,7 @@ import {authRepository} from "../repositories/auth.repository";
 import {SessionDto} from "../types/session.dto";
 import {Session} from "../types/session";
 import {TokensPair} from "../types/tokensPair";
+import {Device} from "../../modules/device/types/device.";
 
 
 export const authService = {
@@ -30,7 +31,7 @@ export const authService = {
                 status: ResultStatus.Unauthorized,
                 data: null,
                 errorMessage: "Unauthorized",
-                extensions: [{field: loginOrEmail, message: "Wrong credentials"}]
+                extensions: [{ field: loginOrEmail, message: "Wrong credentials" }]
             };
         }
 
@@ -208,82 +209,12 @@ export const authService = {
         };
     },
 
-    // async findRefreshToken(refreshToken: string): Promise<Result<RefreshToken | null>> {
-    //     const result = await authRepository.findRefreshToken(refreshToken);
-    //
-    //     if (!result) {
-    //         return {
-    //             status: ResultStatus.Unauthorized,
-    //             errorMessage: 'Unauthorized',
-    //             data: null,
-    //             extensions: [{field: 'refreshToken', message: 'Token not found'}],
-    //         };
-    //     }
-    //
-    //     return {
-    //         status: ResultStatus.Success,
-    //         data: result,
-    //         extensions: [],
-    //     };
-    // },
-
-    // async setTokenValidToFalse(refreshToken: string): Promise<Result> {
-    //
-    //     const result = await authRepository.setTokenValidToFalse(refreshToken);
-    //
-    //     if (!result) {
-    //         return {
-    //             status: ResultStatus.NotFound,
-    //             data: null,
-    //             errorMessage: 'NotFound',
-    //             extensions: [{field: null, message: 'Refresh token not found'}],
-    //         }
-    //     }
-    //
-    //     return {
-    //         status: ResultStatus.Success,
-    //         data: null,
-    //         extensions: [],
-    //     }
-    // },
-
-    async refreshSession(refToken: string): Promise<Result<{
+    async refreshSession(userId: string, deviceId: string): Promise<Result<{
         accessToken: string;
         refreshToken: string
     } | null>> {
 
-        const verifyRefreshTokenResult = await jwtService.verifyRefreshToken(refToken);
-
-        if (!verifyRefreshTokenResult || typeof verifyRefreshTokenResult.iat === 'undefined') {
-            return {
-                status: ResultStatus.Unauthorized,
-                data: null,
-                errorMessage: 'Unauthorized',
-                extensions: [{field: 'refreshToken', message: 'Refresh token is invalid or expired'}]
-            };
-        }
-
-        const findSessionDto = {
-            deviceId: verifyRefreshTokenResult.deviceId,
-            iat: verifyRefreshTokenResult.iat.toString()
-        }
-
-        const sessionRecord = await authRepository.findRefreshToken(findSessionDto);
-
-        if (!sessionRecord) {
-            return {
-                status: ResultStatus.Unauthorized,
-                errorMessage: 'Unauthorized',
-                data: null,
-                extensions: [{field: 'Session', message: 'Session not found'}],
-            };
-        }
-
-        const tokensPairResult = await this._createTokensPair(
-            verifyRefreshTokenResult.userId,
-            verifyRefreshTokenResult.deviceId
-        );
-
+        const tokensPairResult = await this._createTokensPair(userId, deviceId);
         if (!tokensPairResult.data) {
             return {
                 status: ResultStatus.Unauthorized,
@@ -293,9 +224,8 @@ export const authService = {
             };
         }
 
-        const decodedToken = await jwtService.decodeToken(tokensPairResult.data.refreshToken);
-
-        if (!decodedToken || typeof decodedToken.iat !== 'number') {
+        const refreshTokenPayload = await jwtService.decodeToken(tokensPairResult.data.refreshToken);
+        if (!refreshTokenPayload || typeof refreshTokenPayload.iat !== 'number') {
             return {
                 status: ResultStatus.BadRequest,
                 errorMessage: 'Bad Request',
@@ -304,10 +234,9 @@ export const authService = {
             };
         }
 
-        const deviceId = decodedToken.deviceId;
-        const iat = decodedToken.iat.toString();
-
-        const updateIatResult = await authRepository.updateIat(deviceId, iat);
+        const newDeviceId = refreshTokenPayload.deviceId;
+        const iat = refreshTokenPayload.iat.toString();
+        const updateIatResult = await authRepository.updateIat(newDeviceId, iat);
 
         if (!updateIatResult) {
             return {
@@ -321,22 +250,60 @@ export const authService = {
         return tokensPairResult;
     },
 
-    async logout(refreshToken: string): Promise<Result> {
-
-        // const invalidateResult = await this.setTokenValidToFalse(refreshToken);
-
-        // if (invalidateResult.status !== ResultStatus.Success) {
-        //     return {
-        //         status: ResultStatus.Unauthorized,
-        //         data: null,
-        //         errorMessage: 'Session not found or already inactive',
-        //         extensions: []
-        //     };
-        // }
+    async deleteSession(deviceId: string): Promise<Result> {
+        const isDeletedSession = await authRepository.deleteSession(deviceId);
+        if (!isDeletedSession) {
+            return {
+                status: ResultStatus.Unauthorized,
+                errorMessage: 'Session not found or already inactive',
+                data: null,
+                extensions: [{field: 'Session', message: 'Session not found or already inactive'}]
+            };
+        }
 
         return {
             status: ResultStatus.NoContent,
             data: null,
+            extensions: []
+        };
+    },
+
+    async findSession(refreshToken: string): Promise<Result<Session | null>> {
+        const result = await authRepository.findSession(refreshToken);
+
+        if (!result) {
+            return {
+                status: ResultStatus.Unauthorized,
+                errorMessage: 'Unauthorized',
+                data: null,
+                extensions: [{field: 'Session', message: 'Session not found'}],
+            };
+        }
+
+        return {
+            status: ResultStatus.Success,
+            data: result,
+            extensions: [],
+        };
+    },
+
+    async findActiveDevices(userId: string): Promise<Result<Device[]>> {
+        const sessions = await authRepository.findAllUserSessions(userId);
+
+        const devices: Device[] = sessions.map(session => {
+            const lastActiveDate = new Date(Number(session.iat) * 1000).toISOString();
+
+            return {
+                ip: session.ip,
+                title: session.browserName,
+                lastActiveDate: lastActiveDate,
+                deviceId: session.device_id
+            };
+        });
+
+        return {
+            status: ResultStatus.Success,
+            data: devices,
             extensions: []
         };
     },

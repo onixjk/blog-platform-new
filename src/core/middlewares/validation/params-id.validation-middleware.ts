@@ -23,3 +23,11 @@ export const postIdValidation = param('postId')
     .withMessage('ID must be a string')
     .isMongoId()
     .withMessage('Invalid format ObjectId');
+
+export const deviceIdValidation = param('postId')
+    .exists()
+    .withMessage('ID is required')
+    .isString()
+    .withMessage('ID must be a string')
+    .isMongoId()
+    .withMessage('Invalid format ObjectId');
