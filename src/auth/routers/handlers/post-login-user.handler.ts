@@ -15,7 +15,10 @@ export async function loginUserHandler(
             forwardedFor[0] : forwardedFor?.split(',')[0].trim() ||
             req.socket.remoteAddress) ||
         'unknown clientIp';
-    const browserName = req.useragent?.browser || 'Unknown Browser';
+
+    // const browserName = req.useragent?.browser || 'Unknown Browser';
+    //todo
+    const browserName = req.headers['user-agent'] || 'Unknown Browser';
     const cookie_name = 'refreshToken';
 
     const result = await authService.loginUser(loginOrEmail, password, browserName, clientIp);
