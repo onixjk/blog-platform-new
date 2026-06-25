@@ -13,12 +13,14 @@ export const testingRouter = Router();
 
 testingRouter.delete('/all-data', async (req: Request, res: Response) => {
     try {
-        await postCollection.deleteMany({});
-        await blogCollection.deleteMany({});
-        await userCollection.deleteMany({});
-        await commentCollection.deleteMany({});
-        await sessionCollection.deleteMany({});
-        await apiRequestsCollection.deleteMany({});
+        await Promise.all([
+            postCollection.deleteMany({}),
+            blogCollection.deleteMany({}),
+            userCollection.deleteMany({}),
+            commentCollection.deleteMany({}),
+            sessionCollection.deleteMany({}),
+            apiRequestsCollection.deleteMany({})
+        ]);
 
         res.sendStatus(HttpStatuses.NoContent_204)
     } catch (e: unknown) {

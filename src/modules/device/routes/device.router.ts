@@ -12,13 +12,13 @@ export const deviceRouter = Router({});
 
 deviceRouter
     .get('/devices',
-        inputValidationResultMiddleware,
+        refreshTokenGuard,
         getDeviceListHandler
     )
 
     .delete('/devices/:id',
-        deviceIdValidation,
         refreshTokenGuard,
+        deviceIdValidation,
         inputValidationResultMiddleware,
         deleteDeviceHandler
     )

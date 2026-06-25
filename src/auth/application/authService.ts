@@ -267,8 +267,8 @@ export const authService = {
         };
     },
 
-    async findSession(refreshToken: string): Promise<Result<Session | null>> {
-        const result = await authRepository.findSession(refreshToken);
+    async findSession(deviceId: string): Promise<Result<Session | null>> {
+        const result = await authRepository.findSession(deviceId);
 
         if (!result) {
             return {
