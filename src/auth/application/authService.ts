@@ -233,7 +233,6 @@ export const authService = {
             };
         }
 
-        // const newDeviceId = refreshTokenPayload.deviceId;
         const iatDate = new Date(refreshTokenPayload.iat * 1000);
         const updateIatResult = await authRepository.updateIat(deviceId, iatDate);
 

@@ -2,7 +2,6 @@ import { NextFunction, Request, Response } from 'express';
 import { jwtService } from "../adapters/jwt.service";
 import { HttpStatuses } from "../../core/types/http-statuses";
 import { authService } from "../application/authService";
-import { authRepository } from "../repositories/auth.repository";
 
 export const refreshTokenGuard = async (
     req: Request,
@@ -29,7 +28,6 @@ export const refreshTokenGuard = async (
     const payloadIat = Math.floor(payload.iat);
 
     if (sessionIatInSeconds !== payloadIat) {
-        // await authRepository.deleteSession(payload.deviceId);
         return res.sendStatus(HttpStatuses.Unauthorized_401);
     }
 
