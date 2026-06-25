@@ -29,5 +29,5 @@ export const deviceIdValidation = param('deviceId')
     .withMessage('ID is required')
     .isString()
     .withMessage('ID must be a string')
-    .isUUID()
-    .withMessage('Invalid format ObjectId');
+    // .isUUID()
+    // .withMessage('Invalid format ObjectId');
