@@ -23,6 +23,6 @@ export async function refreshTokenHandler(
             .send({errorsMessages: result.extensions});
     }
 
-    res.cookie(cookie_name, result.data.refreshToken, {httpOnly: true, secure: false})
+    res.cookie(cookie_name, result.data.refreshToken, {httpOnly: true, secure: true})
     res.status(HttpStatuses.Ok_200).send({accessToken: result.data.accessToken});
 }

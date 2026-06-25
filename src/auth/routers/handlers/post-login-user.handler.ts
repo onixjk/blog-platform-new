@@ -4,7 +4,6 @@ import { authService } from "../../application/authService";
 import { HttpStatuses } from "../../../core/types/http-statuses";
 import { ResultStatus } from "../../../core/result/resultCode";
 import { resultCodeToHttpException } from "../../../core/result/resultCodeToHttpException";
-import { factory } from "ts-jest/dist/transformers/hoist-jest";
 
 export async function loginUserHandler(
     req: Request<{}, {}, LoginInputDto>,
@@ -26,6 +25,6 @@ export async function loginUserHandler(
         return res.status(resultCodeToHttpException(result.status)).send(result.extensions);
     }
 
-    res.cookie(cookie_name, result.data!.refreshToken, { httpOnly: true, secure: false })
+    res.cookie(cookie_name, result.data!.refreshToken, { httpOnly: true, secure: true })
     res.status(HttpStatuses.Ok_200).send({ accessToken: result.data!.accessToken });
 }
