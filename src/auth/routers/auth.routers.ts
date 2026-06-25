@@ -49,7 +49,7 @@ authRouter
     )
 
     .post('/registration-email-resending',
-        // rateLimitGuard,
+        rateLimitGuard,
         emailInputValidation,
         inputValidationResultMiddleware,
         registrationEmailResendingHandler
