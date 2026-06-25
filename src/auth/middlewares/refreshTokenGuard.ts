@@ -2,11 +2,13 @@ import { NextFunction, Request, Response } from 'express';
 import { jwtService } from "../adapters/jwt.service";
 import { HttpStatuses } from "../../core/types/http-statuses";
 import { authService } from "../application/authService";
-import { ResultStatus } from "../../core/result/resultCode";
-import jwt from "jsonwebtoken";
 import { authRepository } from "../repositories/auth.repository";
 
-export const refreshTokenGuard = async (req: Request, res: Response, next: NextFunction) => {
+export const refreshTokenGuard = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+) => {
 
     const refreshToken = req.cookies.refreshToken;
     if (!refreshToken) {

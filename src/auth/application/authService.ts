@@ -1,19 +1,19 @@
-import {bcryptService} from "../adapters/bcrypt.service";
-import {usersService} from "../../modules/user/application/usersService";
-import {ResultStatus} from "../../core/result/resultCode";
-import {IUserDB} from "../../modules/user/types/user.db.interface";
-import {WithId} from "mongodb";
-import {Result} from "../../core/result/result.type";
-import {jwtService} from "../adapters/jwt.service";
-import {nodemailerService} from "../adapters/nodemailer.service";
-import {randomUUID} from "node:crypto";
-import {emailExamples} from "../adapters/email-examples";
-import {usersRepository} from "../../modules/user/repositories/user.repository";
-import {authRepository} from "../repositories/auth.repository";
-import {SessionDto} from "../types/session.dto";
-import {Session} from "../types/session";
-import {TokensPair} from "../types/tokensPair";
-import {Device} from "../../modules/device/types/device.";
+import { bcryptService } from "../adapters/bcrypt.service";
+import { usersService } from "../../modules/user/application/usersService";
+import { ResultStatus } from "../../core/result/resultCode";
+import { IUserDB } from "../../modules/user/types/user.db.interface";
+import { WithId } from "mongodb";
+import { Result } from "../../core/result/result.type";
+import { jwtService } from "../adapters/jwt.service";
+import { nodemailerService } from "../adapters/nodemailer.service";
+import { randomUUID } from "node:crypto";
+import { emailExamples } from "../adapters/email-examples";
+import { usersRepository } from "../../modules/user/repositories/user.repository";
+import { authRepository } from "../repositories/auth.repository";
+import { SessionDto } from "../types/session.dto";
+import { Session } from "../types/session";
+import { TokensPair } from "../types/tokensPair";
+import { Device } from "../../modules/device/types/device.";
 
 
 export const authService = {
@@ -50,7 +50,7 @@ export const authService = {
                 status: ResultStatus.Unauthorized,
                 errorMessage: 'Unauthorized',
                 data: null,
-                extensions: [{field: null, message: 'Failed to save refresh token'}],
+                extensions: [{ field: null, message: 'Failed to save refresh token' }],
             };
         }
 
@@ -59,7 +59,7 @@ export const authService = {
 
         return {
             status: ResultStatus.Success,
-            data: {accessToken, refreshToken},
+            data: { accessToken, refreshToken },
             extensions: [],
         };
     },
@@ -75,7 +75,7 @@ export const authService = {
                 status: ResultStatus.NotFound,
                 data: null,
                 errorMessage: "Not Found",
-                extensions: [{field: loginOrEmail, message: "Not Found"}]
+                extensions: [{ field: loginOrEmail, message: "Not Found" }]
             };
 
         const isPassCorrect = await bcryptService.checkPassword(password, user.passwordHash);
@@ -85,7 +85,7 @@ export const authService = {
                 status: ResultStatus.Unauthorized,
                 data: null,
                 errorMessage: 'Unauthorized',
-                extensions: [{field: 'password', message: 'Wrong password'}],
+                extensions: [{ field: 'password', message: 'Wrong password' }],
             };
 
         return {
@@ -109,7 +109,7 @@ export const authService = {
                 status: ResultStatus.BadRequest,
                 errorMessage: 'Bad Request',
                 data: null,
-                extensions: [{field: userByLogin ? 'login' : 'email', message: 'Already Registered'}],
+                extensions: [{ field: userByLogin ? 'login' : 'email', message: 'Already Registered' }],
             }
         }
 
@@ -153,7 +153,7 @@ export const authService = {
                 status: ResultStatus.BadRequest,
                 errorMessage: 'Bad Request',
                 data: null,
-                extensions: [{field: 'email', message: 'Invalid email'}],
+                extensions: [{ field: 'email', message: 'Invalid email' }],
             }
         }
 
@@ -162,7 +162,7 @@ export const authService = {
                 status: ResultStatus.BadRequest,
                 errorMessage: 'Bad Request',
                 data: null,
-                extensions: [{field: 'email', message: 'Email confirmed'}],
+                extensions: [{ field: 'email', message: 'Email confirmed' }],
             }
         }
 
@@ -197,7 +197,7 @@ export const authService = {
                 status: ResultStatus.BadRequest,
                 errorMessage: 'Bad Request',
                 data: null,
-                extensions: [{field: 'code', message: 'Incorrect code'}],
+                extensions: [{ field: 'code', message: 'Incorrect code' }],
             };
         }
 
@@ -220,7 +220,7 @@ export const authService = {
                 status: ResultStatus.Unauthorized,
                 data: null,
                 errorMessage: 'Unauthorized',
-                extensions: [{field: 'refreshToken', message: 'Refresh token is invalid or expired'}]
+                extensions: [{ field: 'refreshToken', message: 'Refresh token is invalid or expired' }]
             };
         }
 
@@ -230,7 +230,7 @@ export const authService = {
                 status: ResultStatus.BadRequest,
                 errorMessage: 'Bad Request',
                 data: null,
-                extensions: [{field: null, message: 'Can\'t decode token'}],
+                extensions: [{ field: null, message: 'Can\'t decode token' }],
             };
         }
 
@@ -243,7 +243,7 @@ export const authService = {
                 status: ResultStatus.Unauthorized,
                 data: null,
                 errorMessage: 'Unauthorized',
-                extensions: [{field: 'Iat', message: 'Can\'t update iat'}]
+                extensions: [{ field: 'Iat', message: 'Can\'t update iat' }]
             };
         }
 
@@ -257,7 +257,7 @@ export const authService = {
                 status: ResultStatus.Unauthorized,
                 errorMessage: 'Session not found or already inactive',
                 data: null,
-                extensions: [{field: 'Session', message: 'Session not found or already inactive'}]
+                extensions: [{ field: 'Session', message: 'Session not found or already inactive' }]
             };
         }
 
@@ -276,7 +276,7 @@ export const authService = {
                 status: ResultStatus.Unauthorized,
                 errorMessage: 'Unauthorized',
                 data: null,
-                extensions: [{field: 'Session', message: 'Session not found'}],
+                extensions: [{ field: 'Session', message: 'Session not found' }],
             };
         }
 
@@ -317,7 +317,7 @@ export const authService = {
                 status: ResultStatus.Unauthorized,
                 data: null,
                 errorMessage: 'Unauthorized',
-                extensions: [{field: 'refreshToken', message: 'Refresh token is invalid or expired'}]
+                extensions: [{ field: 'refreshToken', message: 'Refresh token is invalid or expired' }]
             };
         }
 
@@ -334,7 +334,7 @@ export const authService = {
                 status: ResultStatus.BadRequest,
                 errorMessage: 'Bad Request',
                 data: null,
-                extensions: [{field: null, message: 'Can\'t decode token'}],
+                extensions: [{ field: null, message: 'Can\'t decode token' }],
             };
         }
 
@@ -354,7 +354,7 @@ export const authService = {
 
         return {
             status: ResultStatus.Success,
-            data: {accessToken, refreshToken},
+            data: { accessToken, refreshToken },
             extensions: [],
         };
     },
@@ -386,7 +386,7 @@ export const authService = {
 
         return {
             status: ResultStatus.Success,
-            data: {accessToken, refreshToken},
+            data: { accessToken, refreshToken },
             extensions: []
         };
     },

@@ -3,9 +3,10 @@ import { deviceIdValidation, idValidation } from "../../../core/middlewares/vali
 import {
     inputValidationResultMiddleware
 } from "../../../core/middlewares/validation/input-validation-result.middleware";
-import { accessTokenGuard } from "../../../auth/middlewares/access-token.guard";
-import { commentInputValidation } from "../../comment/middlewares/comment.input-dto.validation-middlewares";
 import { getDeviceListHandler } from "./handlers/get-device-list.handler";
+import { deleteDeviceHandler } from "./handlers/delete-device.handler";
+import { refreshTokenGuard } from "../../../auth/middlewares/refreshTokenGuard";
+import { deleteDeviceListHandler } from "./handlers/delete-device-list.handler";
 
 export const deviceRouter = Router({});
 
@@ -18,15 +19,13 @@ deviceRouter
 
     .delete('/devices/:id',
         deviceIdValidation,
-        accessTokenGuard,
+        refreshTokenGuard,
         inputValidationResultMiddleware,
-        // todo
+        deleteDeviceHandler
     )
 
     .delete('/devices',
-        accessTokenGuard,
-        commentInputValidation,
+        refreshTokenGuard,
         inputValidationResultMiddleware,
-        // todo
+        deleteDeviceListHandler
     )
-

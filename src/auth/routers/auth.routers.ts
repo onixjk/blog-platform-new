@@ -16,6 +16,7 @@ import { refreshTokenGuard } from "../middlewares/refreshTokenGuard";
 import { refreshTokenHandler } from "./handlers/post-refresh-token.handler";
 import { logoutHandler } from "./handlers/post-logout.handler";
 import useragent from "express-useragent";
+import { rateLimitGuard } from "../middlewares/rate-limit.guard";
 
 export const authRouter = Router({});
 
@@ -26,6 +27,7 @@ authRouter
     )
 
     .post('/login',
+        rateLimitGuard,
         loginOrEmailValidation,
         inputValidationResultMiddleware,
         useragent.express(),
@@ -33,18 +35,21 @@ authRouter
     )
 
     .post('/registration',
+        rateLimitGuard,
         userInputValidation,
         inputValidationResultMiddleware,
         registrationHandler,
     )
 
     .post('/registration-confirmation',
+        rateLimitGuard,
         confirmationCodeInputValidation,
         inputValidationResultMiddleware,
         registrationConfirmationHandler
     )
 
     .post('/registration-email-resending',
+        rateLimitGuard,
         emailInputValidation,
         inputValidationResultMiddleware,
         registrationEmailResendingHandler

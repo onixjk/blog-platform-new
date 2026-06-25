@@ -1,6 +1,7 @@
 import {Request, Response, Router} from "express";
 import {HttpStatuses} from "../../../core/types/http-statuses";
 import {
+    apiRequestsCollection,
     blogCollection,
     commentCollection,
     postCollection,
@@ -17,6 +18,7 @@ testingRouter.delete('/all-data', async (req: Request, res: Response) => {
         await userCollection.deleteMany({});
         await commentCollection.deleteMany({});
         await sessionCollection.deleteMany({});
+        await apiRequestsCollection.deleteMany({});
 
         res.sendStatus(HttpStatuses.NoContent_204)
     } catch (e: unknown) {

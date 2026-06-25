@@ -17,21 +17,22 @@ import {userRouter} from "./modules/user/routes/user.routers";
 import {authRouter} from "./auth/routers/auth.routers";
 import {commentRouter} from "./modules/comment/routes/comment.router";
 import cookieParser from "cookie-parser";
+import { deviceRouter } from "./modules/device/routes/device.router";
 
-export const setupApp = (app: Express) => {
+    export const setupApp = (app: Express) => {
 
-    app.use(cors());
-    app.use(express.json());
-    app.use(cookieParser())
+        app.set('trust proxy', true);
+        app.use(cors());
+        app.use(express.json());
+        app.use(cookieParser())
 
-    app.use(BLOGS_PATH, blogRouter)
-    app.use(POSTS_PATH, postRouter)
-    app.use(USERS_PATH, userRouter)
-    app.use(COMMENTS_PATH, commentRouter)
-    app.use(TESTING_PATH, testingRouter)
-    app.use(AUTH_PATH, authRouter)
-    app.use(SECURITY_PATH, authRouter)
+        app.use(BLOGS_PATH, blogRouter)
+        app.use(POSTS_PATH, postRouter)
+        app.use(USERS_PATH, userRouter)
+        app.use(COMMENTS_PATH, commentRouter)
+        app.use(TESTING_PATH, testingRouter)
+        app.use(AUTH_PATH, authRouter)
+        app.use(SECURITY_PATH, deviceRouter)
 
-
-    return app;
-};
+        return app;
+    };
