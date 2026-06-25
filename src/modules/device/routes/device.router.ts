@@ -12,7 +12,7 @@ export const deviceRouter = Router({});
 
 deviceRouter
     .get('/devices',
-        idValidation,
+        deviceIdValidation,
         inputValidationResultMiddleware,
         getDeviceListHandler
     )
