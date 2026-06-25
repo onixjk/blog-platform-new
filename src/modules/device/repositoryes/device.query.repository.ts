@@ -15,5 +15,6 @@ export const deviceQueryRepository = {
             lastActiveDate: session.iat.toISOString(),
             deviceId: session.device_id
         }));
+
     }
 }
