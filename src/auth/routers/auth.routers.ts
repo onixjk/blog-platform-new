@@ -35,21 +35,21 @@ authRouter
     )
 
     .post('/registration',
-        rateLimitGuard,
+        // rateLimitGuard,
         userInputValidation,
         inputValidationResultMiddleware,
         registrationHandler,
     )
 
     .post('/registration-confirmation',
-        rateLimitGuard,
+        // rateLimitGuard,
         confirmationCodeInputValidation,
         inputValidationResultMiddleware,
         registrationConfirmationHandler
     )
 
     .post('/registration-email-resending',
-        rateLimitGuard,
+        // rateLimitGuard,
         emailInputValidation,
         inputValidationResultMiddleware,
         registrationEmailResendingHandler
