@@ -25,9 +25,12 @@ export const refreshTokenGuard = async (
         return res.sendStatus(HttpStatuses.Unauthorized_401);
     }
 
-    const sessionIatInSeconds = Math.floor(sessionRecord.data.iat.getTime() / 1000);
+    const sessionIatInSeconds = Math.round(sessionRecord.data.iat.getTime() / 1000);
+    const payloadIat = Math.round(payload.iat);
 
-    if (sessionIatInSeconds !== payload.iat) {
+    if (sessionIatInSeconds !== payloadIat) {
+        //todo
+        console.error(`Мисматч iat! В базе: ${sessionIatInSeconds}, в токене: ${payloadIat}`);
         await authRepository.deleteSession(payload.deviceId);
         return res.sendStatus(HttpStatuses.Unauthorized_401);
     }
