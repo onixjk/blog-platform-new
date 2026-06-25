@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { deviceIdValidation, idValidation } from "../../../core/middlewares/validation/params-id.validation-middleware";
+import { deviceIdValidation } from "../../../core/middlewares/validation/params-id.validation-middleware";
 import {
     inputValidationResultMiddleware
 } from "../../../core/middlewares/validation/input-validation-result.middleware";
@@ -12,7 +12,6 @@ export const deviceRouter = Router({});
 
 deviceRouter
     .get('/devices',
-        deviceIdValidation,
         inputValidationResultMiddleware,
         getDeviceListHandler
     )
