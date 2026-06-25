@@ -13,7 +13,6 @@ import { authRepository } from "../repositories/auth.repository";
 import { SessionDto } from "../types/session.dto";
 import { Session } from "../types/session";
 import { TokensPair } from "../types/tokensPair";
-import { Device } from "../../modules/device/types/device.";
 
 
 export const authService = {
@@ -284,27 +283,6 @@ export const authService = {
             status: ResultStatus.Success,
             data: result,
             extensions: [],
-        };
-    },
-
-    async findActiveDevices(userId: string): Promise<Result<Device[]>> {
-        const sessions = await authRepository.findAllUserSessions(userId);
-
-        const devices: Device[] = sessions.map(session => {
-            const lastActiveDate = new Date(Number(session.iat) * 1000).toISOString();
-
-            return {
-                ip: session.ip,
-                title: session.browserName,
-                lastActiveDate: lastActiveDate,
-                deviceId: session.device_id
-            };
-        });
-
-        return {
-            status: ResultStatus.Success,
-            data: devices,
-            extensions: []
         };
     },
 
