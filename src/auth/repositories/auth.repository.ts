@@ -25,8 +25,4 @@ export const authRepository = {
         const result = await sessionCollection.deleteOne({ device_id: deviceId });
         return result.deletedCount > 0;
     },
-
-    async findAllUserSessions(userId: string): Promise<WithId<Session>[]> {
-        return await sessionCollection.find({ user_id: userId }).toArray();
-    },
 }
