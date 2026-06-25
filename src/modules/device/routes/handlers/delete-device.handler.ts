@@ -5,11 +5,11 @@ import { ResultStatus } from "../../../../core/result/resultCode";
 import { resultCodeToHttpException } from "../../../../core/result/resultCodeToHttpException";
 
 export async function deleteDeviceHandler(
-    req: Request<{ id: string }, {}, {}, {}>,
+    req: Request<{ deviceId: string }, {}, {}, {}>,
     res: Response
 ) {
     const userId = req.user?.id;
-    const deviceId = req.params.id;
+    const deviceId = req.params.deviceId;
 
     if (!userId || !deviceId) {
         return res.sendStatus(HttpStatuses.Unauthorized_401);

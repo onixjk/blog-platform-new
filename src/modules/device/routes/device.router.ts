@@ -16,7 +16,7 @@ deviceRouter
         getDeviceListHandler
     )
 
-    .delete('/devices/:id',
+    .delete('/devices/:deviceId',
         refreshTokenGuard,
         deviceIdValidation,
         inputValidationResultMiddleware,
