@@ -24,7 +24,7 @@ export const postIdValidation = param('postId')
     .isMongoId()
     .withMessage('Invalid format ObjectId');
 
-export const deviceIdValidation = param('postId')
+export const deviceIdValidation = param('deviceId')
     .exists()
     .withMessage('ID is required')
     .isString()
