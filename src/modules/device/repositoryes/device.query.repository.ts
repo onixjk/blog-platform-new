@@ -9,12 +9,18 @@ export const deviceQueryRepository = {
             .find({user_id: userId})
             .toArray();
 
+        // return sessions.map((session) => ({
+        //     ip: session.ip,
+        //     title: session.browserName,
+        //     lastActiveDate: session.iat.toISOString(),
+        //     deviceId: session.device_id
+        // }));
+
         return sessions.map((session) => ({
             ip: session.ip,
             title: session.browserName,
             lastActiveDate: session.iat.toISOString(),
             deviceId: session.device_id
         }));
-
     }
 }
