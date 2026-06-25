@@ -25,8 +25,8 @@ export const refreshTokenGuard = async (
         return res.sendStatus(HttpStatuses.Unauthorized_401);
     }
 
-    const sessionIatInSeconds = Math.round(sessionRecord.data.iat.getTime() / 1000);
-    const payloadIat = Math.round(payload.iat);
+    const sessionIatInSeconds = Math.floor(sessionRecord.data.iat.getTime() / 1000);
+    const payloadIat = Math.floor(payload.iat);
 
     if (sessionIatInSeconds !== payloadIat) {
         await authRepository.deleteSession(payload.deviceId);

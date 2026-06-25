@@ -26,6 +26,6 @@ export async function loginUserHandler(
         return res.status(resultCodeToHttpException(result.status)).send(result.extensions);
     }
 
-    res.cookie(cookie_name, result.data!.refreshToken, { httpOnly: true, secure: false })
+    res.cookie(cookie_name, result.data!.refreshToken, { httpOnly: true, secure: true })
     return res.status(HttpStatuses.Ok_200).send({ accessToken: result.data!.accessToken });
 }
