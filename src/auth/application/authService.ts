@@ -235,8 +235,8 @@ export const authService = {
         }
 
         const newDeviceId = refreshTokenPayload.deviceId;
-        const iat = refreshTokenPayload.iat.toString();
-        const updateIatResult = await authRepository.updateIat(newDeviceId, iat);
+        const iatDate = new Date(refreshTokenPayload.iat * 1000);
+        const updateIatResult = await authRepository.updateIat(newDeviceId, iatDate);
 
         if (!updateIatResult) {
             return {
@@ -338,16 +338,16 @@ export const authService = {
             };
         }
 
-        const iat = refreshTokenPayload.iat.toString();
-        const exp = refreshTokenPayload.exp.toString();
+        const iatDate = new Date(refreshTokenPayload.iat * 1000);
+        const expDate = new Date(refreshTokenPayload.exp * 1000);
 
         const session: Session = {
             user_id: sessionDto.userId,
             device_id: deviceId,
-            iat: iat,
+            iat: iatDate,
             browserName: sessionDto.browserName,
             ip: sessionDto.clientIp,
-            exp: exp,
+            exp: expDate,
         }
 
         await authRepository.saveSession(session);

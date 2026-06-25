@@ -12,7 +12,7 @@ export const authRepository = {
         return await sessionCollection.findOne({device_id: deviceId});
     },
 
-    async updateIat(deviceId: string, iat: string): Promise<boolean> {
+    async updateIat(deviceId: string, iat: Date): Promise<boolean> {
         const result = await sessionCollection.updateOne(
             { device_id: deviceId },
             { $set: { iat: iat } }

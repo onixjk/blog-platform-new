@@ -12,7 +12,7 @@ export const deviceQueryRepository = {
         return sessions.map((session) => ({
             ip: session.ip,
             title: session.browserName,
-            lastActiveDate: session.iat,
+            lastActiveDate: session.iat.toISOString(),
             deviceId: session.device_id
         }));
     }
