@@ -129,7 +129,7 @@ export const authService = {
 
         const createdId = await usersRepository.create(newUser);
 
-        await nodemailerService
+        nodemailerService //todo
             .sendEmail(
                 newUser.email,
                 newUser.emailConfirmation.confirmationCode,

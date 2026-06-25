@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import { apiRequestsCollection } from "../../db/mongo.db";
+import { HttpStatuses } from "../../core/types/http-statuses";
 
 export const rateLimitGuard = async (
     req: Request,
@@ -21,7 +22,7 @@ export const rateLimitGuard = async (
 
     // 2. Если уже набралось 5 или более запросов — блокируем (429)
     if (currentAttemptsCount >= 5) {
-        return res.sendStatus(429);
+        return res.sendStatus(HttpStatuses.TooManyRequests_429);
     }
 
     // 3. Если лимит не превышен, логируем текущий запрос в БД
