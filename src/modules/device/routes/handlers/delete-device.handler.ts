@@ -23,5 +23,6 @@ export async function deleteDeviceHandler(
             .send({ errorsMessages: result.extensions });
     }
 
+
     return res.sendStatus(HttpStatuses.NoContent_204);
 }
