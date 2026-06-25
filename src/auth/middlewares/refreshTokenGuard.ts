@@ -29,8 +29,6 @@ export const refreshTokenGuard = async (
     const payloadIat = Math.round(payload.iat);
 
     if (sessionIatInSeconds !== payloadIat) {
-        //todo
-        console.error(`Мисматч iat! В базе: ${sessionIatInSeconds}, в токене: ${payloadIat}`);
         await authRepository.deleteSession(payload.deviceId);
         return res.sendStatus(HttpStatuses.Unauthorized_401);
     }

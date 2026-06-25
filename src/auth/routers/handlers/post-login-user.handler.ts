@@ -16,9 +16,12 @@ export async function loginUserHandler(
             req.socket.remoteAddress) ||
         'unknown clientIp';
 
+    // todo
     // const browserName = req.useragent?.browser || 'Unknown Browser';
-    //todo
-    const browserName = req.headers['user-agent'] || 'Unknown Browser';
+    const browser = req.useragent?.browser || 'Chrome';
+    const os = req.useragent?.os || 'Unknown OS';
+    const browserName = `${browser} / ${os}`;
+
     const cookie_name = 'refreshToken';
 
     const result = await authService.loginUser(loginOrEmail, password, browserName, clientIp);
