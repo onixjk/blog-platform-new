@@ -84,3 +84,48 @@ import { HttpStatuses } from "../../core/types/http-statuses";
 //
 //     return next();
 // };
+
+
+export const rateLimitGuard = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+) => {
+    try {
+        const clientIp = (req.headers['x-forwarded-for'] as string) || req.ip || 'unknown';
+
+        // ОЧИЩАЕМ URL: берем только путь без query-параметров (?...)
+        // req.baseUrl + req.path гарантирует, что /auth/login?а=1 и /auth/login будут посчитаны как один URL
+        const currentUrl = req.baseUrl + req.path;
+
+        const currentTime = new Date();
+        // Отнимаем ровно 10 секунд
+        const tenSecondsAgo = new Date(currentTime.getTime() - 10 * 1000);
+
+        // 1. Считаем запросы строго за последние 10 секунд
+        const currentAttemptsCount = await apiRequestsCollection.countDocuments({
+            ip: clientIp,
+            url: currentUrl,
+            date: { $gte: tenSecondsAgo }
+        });
+
+        // 2. Если уже есть 5 запросов — блокируем ДО записи текущего запроса
+        if (currentAttemptsCount >= 5) {
+            return res.sendStatus(HttpStatuses.TooManyRequests_429);
+        }
+
+        // 3. Записываем текущий запрос в БД ПОСЛЕ проверки, чтобы он не мешал текущему счетчику
+        await apiRequestsCollection.insertOne({
+            ip: clientIp,
+            url: currentUrl,
+            date: currentTime
+        });
+
+        return next();
+    } catch (error) {
+        console.error("Rate limit guard database error:", error);
+        // Безопасный фолбек: если база упала, не вешаем сервер, а отдаем 500
+        return res.sendStatus(HttpStatuses.InternalServerError_500);
+    }
+};
+
