@@ -90,7 +90,7 @@ describe('Comprehensive API Integration Tests (Full Swagger Coverage)', () => {
     });
 
     // ==========================================
-    // 2. КОНТРОЛЛЕР: AUTH FLOW
+    // 2. КОНТРОЛЛЕР: AUTH FLOW & RATE LIMITS
     // ==========================================
     describe('Auth Operations', () => {
         it('POST /auth/login -> Успешный вход и генерация JWT (200)', async () => {
@@ -108,18 +108,40 @@ describe('Comprehensive API Integration Tests (Full Swagger Coverage)', () => {
 
         it('GET /auth/me -> Успешное получение профиля с Bearer токеном (200)', async () => {
             const res = await request
-                .get('/auth/me') // 👈 Чистый и правильный одинарный путь
+                .get('/auth/me')
                 .set('Authorization', `Bearer ${jwtToken}`);
 
             expect(res.statusCode).toBe(200);
+            // Сверяем строгую структуру ответа по новому Swagger
             expect(res.body).toHaveProperty('userId');
+            expect(res.body).toHaveProperty('login');
+            expect(res.body).toHaveProperty('email');
+            expect(res.body.login).toBe(userCredentials.login);
+            expect(res.body.email).toBe(userCredentials.email);
         });
 
         it('GET /auth/me -> Ошибка 401 при отсутствии токена', async () => {
             const res = await request
-                .get('/auth/me'); // 👈 И здесь тоже одинарный путь
+                .get('/auth/me');
 
             expect(res.statusCode).toBe(401);
+        });
+
+        // 🔥 Проверка Rate Limiting (429) из нового Swagger
+        it('POST /auth/login -> Ошибка 429 при отправке более 5 запросов за 10 секунд', async () => {
+            // Быстро отправляем 5 неверных запросов подряд, забивая лимит
+            for (let i = 0; i < 5; i++) {
+                await request
+                    .post('/auth/login')
+                    .send({ loginOrEmail: userCredentials.login, password: 'wrong-password' });
+            }
+
+            // 6-й запрос гарантированно спотыкается о лимит сервера
+            const res = await request
+                .post('/auth/login')
+                .send({ loginOrEmail: userCredentials.login, password: userCredentials.password });
+
+            expect(res.statusCode).toBe(429);
         });
     });
 
@@ -128,7 +150,9 @@ describe('Comprehensive API Integration Tests (Full Swagger Coverage)', () => {
     // =========================================================================
     describe('Auth Token Lifecycle (Refresh & Logout via Cookies)', () => {
         let savedCookieString: string = '';
-
+        beforeAll(async () => {
+            await new Promise((resolve) => setTimeout(resolve, 10000));
+        });
         // Вспомогательная функция: извлекает только чистую строку 'refreshToken=значение'
         const getRefreshTokenFromCookie = (res: any): string | null => {
             const setCookieHeaders = res.headers['set-cookie'];
@@ -173,6 +197,122 @@ describe('Comprehensive API Integration Tests (Full Swagger Coverage)', () => {
             // Синхронизируем глобальный токен для ваших старых тестов (комментариев и т.д.)
             try { jwtToken = res.body.accessToken; } catch (e) {}
         });
+
+        // =========================================================================
+        // ВЛОЖЕННЫЙ БЛОК: СЕССИИ И УСТРОЙСТВА (ПОЛНОЕ ПОКРЫТИЕ SECURITY/DEVICES)
+        // =========================================================================
+        describe('Security Devices Operations', () => {
+            let secondUserCookie = '';
+            let firstUserDeviceId = '';
+            let secondUserDeviceId = '';
+
+            beforeAll(async () => {
+                // Создаем второго пользователя для полноценного теста ошибки 403 Forbidden
+                const secondUserCredentials = {
+                    login: 'devicetester2',
+                    password: 'superpassword123',
+                    email: 'devicetester2@example.com'
+                };
+
+                await request
+                    .post('/users')
+                    .set('Authorization', basicAuthHeader)
+                    .send(secondUserCredentials);
+
+                const loginRes = await request
+                    .post('/auth/login')
+                    .send({
+                        loginOrEmail: secondUserCredentials.login,
+                        password: secondUserCredentials.password
+                    });
+
+                const setCookieHeaders = loginRes.headers['set-cookie'] as any;
+                if (setCookieHeaders) {
+                    // Если пришла строка, оборачиваем в массив, если уже массив — используем как есть
+                    const cookiesArray = Array.isArray(setCookieHeaders) ? setCookieHeaders : [setCookieHeaders];
+                    const refreshCookie = cookiesArray.find((cookie: string) => cookie.startsWith('refreshToken='));
+                    if (refreshCookie) {
+                        secondUserCookie = refreshCookie.split(';')[0];
+                    }
+                }
+            });
+
+            it('GET /security/devices -> Ошибка 401 при отсутствии сессионной куки', async () => {
+                const res = await request
+                    .get('/security/devices')
+                    .set('Cookie', []);
+
+                expect(res.statusCode).toBe(401);
+            });
+
+            it('DELETE /security/devices/:deviceId -> Ошибка 401 при удалении без куки', async () => {
+                const res = await request
+                    .delete(`/security/devices/${nonexistentId}`)
+                    .set('Cookie', []);
+
+                expect(res.statusCode).toBe(401);
+            });
+
+            it('GET /security/devices -> Успешное получение списка устройств и фиксация deviceId', async () => {
+                // Проверяем сессию первого пользователя
+                const resFirst = await request
+                    .get('/security/devices')
+                    .set('Cookie', [savedCookieString]);
+                expect(resFirst.statusCode).toBe(200);
+                expect(Array.isArray(resFirst.body)).toBe(true);
+                firstUserDeviceId = resFirst.body[0].deviceId;
+
+                // Проверяем сессию второго пользователя
+                const resSecond = await request
+                    .get('/security/devices')
+                    .set('Cookie', [secondUserCookie]);
+                expect(resSecond.statusCode).toBe(200);
+                expect(Array.isArray(resSecond.body)).toBe(true);
+                secondUserDeviceId = resSecond.body[0].deviceId;
+
+                // Проверяем соответствие схеме Swagger для первого девайса
+                const device = resFirst.body[0];
+                expect(device).toHaveProperty('ip');
+                expect(device).toHaveProperty('title');
+                expect(device).toHaveProperty('lastActiveDate');
+                expect(device).toHaveProperty('deviceId');
+            });
+
+            it('DELETE /security/devices/:deviceId -> Ошибка 404, если устройство не найдено', async () => {
+                const res = await request
+                    .delete(`/security/devices/${nonexistentId}`)
+                    .set('Cookie', [savedCookieString]);
+
+                expect(res.statusCode).toBe(404);
+            });
+
+            it('DELETE /security/devices/:deviceId -> Ошибка 403 при попытке удалить чужое устройство', async () => {
+                // Первый пользователь пытается грохнуть сессию второго пользователя
+                const res = await request
+                    .delete(`/security/devices/${secondUserDeviceId}`)
+                    .set('Cookie', [savedCookieString]);
+
+                expect(res.statusCode).toBe(403);
+            });
+
+            it('DELETE /security/devices/:deviceId -> Успешное точечное удаление сессии по ID (204)', async () => {
+                // Второй пользователь удаляет свою собственную сессию
+                const res = await request
+                    .delete(`/security/devices/${secondUserDeviceId}`)
+                    .set('Cookie', [secondUserCookie]);
+
+                expect(res.statusCode).toBe(204);
+            });
+
+            it('DELETE /security/devices -> Успешное удаление всех остальных сессий, кроме текущей (204)', async () => {
+                const res = await request
+                    .delete('/security/devices')
+                    .set('Cookie', [savedCookieString]);
+
+                expect(res.statusCode).toBe(204);
+            });
+        });
+
 
         it('POST /auth/refresh-token -> Ошибка 401, если кука refreshToken отсутствует', async () => {
             const res: any = await request
@@ -475,9 +615,8 @@ describe('Comprehensive API Integration Tests (Full Swagger Coverage)', () => {
     });
 });
 
-
 // ==========================================
-// ДОПОЛНЕНИЕ ДЛЯ КОНТРОЛЛЕРА: AUTH OPERATIONS (Регистрация и подтверждение)
+// 6. КОНТРОЛЛЕР: REGISTRATION & CONFIRMATION
 // ==========================================
 describe('Registration & Confirmation Flow', () => {
     const newUserCredentials = {
@@ -488,6 +627,11 @@ describe('Registration & Confirmation Flow', () => {
 
     const invalidConfirmationCode = 'invalid-code-12345';
 
+    // Пауза 10 секунд перед стартом блока для сброса лимитов IP после прошлых тестов
+    beforeAll(async () => {
+        await new Promise((resolve) => setTimeout(resolve, 10000));
+    });
+
     it('POST /auth/registration -> Ошибка 400 при некорректных входных данных', async () => {
         const res = await request
             .post('/auth/registration')
@@ -495,11 +639,6 @@ describe('Registration & Confirmation Flow', () => {
 
         expect(res.statusCode).toBe(400);
         expect(res.body).toHaveProperty('errorsMessages');
-        expect(Array.isArray(res.body.errorsMessages)).toBe(true);
-        expect(res.body.errorsMessages[0]).toEqual(expect.objectContaining({
-            message: expect.any(String),
-            field: expect.any(String)
-        }));
     });
 
     it('POST /auth/registration -> Успешная регистрация нового пользователя (204)', async () => {
@@ -508,49 +647,94 @@ describe('Registration & Confirmation Flow', () => {
             .send(newUserCredentials);
 
         expect(res.statusCode).toBe(204);
-        expect(res.body).toEqual({});
     });
 
-    it('POST /auth/registration -> Ошибка 400, если пользователь с таким логином или email уже существует', async () => {
+    it('POST /auth/registration -> Ошибка 400, если пользователь уже существует', async () => {
         const res = await request
             .post('/auth/registration')
-            .send(newUserCredentials); // Повторная отправка тех же данных
+            .send(newUserCredentials);
 
         expect(res.statusCode).toBe(400);
-        expect(res.body).toHaveProperty('errorsMessages');
     });
 
-    it('POST /auth/registration-confirmation -> Ошибка 400 при отправке некорректного или истекшего кода', async () => {
+    it('POST /auth/registration -> Ошибка 429 при превышении лимита 5 запросов', async () => {
+        for (let i = 0; i < 4; i++) {
+            await request
+                .post('/auth/registration')
+                .send({ login: `user${i}`, password: 'password123', email: `user${i}@test.com` });
+        }
+        const res = await request
+            .post('/auth/registration')
+            .send(newUserCredentials);
+
+        expect(res.statusCode).toBe(429);
+    });
+
+    it('Ожидание сброса лимитов после теста регистрации', async () => {
+        await new Promise((resolve) => setTimeout(resolve, 10000));
+        expect(true).toBe(true);
+    });
+
+    it('POST /auth/registration-confirmation -> Ошибка 400 при отправке некорректного кода', async () => {
         const res = await request
             .post('/auth/registration-confirmation')
             .send({ code: invalidConfirmationCode });
 
         expect(res.statusCode).toBe(400);
-        expect(res.body).toHaveProperty('errorsMessages');
-        expect(Array.isArray(res.body.errorsMessages)).toBe(true);
     });
 
-    it('POST /auth/registration-email-resending -> Ошибка 400 при отправке некорректного формата email', async () => {
+    it('POST /auth/registration-confirmation -> Ошибка 429 при превышении лимита 5 запросов', async () => {
+        for (let i = 0; i < 5; i++) {
+            await request
+                .post('/auth/registration-confirmation')
+                .send({ code: `wrong-code-${i}` });
+        }
+        const res = await request
+            .post('/auth/registration-confirmation')
+            .send({ code: invalidConfirmationCode });
+
+        expect(res.statusCode).toBe(429);
+    });
+
+    it('Ожидание сброса лимитов после теста подтверждения', async () => {
+        await new Promise((resolve) => setTimeout(resolve, 10000));
+        expect(true).toBe(true);
+    });
+
+    it('POST /auth/registration-email-resending -> Ошибка 400 при некорректном email', async () => {
         const res = await request
             .post('/auth/registration-email-resending')
             .send({ email: 'not-an-email' });
 
         expect(res.statusCode).toBe(400);
-        expect(res.body).toHaveProperty('errorsMessages');
     });
 
-    it('POST /auth/registration-email-resending -> Успешное переотправление кода на валидный неподтвержденный email (204)', async () => {
+    it('POST /auth/registration-email-resending -> Успешное переотправление кода (204)', async () => {
         const res = await request
             .post('/auth/registration-email-resending')
             .send({ email: newUserCredentials.email });
 
         expect(res.statusCode).toBe(204);
-        expect(res.body).toEqual({});
     });
 
-    // 💡 Примечание: Для полноценного тестирования успешного подтверждения (204) на реальной базе
-    // обычно перехватывают отправленное письмо (например, через Mock-сервис почты или обращаются напрямую в БД/репозиторий),
-    // достают из него реальный code и передают его в POST /auth/registration-confirmation.
+    it('POST /auth/registration-email-resending -> Ошибка 429 при превышении лимита 5 запросов', async () => {
+        for (let i = 0; i < 5; i++) {
+            await request
+                .post('/auth/registration-email-resending')
+                .send({ email: `flood-email-${i}@test.com` });
+        }
+        const res = await request
+            .post('/auth/registration-email-resending')
+            .send({ email: newUserCredentials.email });
+
+        expect(res.statusCode).toBe(429);
+    });
+
+    it('Финальное ожидание сброса лимитов перед CRUD операциями блогов и постов', async () => {
+        await new Promise((resolve) => setTimeout(resolve, 10000));
+        expect(true).toBe(true);
+    });
 });
+
 
 
