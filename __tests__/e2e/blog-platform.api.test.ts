@@ -112,7 +112,6 @@ describe('Comprehensive API Integration Tests (Full Swagger Coverage)', () => {
                 .set('Authorization', `Bearer ${jwtToken}`);
 
             expect(res.statusCode).toBe(200);
-            // Сверяем строгую структуру ответа по новому Swagger
             expect(res.body).toHaveProperty('userId');
             expect(res.body).toHaveProperty('login');
             expect(res.body).toHaveProperty('email');
@@ -127,16 +126,15 @@ describe('Comprehensive API Integration Tests (Full Swagger Coverage)', () => {
             expect(res.statusCode).toBe(401);
         });
 
-        // 🔥 Проверка Rate Limiting (429) из нового Swagger
+        // ⚠️ Тест на флуд перенесен в самый конец describe,
+        // чтобы он не блокировал GET /auth/me, идущие выше
         it('POST /auth/login -> Ошибка 429 при отправке более 5 запросов за 10 секунд', async () => {
-            // Быстро отправляем 5 неверных запросов подряд, забивая лимит
             for (let i = 0; i < 5; i++) {
                 await request
                     .post('/auth/login')
                     .send({ loginOrEmail: userCredentials.login, password: 'wrong-password' });
             }
 
-            // 6-й запрос гарантированно спотыкается о лимит сервера
             const res = await request
                 .post('/auth/login')
                 .send({ loginOrEmail: userCredentials.login, password: userCredentials.password });
@@ -144,6 +142,7 @@ describe('Comprehensive API Integration Tests (Full Swagger Coverage)', () => {
             expect(res.statusCode).toBe(429);
         });
     });
+
 
     // =========================================================================
     // НОВЫЕ ТЕСТЫ: AUTH REFRESH & LOGOUT FLOW (СОГЛАСНО ОБНОВЛЕННОМУ SWAGGER)
@@ -627,7 +626,7 @@ describe('Registration & Confirmation Flow', () => {
 
     const invalidConfirmationCode = 'invalid-code-12345';
 
-    // Пауза 10 секунд перед стартом блока для сброса лимитов IP после прошлых тестов
+    // Даем серверу очистить лимиты IP после прошлых тестов перед началом регистрации
     beforeAll(async () => {
         await new Promise((resolve) => setTimeout(resolve, 10000));
     });
@@ -657,48 +656,12 @@ describe('Registration & Confirmation Flow', () => {
         expect(res.statusCode).toBe(400);
     });
 
-    it('POST /auth/registration -> Ошибка 429 при превышении лимита 5 запросов', async () => {
-        for (let i = 0; i < 4; i++) {
-            await request
-                .post('/auth/registration')
-                .send({ login: `user${i}`, password: 'password123', email: `user${i}@test.com` });
-        }
-        const res = await request
-            .post('/auth/registration')
-            .send(newUserCredentials);
-
-        expect(res.statusCode).toBe(429);
-    });
-
-    it('Ожидание сброса лимитов после теста регистрации', async () => {
-        await new Promise((resolve) => setTimeout(resolve, 10000));
-        expect(true).toBe(true);
-    });
-
     it('POST /auth/registration-confirmation -> Ошибка 400 при отправке некорректного кода', async () => {
         const res = await request
             .post('/auth/registration-confirmation')
             .send({ code: invalidConfirmationCode });
 
         expect(res.statusCode).toBe(400);
-    });
-
-    it('POST /auth/registration-confirmation -> Ошибка 429 при превышении лимита 5 запросов', async () => {
-        for (let i = 0; i < 5; i++) {
-            await request
-                .post('/auth/registration-confirmation')
-                .send({ code: `wrong-code-${i}` });
-        }
-        const res = await request
-            .post('/auth/registration-confirmation')
-            .send({ code: invalidConfirmationCode });
-
-        expect(res.statusCode).toBe(429);
-    });
-
-    it('Ожидание сброса лимитов после теста подтверждения', async () => {
-        await new Promise((resolve) => setTimeout(resolve, 10000));
-        expect(true).toBe(true);
     });
 
     it('POST /auth/registration-email-resending -> Ошибка 400 при некорректном email', async () => {
@@ -717,6 +680,36 @@ describe('Registration & Confirmation Flow', () => {
         expect(res.statusCode).toBe(204);
     });
 
+    // =========================================================================
+    // ⚠️ ОПАСНАЯ ЗОНА ФЛУДА: Выполняется строго в конце, чтобы не мешать тестам выше
+    // =========================================================================
+
+    it('POST /auth/registration -> Ошибка 429 при превышении лимита 5 запросов', async () => {
+        for (let i = 0; i < 4; i++) {
+            await request
+                .post('/auth/registration')
+                .send({ login: `user${i}`, password: 'password123', email: `user${i}@test.com` });
+        }
+        const res = await request
+            .post('/auth/registration')
+            .send(newUserCredentials);
+
+        expect(res.statusCode).toBe(429);
+    });
+
+    it('POST /auth/registration-confirmation -> Ошибка 429 при превышении лимита 5 запросов', async () => {
+        for (let i = 0; i < 5; i++) {
+            await request
+                .post('/auth/registration-confirmation')
+                .send({ code: `wrong-code-${i}` });
+        }
+        const res = await request
+            .post('/auth/registration-confirmation')
+            .send({ code: invalidConfirmationCode });
+
+        expect(res.statusCode).toBe(429);
+    });
+
     it('POST /auth/registration-email-resending -> Ошибка 429 при превышении лимита 5 запросов', async () => {
         for (let i = 0; i < 5; i++) {
             await request
@@ -730,11 +723,8 @@ describe('Registration & Confirmation Flow', () => {
         expect(res.statusCode).toBe(429);
     });
 
-    it('Финальное ожидание сброса лимитов перед CRUD операциями блогов и постов', async () => {
+    it('Финальное ожидание сброса лимитов', async () => {
         await new Promise((resolve) => setTimeout(resolve, 10000));
         expect(true).toBe(true);
     });
 });
-
-
-
