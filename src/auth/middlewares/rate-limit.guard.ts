@@ -48,6 +48,7 @@ export const rateLimitGuard = async (
     const currentTime = new Date();
     const tenSecondsAgo = new Date(currentTime.getTime() - 10 * 1000);
 
+
     // 1. СНАЧАЛА записываем текущий запрос в БД, чтобы он учитывался в счетчике
     await apiRequestsCollection.insertOne({
         ip: clientIp,
