@@ -45,7 +45,7 @@ export async function runDB(url: string): Promise<void> {
         await db.command({ ping: 1 });
         console.log('✅ Connected to the database');
 
-        await apiRequestsCollection.createIndex({ date: 1 }, { expireAfterSeconds: 20 });
+        await apiRequestsCollection.createIndex({ date: 1 }, { expireAfterSeconds: 10 });
         await sessionCollection.createIndex({ expireDate: 1 }, { expireAfterSeconds: 0 });
         console.log('✅ TTL index for sessionCollection created/verified');
     } catch (e) {
