@@ -52,6 +52,7 @@ export const rateLimitGuard = async (
         date: currentTime
     });
 
+
     // 2. Ищем самый ПЕРВЫЙ запрос от этого IP на этот URL за последние 10 секунд
     const firstRequestInWindow = await apiRequestsCollection.findOne(
         {
