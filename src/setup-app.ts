@@ -14,7 +14,7 @@ import {testingRouter} from "./modules/testing/routers/testing.router";
 import {postRouter} from "./modules/post/routes/post.routers";
 import cors from 'cors';
 import {userRouter} from "./modules/user/routes/user.routers";
-import {authRouter} from "./auth/routers/auth.routers";
+import {authRouter} from "./modules/auth/routers/auth.routers";
 import {commentRouter} from "./modules/comment/routes/comment.router";
 import cookieParser from "cookie-parser";
 import { deviceRouter } from "./modules/device/routes/device.router";

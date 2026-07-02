@@ -6,7 +6,7 @@ import {PostInputDto} from "../routes/input/post.input-dto";
 import {Result} from "../../../core/result/result.type";
 import {ResultStatus} from "../../../core/result/resultCode";
 
-export const postsRepository = {
+export class PostsRepository {
 
     async findById(id: string): Promise<Result<WithId<Post> | null>> {
         const post = await postCollection.findOne({_id: new ObjectId(id)});
@@ -25,7 +25,7 @@ export const postsRepository = {
             data: post,
             extensions: [],
         };
-    },
+    }
 
     async findByIdOrFail(id: string): Promise<WithId<Post>> {
         const res = await postCollection.findOne({_id: new ObjectId(id)});
@@ -35,13 +35,13 @@ export const postsRepository = {
         }
 
         return res;
-    },
+    }
 
     async create(newPost: Post): Promise<string> {
         const insertResult = await postCollection.insertOne(newPost);
 
         return insertResult.insertedId.toString()
-    },
+    }
 
     async update(id: string, dto: PostInputDto, blogName: string): Promise<void> {
         const updateResult = await postCollection.updateOne(
@@ -63,7 +63,7 @@ export const postsRepository = {
             throw new RepositoryNotFoundError("Post doesn't exist");
         }
         return;
-    },
+    }
 
     async updateAllBlogNames(blogId: string, blogName: string): Promise<void> {
         await postCollection.updateMany(
@@ -78,7 +78,7 @@ export const postsRepository = {
         );
 
         return;
-    },
+    }
 
     async delete(id: string): Promise<void> {
         const deleteResult = await postCollection.deleteOne({_id: new ObjectId(id)});
@@ -88,7 +88,7 @@ export const postsRepository = {
         }
 
         return;
-    },
+    }
 
     async deleteAllByBlogId(blogId: string): Promise<void> {
         await postCollection.deleteMany({blogId: blogId});

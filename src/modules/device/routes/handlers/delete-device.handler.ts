@@ -1,8 +1,8 @@
 import { Request, Response } from 'express';
 import { HttpStatuses } from "../../../../core/types/http-statuses";
-import { deviceService } from "../../application/device.service";
 import { ResultStatus } from "../../../../core/result/resultCode";
 import { resultCodeToHttpException } from "../../../../core/result/resultCodeToHttpException";
+import { deviceService } from "../../../../composition-root";
 
 export async function deleteDeviceHandler(
     req: Request<{ deviceId: string }, {}, {}, {}>,

@@ -8,7 +8,7 @@ import {
     blogIdValidation,
     idValidation,
 } from "../../../core/middlewares/validation/params-id.validation-middleware";
-import {superAdminGuardMiddleware} from "../../../auth/middlewares/super-admin.guard-middleware";
+import {superAdminGuardMiddleware} from "../../auth/middlewares/super-admin.guard-middleware";
 import {
     paginationAndSortingValidation
 } from "../../../core/middlewares/validation/query-pagination-sorting.validation-middleware";

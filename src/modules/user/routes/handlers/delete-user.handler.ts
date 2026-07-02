@@ -1,7 +1,7 @@
-import {Request, Response} from 'express';
-import {errorsHandler} from "../../../../core/errors/errors.handler";
-import {HttpStatuses} from "../../../../core/types/http-statuses";
-import {usersService} from "../../application/usersService";
+import { Request, Response } from 'express';
+import { errorsHandler } from "../../../../core/errors/errors.handler";
+import { HttpStatuses } from "../../../../core/types/http-statuses";
+import { usersService } from "../../../../composition-root";
 
 export async function deleteUserHandler(
     req: Request<{ id: string }>,

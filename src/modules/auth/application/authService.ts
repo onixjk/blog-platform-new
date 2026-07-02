@@ -1,21 +1,39 @@
-import { bcryptService } from "../adapters/bcrypt.service";
-import { usersService } from "../../modules/user/application/usersService";
-import { ResultStatus } from "../../core/result/resultCode";
-import { IUserDB } from "../../modules/user/types/user.db.interface";
+import { UsersService } from "../../user/application/usersService";
+import { ResultStatus } from "../../../core/result/resultCode";
+import { IUserDB } from "../../user/types/user.db.interface";
 import { WithId } from "mongodb";
-import { Result } from "../../core/result/result.type";
-import { jwtService } from "../adapters/jwt.service";
-import { nodemailerService } from "../adapters/nodemailer.service";
+import { Result } from "../../../core/result/result.type";
 import { randomUUID } from "node:crypto";
 import { emailExamples } from "../adapters/email-examples";
-import { usersRepository } from "../../modules/user/repositories/user.repository";
-import { authRepository } from "../repositories/auth.repository";
+import { UsersRepository } from "../../user/repositories/usersRepository";
+import { AuthRepository } from "../repositories/auth.repository";
 import { SessionDto } from "../types/session.dto";
 import { Session } from "../types/session";
 import { TokensPair } from "../types/tokensPair";
+import { JwtService } from "../adapters/jwt.service";
+import { BcryptService } from "../adapters/bcrypt.service";
+import {
+    authRepository,
+    authService,
+    bcryptService,
+    jwtService,
+    nodemailerService,
+    usersRepository,
+    usersService
+} from "../../../composition-root";
 
 
-export const authService = {
+export class AuthService {
+
+    constructor(
+        public jwtService: JwtService,
+        public bcryptService: BcryptService,
+        public usersService: UsersService,
+        public usersRepository: UsersRepository,
+        public authRepository: AuthRepository,
+    ) {
+    }
+
     async loginUser(
         loginOrEmail: string,
         password: string,
@@ -61,7 +79,7 @@ export const authService = {
             data: { accessToken, refreshToken },
             extensions: [],
         };
-    },
+    }
 
     async checkUserCredentials(
         loginOrEmail: string,
@@ -92,7 +110,7 @@ export const authService = {
             data: user,
             extensions: [],
         };
-    },
+    }
 
     async registerUser(
         login: string,
@@ -141,7 +159,7 @@ export const authService = {
             data: createdId,
             extensions: [],
         };
-    },
+    }
 
     async resendEmailConfirmationCode(email: string): Promise<Result<string | null>> {
 
@@ -185,7 +203,7 @@ export const authService = {
             data: null,
             extensions: [],
         };
-    },
+    }
 
     async confirmEmail(code: string): Promise<Result> {
 
@@ -206,14 +224,14 @@ export const authService = {
             extensions: [],
 
         };
-    },
+    }
 
     async refreshSession(userId: string, deviceId: string): Promise<Result<{
         accessToken: string;
         refreshToken: string
     } | null>> {
 
-        const tokensPairResult = await this._createTokensPair(userId, deviceId);
+        const tokensPairResult = await authService._createTokensPair(userId, deviceId);
         if (!tokensPairResult.data) {
             return {
                 status: ResultStatus.Unauthorized,
@@ -246,7 +264,7 @@ export const authService = {
         }
 
         return tokensPairResult;
-    },
+    }
 
     async deleteSession(deviceId: string): Promise<Result> {
         const isDeletedSession = await authRepository.deleteSession(deviceId);
@@ -264,7 +282,7 @@ export const authService = {
             data: null,
             extensions: []
         };
-    },
+    }
 
     async findSession(deviceId: string): Promise<Result<Session | null>> {
         const result = await authRepository.findSession(deviceId);
@@ -283,11 +301,11 @@ export const authService = {
             data: result,
             extensions: [],
         };
-    },
+    }
 
     async _createSession(sessionDto: SessionDto): Promise<Result<TokensPair | null>> {
         const deviceId = randomUUID();
-        const tokensPairResult = await this._createTokensPair(sessionDto.userId, deviceId)
+        const tokensPairResult = await authService._createTokensPair(sessionDto.userId, deviceId)
 
         if (!tokensPairResult.data) {
             return {
@@ -334,7 +352,7 @@ export const authService = {
             data: { accessToken, refreshToken },
             extensions: [],
         };
-    },
+    }
 
     async _createTokensPair(userId: string, deviceId: string): Promise<Result<TokensPair | null>> {
 
@@ -366,5 +384,5 @@ export const authService = {
             data: { accessToken, refreshToken },
             extensions: []
         };
-    },
+    }
 }

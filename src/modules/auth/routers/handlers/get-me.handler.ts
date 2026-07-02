@@ -1,6 +1,6 @@
 import {Request, Response} from 'express';
-import {HttpStatuses} from "../../../core/types/http-statuses";
-import {usersQueryRepository} from "../../../modules/user/repositories/users.query.repository";
+import {HttpStatuses} from "../../../../core/types/http-statuses";
+import { usersQueryRepository } from "../../../../composition-root";
 
 export async function getMeHandler(
     req: Request,

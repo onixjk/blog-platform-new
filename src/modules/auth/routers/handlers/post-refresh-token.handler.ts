@@ -1,8 +1,8 @@
 import {Request, Response} from "express";
-import {authService} from "../../application/authService";
-import {ResultStatus} from "../../../core/result/resultCode";
-import {resultCodeToHttpException} from "../../../core/result/resultCodeToHttpException";
-import {HttpStatuses} from "../../../core/types/http-statuses";
+import {ResultStatus} from "../../../../core/result/resultCode";
+import {resultCodeToHttpException} from "../../../../core/result/resultCodeToHttpException";
+import {HttpStatuses} from "../../../../core/types/http-statuses";
+import { authService } from "../../../../composition-root";
 
 export async function refreshTokenHandler(
     req: Request,

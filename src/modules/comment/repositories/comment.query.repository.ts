@@ -8,7 +8,7 @@ import {mapToCommentOutput} from "../routes/mapers/map-to-comment-output.util";
 import {ResultStatus} from "../../../core/result/resultCode";
 import {Result} from "../../../core/result/result.type";
 
-export const commentQueryRepository = {
+export class CommentQueryRepository {
 
     async findById(id: string): Promise<Result<CommentOutput | null>>
     {
@@ -28,7 +28,7 @@ export const commentQueryRepository = {
             data: mapToCommentOutput(comment),
             extensions: [],
         }
-    },
+    }
 
     async findCommentByPost(
         queryDto: CommentQueryInput,
@@ -57,5 +57,5 @@ export const commentQueryRepository = {
             data: paginatedData,
             extensions: []
         };
-    },
+    }
 }

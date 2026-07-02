@@ -4,9 +4,9 @@ import { Blog } from "../modules/blog/types/blog";
 import { Post } from "../modules/post/types/post";
 import { IUserDB } from "../modules/user/types/user.db.interface";
 import { Comment } from "../modules/comment/types/comment";
-import { Session } from "../auth/types/session";
+import { Session } from "../modules/auth/types/session";
 import { Device } from "../modules/device/types/device.";
-import { ApiRequestLog } from "../auth/types/api-request-log";
+import { ApiRequestLog } from "../modules/auth/types/api-request-log";
 
 const BLOG_COLLECTION_NAME = 'blogs';
 const POST_COLLECTION_NAME = 'posts';

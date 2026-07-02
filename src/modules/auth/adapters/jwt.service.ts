@@ -1,28 +1,8 @@
-import jwt, {JwtPayload} from "jsonwebtoken";
-import {appConfig} from "../../core/config/config";
-import {promisify} from 'util';
-import {RefreshTokenPayload} from "../types/refresh-token-payload.interface";
+import jwt from "jsonwebtoken";
+import { appConfig } from "../../../core/config/config";
+import { RefreshTokenPayload } from "../types/refresh-token-payload.interface";
 
-// Превращаем jwt.sign в асинхронную функцию
-const signJwtAsync = promisify(jwt.sign as any);
-
-export const jwtService = {
-    // async createAccessToken(userId: string): Promise<string> {
-    //     return jwt.sign(
-    //         {userId},
-    //         appConfig.AC_SECRET,
-    //         {expiresIn: appConfig.AC_TIME as any}
-    //     );
-    // },
-    //
-    // async createRefreshToken(userId: string, deviceId: string): Promise<string> {
-    //     return jwt.sign(
-    //         {userId, deviceId},
-    //         appConfig.RT_SECRET,
-    //         {expiresIn: appConfig.RT_TIME as any}
-    //     );
-    // },
-
+export class JwtService {
     async createAccessToken(userId: string): Promise<string | null> {
         return new Promise((resolve) => {
             jwt.sign(
@@ -37,7 +17,7 @@ export const jwtService = {
                 }
             );
         });
-    },
+    }
 
     async createRefreshToken(userId: string, deviceId: string): Promise<string | null> {
         return new Promise((resolve) => {
@@ -53,7 +33,7 @@ export const jwtService = {
                 }
             );
         });
-    },
+    }
 
     async decodeToken(token: string): Promise<any> {
         try {
@@ -62,7 +42,7 @@ export const jwtService = {
             console.error("Can't decode token", e);
             return null;
         }
-    },
+    }
 
     async verifyAccessToken(token: string): Promise<{ userId: string } | null> {
         try {
@@ -71,7 +51,7 @@ export const jwtService = {
             console.error("Token verify some error");
             return null;
         }
-    },
+    }
 
     async verifyRefreshToken(token: string): Promise<RefreshTokenPayload | null> {
         try {

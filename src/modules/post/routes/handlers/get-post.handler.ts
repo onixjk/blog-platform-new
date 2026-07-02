@@ -1,8 +1,7 @@
-import {Request, Response} from 'express';
-import {errorsHandler} from "../../../../core/errors/errors.handler";
-import {HttpStatuses} from "../../../../core/types/http-statuses";
-import {postsQueryRepository} from "../../repositories/posts.query.repository";
-import {postsService} from "../../application/posts.service";
+import { Request, Response } from 'express';
+import { errorsHandler } from "../../../../core/errors/errors.handler";
+import { HttpStatuses } from "../../../../core/types/http-statuses";
+import { postsQueryRepository, postsService } from "../../../../composition-root";
 
 export async function getPostHandler(
     req: Request<{ id: string }>,

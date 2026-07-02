@@ -1,10 +1,10 @@
-import {Request, Response} from 'express';
-import {BlogQueryInput} from "../input/blog-query.input";
-import {matchedData} from "express-validator";
-import {setDefaultSortAndPaginationIfNotExist} from "../../../../core/helpers/set-default-sort-and-pagination";
-import {errorsHandler} from "../../../../core/errors/errors.handler";
-import {HttpStatuses} from "../../../../core/types/http-statuses";
-import {blogsQueryRepository} from "../../repositories/blogs.query.repository";
+import { Request, Response } from 'express';
+import { BlogQueryInput } from "../input/blog-query.input";
+import { matchedData } from "express-validator";
+import { setDefaultSortAndPaginationIfNotExist } from "../../../../core/helpers/set-default-sort-and-pagination";
+import { errorsHandler } from "../../../../core/errors/errors.handler";
+import { HttpStatuses } from "../../../../core/types/http-statuses";
+import { blogsQueryRepository } from "../../../../composition-root";
 
 export async function getBlogListHandler(
     req: Request,

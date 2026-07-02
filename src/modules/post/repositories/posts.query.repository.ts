@@ -6,7 +6,7 @@ import {ObjectId} from "mongodb";
 import {PostOutput} from "../routes/output/post-output";
 import {mapToPostOutput} from "../routes/mapers/map-to-post-output.util";
 
-export const postsQueryRepository = {
+export class PostsQueryRepository {
 
     async findMany(
         queryDto: PostQueryInput
@@ -29,7 +29,7 @@ export const postsQueryRepository = {
             pageSize: queryDto.pageSize,
             totalCount,
         });
-    },
+    }
 
     async findPostsByBlog(
         queryDto: PostQueryInput,
@@ -53,11 +53,11 @@ export const postsQueryRepository = {
             pageSize: queryDto.pageSize,
             totalCount,
         });
-    },
+    }
 
     async findById(id: string): Promise<PostOutput | null> {
         const post = await postCollection.findOne({_id: new ObjectId(id)});
 
         return post ? mapToPostOutput(post) : null;
-    },
+    }
 }

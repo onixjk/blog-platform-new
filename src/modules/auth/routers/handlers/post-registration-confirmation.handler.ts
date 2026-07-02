@@ -1,15 +1,15 @@
-import {Request, Response} from "express";
-import {RegistrationConfirmationCode} from "../../types/registration-confirmation-code";
-import {authService} from "../../application/authService";
-import {ResultStatus} from "../../../core/result/resultCode";
-import {resultCodeToHttpException} from "../../../core/result/resultCodeToHttpException";
-import {HttpStatuses} from "../../../core/types/http-statuses";
+import { Request, Response } from "express";
+import { RegistrationConfirmationCode } from "../../types/registration-confirmation-code";
+import { ResultStatus } from "../../../../core/result/resultCode";
+import { resultCodeToHttpException } from "../../../../core/result/resultCodeToHttpException";
+import { HttpStatuses } from "../../../../core/types/http-statuses";
+import { authService } from "../../../../composition-root";
 
 export async function registrationConfirmationHandler(
     req: Request<{}, {}, RegistrationConfirmationCode>,
     res: Response,
 ) {
-    const {code} = req.body
+    const { code } = req.body
 
     if (!code) {
         return res
@@ -22,7 +22,7 @@ export async function registrationConfirmationHandler(
     if (result.status !== ResultStatus.NoContent)
         return res
             .status(resultCodeToHttpException(result.status))
-            .send({errorsMessages: result.extensions});
+            .send({ errorsMessages: result.extensions });
 
     return res.status(HttpStatuses.NoContent_204).send(result.data);
 }

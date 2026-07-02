@@ -1,12 +1,11 @@
-import {Request, Response} from "express";
-import {errorsHandler} from "../../../../core/errors/errors.handler";
-import {HttpStatuses} from "../../../../core/types/http-statuses";
-import {postsService} from "../../../post/application/posts.service";
-import {BlogPostInputDto} from "../../../post/routes/input/blog-post.input-dto";
-import {postsQueryRepository} from "../../../post/repositories/posts.query.repository";
+import { Request, Response } from "express";
+import { errorsHandler } from "../../../../core/errors/errors.handler";
+import { HttpStatuses } from "../../../../core/types/http-statuses";
+import { BlogPostInputDto } from "../../../post/routes/input/blog-post.input-dto";
+import { postsQueryRepository, postsService } from "../../../../composition-root";
 
 export async function createBlogPostHandler(
-    req: Request<{blogId: string}, {}, BlogPostInputDto>,
+    req: Request<{ blogId: string }, {}, BlogPostInputDto>,
     res: Response
 ) {
     try {

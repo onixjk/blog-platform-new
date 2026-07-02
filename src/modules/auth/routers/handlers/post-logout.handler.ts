@@ -1,7 +1,7 @@
 import {Request, Response} from "express";
-import {HttpStatuses} from "../../../core/types/http-statuses";
-import {authService} from "../../application/authService";
-import {ResultStatus} from "../../../core/result/resultCode";
+import {HttpStatuses} from "../../../../core/types/http-statuses";
+import {ResultStatus} from "../../../../core/result/resultCode";
+import { authService } from "../../../../composition-root";
 
 export async function logoutHandler(
     req: Request,

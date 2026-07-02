@@ -1,10 +1,10 @@
 import { Router } from "express";
-import { inputValidationResultMiddleware } from "../../core/middlewares/validation/input-validation-result.middleware";
+import { inputValidationResultMiddleware } from "../../../core/middlewares/validation/input-validation-result.middleware";
 import { loginUserHandler } from "./handlers/post-login-user.handler";
 import {
     loginOrEmailValidation,
     userInputValidation
-} from "../../modules/user/middlewares/user.input-dto.validation-middlewares";
+} from "../../user/middlewares/user.input-dto.validation-middlewares";
 import { accessTokenGuard } from "../middlewares/access-token.guard";
 import { getMeHandler } from "./handlers/get-me.handler";
 import { registrationHandler } from "./handlers/post-registration.handler";

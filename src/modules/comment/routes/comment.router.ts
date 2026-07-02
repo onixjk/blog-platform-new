@@ -4,7 +4,7 @@ import {idValidation} from "../../../core/middlewares/validation/params-id.valid
 import {getCommentHandler} from "./handlers/get-comment.handler";
 import {deleteCommentHandler} from "./handlers/delete-comment.handler";
 import {commentInputValidation} from "../middlewares/comment.input-dto.validation-middlewares";
-import {accessTokenGuard} from "../../../auth/middlewares/access-token.guard";
+import {accessTokenGuard} from "../../auth/middlewares/access-token.guard";
 import {updateCommentHandler} from "./handlers/update-comment.handler";
 
 export const commentRouter = Router({});

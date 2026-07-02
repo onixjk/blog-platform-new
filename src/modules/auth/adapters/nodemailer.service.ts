@@ -1,6 +1,6 @@
 import nodemailer from "nodemailer";
 
-export const nodemailerService = {
+export class NodemailerService {
     async sendEmail(
         email: string,
         code: string,
@@ -22,5 +22,5 @@ export const nodemailerService = {
         });
 
         return !!info;
-    },
+    }
 }

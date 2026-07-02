@@ -1,10 +1,10 @@
-import {Request, Response} from "express";
-import {errorsHandler} from "../../../../core/errors/errors.handler";
-import {commentService} from "../../application/comment.service";
-import {CommentInputDto} from "../input/comment-input.dto";
-import {ResultStatus} from "../../../../core/result/resultCode";
-import {resultCodeToHttpException} from "../../../../core/result/resultCodeToHttpException";
-import {HttpStatuses} from "../../../../core/types/http-statuses";
+import { Request, Response } from "express";
+import { errorsHandler } from "../../../../core/errors/errors.handler";
+import { CommentInputDto } from "../input/comment-input.dto";
+import { ResultStatus } from "../../../../core/result/resultCode";
+import { resultCodeToHttpException } from "../../../../core/result/resultCodeToHttpException";
+import { HttpStatuses } from "../../../../core/types/http-statuses";
+import { commentService } from "../../../../composition-root";
 
 export async function updateCommentHandler(
     req: Request<{ id: string }, {}, CommentInputDto>,
@@ -14,7 +14,7 @@ export async function updateCommentHandler(
         const commentId = req.params.id;
         const userId = req.user.id!;
 
-        const commentData = {commentId, userId, ...req.body}
+        const commentData = { commentId, userId, ...req.body }
 
         const result = await commentService.update(commentData);
 

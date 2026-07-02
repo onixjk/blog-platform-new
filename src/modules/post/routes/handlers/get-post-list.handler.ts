@@ -1,10 +1,10 @@
-import {Request, Response} from 'express';
-import {errorsHandler} from "../../../../core/errors/errors.handler";
-import {PostQueryInput} from "../input/post-query.input";
-import {matchedData} from "express-validator";
-import {setDefaultSortAndPaginationIfNotExist} from "../../../../core/helpers/set-default-sort-and-pagination";
-import {HttpStatuses} from "../../../../core/types/http-statuses";
-import {postsQueryRepository} from "../../repositories/posts.query.repository";
+import { Request, Response } from 'express';
+import { errorsHandler } from "../../../../core/errors/errors.handler";
+import { PostQueryInput } from "../input/post-query.input";
+import { matchedData } from "express-validator";
+import { setDefaultSortAndPaginationIfNotExist } from "../../../../core/helpers/set-default-sort-and-pagination";
+import { HttpStatuses } from "../../../../core/types/http-statuses";
+import { postsQueryRepository } from "../../../../composition-root";
 
 export async function getPostListHandler(
     req: Request,

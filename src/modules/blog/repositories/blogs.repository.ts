@@ -4,7 +4,7 @@ import {BlogInputDto} from "../routes/input/blog.input-dto";
 import {Blog} from "../types/blog";
 import {RepositoryNotFoundError} from "../../../core/errors/repository-not-found.error";
 
-export const blogsRepository = {
+export class BlogsRepository {
 
     async findByIdOrFail(id: string): Promise<WithId<Blog>> {
         const blog = await blogCollection.findOne({_id: new ObjectId(id)});
@@ -14,13 +14,13 @@ export const blogsRepository = {
         }
 
         return blog;
-    },
+    }
 
     async create(newBlog: Blog): Promise<string> {
         const insertResult = await blogCollection.insertOne(newBlog)
 
         return insertResult.insertedId.toString();
-    },
+    }
 
     async update(id: string, dto: BlogInputDto): Promise<void> {
         const updateResult = await blogCollection.updateOne(
@@ -41,7 +41,7 @@ export const blogsRepository = {
         }
 
         return;
-    },
+    }
 
     async delete(id: string): Promise<void> {
         const deleteResult = await blogCollection.deleteOne({_id: new ObjectId(id)});

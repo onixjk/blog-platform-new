@@ -1,8 +1,8 @@
-import {Request, Response} from 'express';
-import {blogsService} from "../../application/blogs.service";
-import {HttpStatuses} from "../../../../core/types/http-statuses";
-import {BlogInputDto} from "../input/blog.input-dto";
-import {errorsHandler} from "../../../../core/errors/errors.handler";
+import { Request, Response } from 'express';
+import { HttpStatuses } from "../../../../core/types/http-statuses";
+import { BlogInputDto } from "../input/blog.input-dto";
+import { errorsHandler } from "../../../../core/errors/errors.handler";
+import { blogsService } from "../../../../composition-root";
 
 export async function updateBlogHandler(
     req: Request<{ id: string }, {}, BlogInputDto>,

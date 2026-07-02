@@ -1,6 +1,6 @@
-import {Request, Response} from 'express';
-import {HttpStatuses} from "../../../../core/types/http-statuses";
-import {deviceQueryRepository} from "../../repositoryes/device.query.repository";
+import { Request, Response } from 'express';
+import { HttpStatuses } from "../../../../core/types/http-statuses";
+import { deviceQueryRepository } from "../../../../composition-root";
 
 export async function getDeviceListHandler(
     req: Request,

@@ -1,8 +1,8 @@
-import {Request, Response} from "express";
-import {errorsHandler} from "../../../../core/errors/errors.handler";
-import {commentService} from "../../application/comment.service";
-import {ResultStatus} from "../../../../core/result/resultCode";
-import {resultCodeToHttpException} from "../../../../core/result/resultCodeToHttpException";
+import { Request, Response } from "express";
+import { errorsHandler } from "../../../../core/errors/errors.handler";
+import { ResultStatus } from "../../../../core/result/resultCode";
+import { resultCodeToHttpException } from "../../../../core/result/resultCodeToHttpException";
+import { commentService } from "../../../../composition-root";
 
 export async function deleteCommentHandler(
     req: Request<{ id: string }>,

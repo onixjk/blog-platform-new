@@ -1,7 +1,7 @@
 import { Device } from "../types/device.";
 import { sessionCollection } from "../../../db/mongo.db";
 
-export const deviceQueryRepository = {
+export class DeviceQueryRepository {
 
     async findMany(userId: string): Promise<Device[]> {
 

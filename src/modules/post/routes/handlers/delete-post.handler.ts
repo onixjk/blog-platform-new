@@ -1,7 +1,7 @@
-import {Request, Response} from 'express';
-import {errorsHandler} from "../../../../core/errors/errors.handler";
-import {postsService} from "../../application/posts.service";
-import {HttpStatuses} from "../../../../core/types/http-statuses";
+import { Request, Response } from 'express';
+import { errorsHandler } from "../../../../core/errors/errors.handler";
+import { HttpStatuses } from "../../../../core/types/http-statuses";
+import { postsService } from "../../../../composition-root";
 
 export async function deletePostHandler(
     req: Request<{ id: string }>,

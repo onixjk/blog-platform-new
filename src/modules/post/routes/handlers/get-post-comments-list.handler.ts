@@ -1,12 +1,11 @@
-import {Request, Response} from "express";
-import {matchedData} from "express-validator";
-import {setDefaultSortAndPaginationIfNotExist} from "../../../../core/helpers/set-default-sort-and-pagination";
-import {errorsHandler} from "../../../../core/errors/errors.handler";
-import {CommentQueryInput} from "../../../comment/routes/input/comment-query.input";
-import {postsService} from "../../application/posts.service";
-import {commentQueryRepository} from "../../../comment/repositories/comment.query.repository";
-import {ResultStatus} from "../../../../core/result/resultCode";
-import {resultCodeToHttpException} from "../../../../core/result/resultCodeToHttpException";
+import { Request, Response } from "express";
+import { matchedData } from "express-validator";
+import { setDefaultSortAndPaginationIfNotExist } from "../../../../core/helpers/set-default-sort-and-pagination";
+import { errorsHandler } from "../../../../core/errors/errors.handler";
+import { CommentQueryInput } from "../../../comment/routes/input/comment-query.input";
+import { ResultStatus } from "../../../../core/result/resultCode";
+import { resultCodeToHttpException } from "../../../../core/result/resultCodeToHttpException";
+import { commentQueryRepository, postsService } from "../../../../composition-root";
 
 export async function getPostCommentListHandler(
     req: Request<{ postId: string }, {}, {}, {}>,

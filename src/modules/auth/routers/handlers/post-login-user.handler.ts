@@ -1,9 +1,9 @@
 import { Request, Response } from "express";
 import { LoginInputDto } from "../../input/login.input-dto";
-import { authService } from "../../application/authService";
-import { HttpStatuses } from "../../../core/types/http-statuses";
-import { ResultStatus } from "../../../core/result/resultCode";
-import { resultCodeToHttpException } from "../../../core/result/resultCodeToHttpException";
+import { HttpStatuses } from "../../../../core/types/http-statuses";
+import { ResultStatus } from "../../../../core/result/resultCode";
+import { resultCodeToHttpException } from "../../../../core/result/resultCodeToHttpException";
+import { authService } from "../../../../composition-root";
 
 export async function loginUserHandler(
     req: Request<{}, {}, LoginInputDto>,

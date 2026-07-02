@@ -1,9 +1,8 @@
-import {Request, Response} from "express";
-import {errorsHandler} from "../../../../core/errors/errors.handler";
-import {HttpStatuses} from "../../../../core/types/http-statuses";
-import {usersService} from "../../application/usersService";
-import {UserInputDto} from "../input/user.input-dto";
-import {usersQueryRepository} from "../../repositories/users.query.repository";
+import { Request, Response } from "express";
+import { errorsHandler } from "../../../../core/errors/errors.handler";
+import { HttpStatuses } from "../../../../core/types/http-statuses";
+import { UserInputDto } from "../input/user.input-dto";
+import { usersQueryRepository, usersService } from "../../../../composition-root";
 
 export async function createUserHandler(
     req: Request<{}, {}, UserInputDto>,

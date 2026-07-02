@@ -5,7 +5,7 @@ import {
 } from "../../../core/middlewares/validation/input-validation-result.middleware";
 import { getDeviceListHandler } from "./handlers/get-device-list.handler";
 import { deleteDeviceHandler } from "./handlers/delete-device.handler";
-import { refreshTokenGuard } from "../../../auth/middlewares/refreshTokenGuard";
+import { refreshTokenGuard } from "../../auth/middlewares/refreshTokenGuard";
 import { deleteDeviceListHandler } from "./handlers/delete-device-list.handler";
 
 export const deviceRouter = Router({});

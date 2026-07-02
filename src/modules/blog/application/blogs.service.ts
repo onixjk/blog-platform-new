@@ -1,22 +1,21 @@
-import {BlogInputDto} from "../routes/input/blog.input-dto";
-import {Blog} from "../types/blog";
-import {WithId} from "mongodb";
-import {blogsRepository} from "../repositories/blogs.repository";
-import {BlogQueryInput} from "../routes/input/blog-query.input";
-import {postsService} from "../../post/application/posts.service";
-import {blogsQueryRepository} from "../repositories/blogs.query.repository";
-import {BlogListPaginatedOutput} from "../routes/output/blog-list-paginated.output.ts";
+import { BlogInputDto } from "../routes/input/blog.input-dto";
+import { Blog } from "../types/blog";
+import { WithId } from "mongodb";
+import { blogsRepository, postsService } from "../../../composition-root";
+import { PostsService } from "../../post/application/posts.service";
+import { BlogsRepository } from "../repositories/blogs.repository";
 
-export const blogsService = {
-    async findMany(
-        queryDto: BlogQueryInput,
-    ): Promise<BlogListPaginatedOutput> {
-        return blogsQueryRepository.findMany(queryDto);
-    },
+export class BlogsService {
+
+    constructor(
+        public blogsRepository: BlogsRepository,
+        public postsService: PostsService,
+    ) {
+    }
 
     async findByIdOrFail(id: string): Promise<WithId<Blog>> {
         return blogsRepository.findByIdOrFail(id);
-    },
+    }
 
     async create(dto: BlogInputDto): Promise<string> {
         const newBlog: Blog = {
@@ -28,14 +27,14 @@ export const blogsService = {
         }
 
         return blogsRepository.create(newBlog);
-    },
+    }
 
     async update(id: string, dto: BlogInputDto): Promise<void> {
         await postsService.updateBlogName(id, dto.name);
         await blogsRepository.update(id, dto);
 
         return;
-    },
+    }
 
     async delete(id: string): Promise<void> {
         await postsService.deleteAllByBlogId(id)

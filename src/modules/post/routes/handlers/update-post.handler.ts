@@ -1,8 +1,8 @@
-import {Request, Response} from 'express';
-import {HttpStatuses} from "../../../../core/types/http-statuses";
-import {postsService} from "../../application/posts.service";
-import {errorsHandler} from "../../../../core/errors/errors.handler";
-import {PostInputDto} from "../input/post.input-dto";
+import { Request, Response } from 'express';
+import { HttpStatuses } from "../../../../core/types/http-statuses";
+import { errorsHandler } from "../../../../core/errors/errors.handler";
+import { PostInputDto } from "../input/post.input-dto";
+import { postsService } from "../../../../composition-root";
 
 export async function updatePostHandler(
     req: Request<{ id: string }, {}, PostInputDto>,

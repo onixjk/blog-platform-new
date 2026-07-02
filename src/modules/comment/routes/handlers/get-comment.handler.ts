@@ -1,8 +1,8 @@
-import {Request, Response} from "express";
-import {errorsHandler} from "../../../../core/errors/errors.handler";
-import {commentQueryRepository} from "../../repositories/comment.query.repository";
-import {ResultStatus} from "../../../../core/result/resultCode";
-import {resultCodeToHttpException} from "../../../../core/result/resultCodeToHttpException";
+import { Request, Response } from "express";
+import { errorsHandler } from "../../../../core/errors/errors.handler";
+import { ResultStatus } from "../../../../core/result/resultCode";
+import { resultCodeToHttpException } from "../../../../core/result/resultCodeToHttpException";
+import { commentQueryRepository } from "../../../../composition-root";
 
 export async function getCommentHandler(
     req: Request<{ id: string }>,

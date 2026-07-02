@@ -1,24 +1,31 @@
-import {WithId} from "mongodb";
-import {User} from "../types/user";
-import {UserInputDto} from "../routes/input/user.input-dto";
-import {usersRepository} from "../repositories/user.repository";
-import {IUserDB} from "../types/user.db.interface";
-import {bcryptService} from "../../../auth/adapters/bcrypt.service";
-import {randomUUID} from "node:crypto";
+import { WithId } from "mongodb";
+import { User } from "../types/user";
+import { UserInputDto } from "../routes/input/user.input-dto";
+import { UsersRepository } from "../repositories/usersRepository";
+import { IUserDB } from "../types/user.db.interface";
+import { BcryptService } from "../../auth/adapters/bcrypt.service";
+import { randomUUID } from "node:crypto";
+import { bcryptService, usersRepository } from "../../../composition-root";
 
-export const usersService = {
+export class UsersService {
+
+    constructor(
+        public usersRepository: UsersRepository,
+        public bcryptService: BcryptService,
+    ) {
+    }
 
     async findByIdOrFail(id: string): Promise<WithId<User>> {
         return usersRepository.findByIdOrFail(id);
-    },
+    }
 
     async findByLoginOrEmail(loginOrEmail: string): Promise<WithId<IUserDB> | null> {
         return usersRepository.findByLoginOrEmail(loginOrEmail);
-    },
+    }
 
     async updateEmailConfirmationStatus(code: string): Promise<WithId<IUserDB> | null> {
         return usersRepository.updateEmailConfirmationStatus(code);
-    },
+    }
 
     async create(dto: UserInputDto): Promise<string> {
 
@@ -49,10 +56,10 @@ export const usersService = {
         }
 
         return usersRepository.create(newUser);
-    },
+    }
 
     async delete(id: string): Promise<void> {
         await usersRepository.delete(id);
         return;
-    },
+    }
 }

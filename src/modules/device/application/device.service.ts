@@ -1,8 +1,11 @@
 import { Result } from "../../../core/result/result.type";
-import { deviceRepository } from "../repositoryes/device.repository";
+import { DeviceRepository } from "../repositoryes/device.repository";
 import { ResultStatus } from "../../../core/result/resultCode";
+import { deviceRepository } from "../../../composition-root";
 
-export const deviceService = {
+export class DeviceService {
+
+    constructor(public deviceRepository: DeviceRepository) {}
 
     async deleteSessionById(userId: string, deviceId: string): Promise<Result> {
         const session = await deviceRepository.findSessionById(deviceId);
@@ -39,7 +42,7 @@ export const deviceService = {
             data: null,
             extensions: []
         };
-    },
+    }
 
     async deleteOtherSessions(userId: string, deviceId: string): Promise<Result> {
         const isCompleted = await deviceRepository.deleteOtherSessions(userId, deviceId);
@@ -58,5 +61,5 @@ export const deviceService = {
             data: null,
             extensions: []
         };
-    },
+    }
 }

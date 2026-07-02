@@ -1,16 +1,16 @@
-import {sessionCollection} from "../../db/mongo.db";
-import {WithId} from "mongodb";
-import {Session} from "../types/session";
+import { sessionCollection } from "../../../db/mongo.db";
+import { WithId } from "mongodb";
+import { Session } from "../types/session";
 
-export const authRepository = {
+export class AuthRepository {
 
     async saveSession(session: Session): Promise<void> {
         await sessionCollection.insertOne(session);
-    },
+    }
 
     async findSession(deviceId: string): Promise<WithId<Session> | null> {
-        return await sessionCollection.findOne({device_id: deviceId});
-    },
+        return await sessionCollection.findOne({ device_id: deviceId });
+    }
 
     async updateIat(deviceId: string, iat: Date): Promise<boolean> {
         const result = await sessionCollection.updateOne(
@@ -19,10 +19,10 @@ export const authRepository = {
         );
 
         return result.matchedCount > 0;
-    },
+    }
 
     async deleteSession(deviceId: string): Promise<boolean> {
         const result = await sessionCollection.deleteOne({ device_id: deviceId });
         return result.deletedCount > 0;
-    },
+    }
 }

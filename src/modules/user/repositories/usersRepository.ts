@@ -6,13 +6,13 @@ import {User} from "../types/user";
 import {ResultStatus} from "../../../core/result/resultCode";
 import {Result} from "../../../core/result/result.type";
 
-export const usersRepository = {
+export class UsersRepository {
 
     async findByLoginOrEmail(loginOrEmail: string): Promise<WithId<IUserDB> | null> {
         return userCollection.findOne({
             $or: [{email: loginOrEmail}, {login: loginOrEmail}],
         });
-    },
+    }
 
     async updateEmailConfirmationStatus(code: string): Promise<WithId<IUserDB> | null> {
 
@@ -29,7 +29,7 @@ export const usersRepository = {
                 returnDocument: 'after'
             }
         );
-    },
+    }
 
     async updateEmailConfirmationCode(
         email: string,
@@ -52,7 +52,7 @@ export const usersRepository = {
             data: null,
             extensions: [],
         }
-    },
+    }
 
     async findByIdOrFail(id: string): Promise<WithId<User>> {
         const res = await userCollection.findOne({_id: new ObjectId(id)});
@@ -62,13 +62,13 @@ export const usersRepository = {
         }
 
         return res;
-    },
+    }
 
     async create(newUser: IUserDB): Promise<string> {
         const insertResult = await userCollection.insertOne(newUser);
 
         return insertResult.insertedId.toString()
-    },
+    }
 
     async delete(id: string): Promise<void> {
         const deleteResult = await userCollection.deleteOne({_id: new ObjectId(id)});

@@ -6,7 +6,7 @@ import {ObjectId} from "mongodb";
 import {mapToBlogOutput} from "../routes/mapers/map-to-blog-output.util";
 import {BlogOutput} from "../routes/output/blog-output";
 
-export const blogsQueryRepository = {
+export class BlogsQueryRepository {
     async findMany(queryDto: BlogQueryInput): Promise<BlogListPaginatedOutput> {
         const {pageNumber, pageSize, sortBy, sortDirection, searchNameTerm: searchNameTerm} = queryDto;
         const skip = (pageNumber - 1) * pageSize;
@@ -30,11 +30,11 @@ export const blogsQueryRepository = {
             pageSize: queryDto.pageSize,
             totalCount,
         });
-    },
+    }
 
     async findById(id: string): Promise<BlogOutput | null> {
         const blog = await blogCollection.findOne({_id: new ObjectId(id)});
 
         return blog ? mapToBlogOutput(blog) : null;
-    },
+    }
 }
