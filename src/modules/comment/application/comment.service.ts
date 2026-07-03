@@ -23,9 +23,9 @@ export class CommentService {
     async create(dto: CommentCreateDto): Promise<Result<string | null>> {
         const postResult = await postsService.findById(dto.postId);
 
-        if (postResult.status === ResultStatus.NotFound || !postResult.data) {
+        if (postResult.status === ResultStatus.NotFound_404 || !postResult.data) {
             return {
-                status: ResultStatus.NotFound,
+                status: ResultStatus.NotFound_404,
                 data: null,
                 errorMessage: 'NotFound',
                 extensions: [{ field: null, message: 'Comment not exist' }],
@@ -51,9 +51,9 @@ export class CommentService {
 
         const result = await this.findById(dto.commentId);
 
-        if (result.status === ResultStatus.NotFound || !result.data) {
+        if (result.status === ResultStatus.NotFound_404 || !result.data) {
             return {
-                status: ResultStatus.NotFound,
+                status: ResultStatus.NotFound_404,
                 data: null,
                 errorMessage: 'NotFound',
                 extensions: [{ field: null, message: 'Comment not exist' }],
@@ -62,7 +62,7 @@ export class CommentService {
 
         if (result.data.commentatorInfo.userId !== dto.userId) {
             return {
-                status: ResultStatus.Forbidden,
+                status: ResultStatus.Forbidden_403,
                 data: null,
                 errorMessage: 'Forbidden',
                 extensions: [{ field: null, message: 'You try to update someone else\'s comment' }],
@@ -75,9 +75,9 @@ export class CommentService {
     async delete(id: string, userId: string): Promise<Result<WithId<Comment> | null>> {
         const commentResult = await this.findById(id);
 
-        if (commentResult.status === ResultStatus.NotFound || !commentResult.data) {
+        if (commentResult.status === ResultStatus.NotFound_404 || !commentResult.data) {
             return {
-                status: ResultStatus.NotFound,
+                status: ResultStatus.NotFound_404,
                 data: null,
                 errorMessage: 'Not Found',
                 extensions: [{ field: null, message: 'Comment doesn\'t exist' }],
@@ -86,7 +86,7 @@ export class CommentService {
 
         if (commentResult.data.commentatorInfo.userId !== userId) {
             return {
-                status: ResultStatus.Forbidden,
+                status: ResultStatus.Forbidden_403,
                 data: null,
                 errorMessage: 'Forbidden',
                 extensions: [{ field: null, message: 'You try to delete someone else\'s comment' }],

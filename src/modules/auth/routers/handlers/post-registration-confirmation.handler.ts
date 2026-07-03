@@ -19,7 +19,7 @@ export async function registrationConfirmationHandler(
 
     const result = await authService.confirmEmail(code);
 
-    if (result.status !== ResultStatus.NoContent)
+    if (result.status !== ResultStatus.NoContent_204)
         return res
             .status(resultCodeToHttpException(result.status))
             .send({ errorsMessages: result.extensions });

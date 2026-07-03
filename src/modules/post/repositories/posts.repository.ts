@@ -13,7 +13,7 @@ export class PostsRepository {
 
         if (!post) {
             return {
-                status: ResultStatus.NotFound,
+                status: ResultStatus.NotFound_404,
                 data: null,
                 errorMessage: 'Not Found',
                 extensions: [{field: null, message: 'Post not exist'}],
@@ -21,7 +21,7 @@ export class PostsRepository {
         }
 
         return {
-            status: ResultStatus.Success,
+            status: ResultStatus.Success_200,
             data: post,
             extensions: [],
         };

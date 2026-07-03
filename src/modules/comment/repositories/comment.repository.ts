@@ -12,7 +12,7 @@ export class CommentRepository {
 
         if (!comment) {
             return {
-                status: ResultStatus.NotFound,
+                status: ResultStatus.NotFound_404,
                 data: null,
                 errorMessage: 'Not Found',
                 extensions: [{ field: null, message: 'Comment not exist' }],
@@ -20,7 +20,7 @@ export class CommentRepository {
         }
 
         return {
-            status: ResultStatus.Success,
+            status: ResultStatus.Success_200,
             data: comment,
             extensions: [],
         };
@@ -30,7 +30,7 @@ export class CommentRepository {
         const insertResult = await commentCollection.insertOne(newComment);
 
         return {
-            status: ResultStatus.Created,
+            status: ResultStatus.Created_201,
             data: insertResult.insertedId.toString(),
             extensions: [],
         }
@@ -44,7 +44,7 @@ export class CommentRepository {
 
         if (updateResult.matchedCount < 1) {
             return {
-                status: ResultStatus.NotFound,
+                status: ResultStatus.NotFound_404,
                 data: null,
                 errorMessage: 'Not Found',
                 extensions: [{ field: null, message: 'Comment doesn\'t exist' }],
@@ -52,7 +52,7 @@ export class CommentRepository {
         }
 
         return {
-            status: ResultStatus.NoContent,
+            status: ResultStatus.NoContent_204,
             data: null,
             extensions: [],
         }
@@ -63,7 +63,7 @@ export class CommentRepository {
 
         if (deleteResult.deletedCount < 1) {
             return {
-                status: ResultStatus.NotFound,
+                status: ResultStatus.NotFound_404,
                 data: null,
                 errorMessage: 'Not Found',
                 extensions: [{ field: null, message: 'Comment doesn\'t exist' }],
@@ -71,7 +71,7 @@ export class CommentRepository {
         }
 
         return {
-            status: ResultStatus.NoContent,
+            status: ResultStatus.NoContent_204,
             data: null,
             extensions: [],
         }
@@ -81,7 +81,7 @@ export class CommentRepository {
         await commentCollection.deleteMany({ postId: postId });
 
         return {
-            status: ResultStatus.NoContent,
+            status: ResultStatus.NoContent_204,
             data: null,
             extensions: [],
         };

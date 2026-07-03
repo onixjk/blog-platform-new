@@ -17,7 +17,7 @@ export async function refreshTokenHandler(
 
     const result = await authService.refreshSession(userId, deviceId);
 
-    if (result.status !== ResultStatus.Success || !result.data) {
+    if (result.status !== ResultStatus.Success_200 || !result.data) {
         return res
             .status(resultCodeToHttpException(result.status))
             .send({errorsMessages: result.extensions});

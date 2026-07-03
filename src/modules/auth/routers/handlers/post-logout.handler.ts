@@ -14,7 +14,7 @@ export async function logoutHandler(
 
     const result = await authService.deleteSession(deviceId);
 
-    if (result.status !== ResultStatus.NoContent) {
+    if (result.status !== ResultStatus.NoContent_204) {
         return res.sendStatus(HttpStatuses.Unauthorized_401);
     }
 

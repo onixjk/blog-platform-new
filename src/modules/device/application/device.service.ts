@@ -11,7 +11,7 @@ export class DeviceService {
         const session = await deviceRepository.findSessionById(deviceId);
         if (!session) {
             return {
-                status: ResultStatus.NotFound,
+                status: ResultStatus.NotFound_404,
                 errorMessage: 'Not found',
                 data: null,
                 extensions: [{ field: 'Session', message: 'Session not found' }]
@@ -20,7 +20,7 @@ export class DeviceService {
 
         if (session.user_id !== userId) {
             return {
-                status: ResultStatus.Forbidden,
+                status: ResultStatus.Forbidden_403,
                 errorMessage: 'Forbidden',
                 data: null,
                 extensions: [{ field: 'Session', message: 'You do not have permission to delete this session' }]
@@ -30,7 +30,7 @@ export class DeviceService {
         const isDeleted = await deviceRepository.deleteSessionById(deviceId);
         if (!isDeleted) {
             return {
-                status: ResultStatus.NotFound,
+                status: ResultStatus.NotFound_404,
                 data: null,
                 errorMessage: 'Not Found',
                 extensions: [{ field: 'Session', message: 'Session could not be deleted' }]
@@ -38,7 +38,7 @@ export class DeviceService {
         }
 
         return {
-            status: ResultStatus.NoContent,
+            status: ResultStatus.NoContent_204,
             data: null,
             extensions: []
         };
@@ -49,7 +49,7 @@ export class DeviceService {
 
         if (!isCompleted) {
             return {
-                status: ResultStatus.BadRequest,
+                status: ResultStatus.BadRequest_400,
                 errorMessage: 'Bad Request',
                 data: null,
                 extensions: [{ field: 'Session', message: 'Could not complete operation' }]
@@ -57,7 +57,7 @@ export class DeviceService {
         }
 
         return {
-            status: ResultStatus.NoContent,
+            status: ResultStatus.NoContent_204,
             data: null,
             extensions: []
         };

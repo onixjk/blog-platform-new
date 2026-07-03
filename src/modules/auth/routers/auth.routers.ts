@@ -3,7 +3,8 @@ import { inputValidationResultMiddleware } from "../../../core/middlewares/valid
 import { loginUserHandler } from "./handlers/post-login-user.handler";
 import {
     loginOrEmailValidation,
-    userInputValidation
+    userInputValidation,
+    emailValidation, passwordValidation,
 } from "../../user/middlewares/user.input-dto.validation-middlewares";
 import { accessTokenGuard } from "../middlewares/access-token.guard";
 import { getMeHandler } from "./handlers/get-me.handler";
@@ -17,6 +18,8 @@ import { refreshTokenHandler } from "./handlers/post-refresh-token.handler";
 import { logoutHandler } from "./handlers/post-logout.handler";
 import useragent from "express-useragent";
 import { rateLimitGuard } from "../middlewares/rate-limit.guard";
+import { passwordRecoveryHandler } from "./handlers/post-password-recovery.handler";
+import { newPasswordHandler } from "./handlers/post-new-password.handler";
 
 export const authRouter = Router({});
 
@@ -63,4 +66,18 @@ authRouter
     .post('/logout',
         refreshTokenGuard,
         logoutHandler
+    )
+
+    .post('/new-password',
+        rateLimitGuard,
+        passwordValidation,
+        inputValidationResultMiddleware,
+        newPasswordHandler
+    )
+
+    .post('/password-recovery',
+        rateLimitGuard,
+        emailValidation,
+        inputValidationResultMiddleware,
+        passwordRecoveryHandler
     )

@@ -17,7 +17,7 @@ export async function deleteDeviceListHandler(
 
     const result = await deviceService.deleteOtherSessions(userId, currentDeviceId);
 
-    if (result.status !== ResultStatus.NoContent) {
+    if (result.status !== ResultStatus.NoContent_204) {
         return res
             .status(resultCodeToHttpException(result.status))
             .send({ errorsMessages: result.extensions });

@@ -18,7 +18,7 @@ export async function updateCommentHandler(
 
         const result = await commentService.update(commentData);
 
-        if (result.status !== ResultStatus.NoContent) {
+        if (result.status !== ResultStatus.NoContent_204) {
             return res
                 .status(resultCodeToHttpException(result.status))
                 .send(result.extensions);

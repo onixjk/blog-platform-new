@@ -43,9 +43,9 @@ export class AuthService {
 
         const userCredentialsResult = await authService.checkUserCredentials(loginOrEmail, password);
 
-        if (userCredentialsResult.status !== ResultStatus.Success || !userCredentialsResult.data) {
+        if (userCredentialsResult.status !== ResultStatus.Success_200 || !userCredentialsResult.data) {
             return {
-                status: ResultStatus.Unauthorized,
+                status: ResultStatus.Unauthorized_401,
                 data: null,
                 errorMessage: "Unauthorized",
                 extensions: [{ field: loginOrEmail, message: "Wrong credentials" }]
@@ -64,7 +64,7 @@ export class AuthService {
 
         if (!createSessionResult.data) {
             return {
-                status: ResultStatus.Unauthorized,
+                status: ResultStatus.Unauthorized_401,
                 errorMessage: 'Unauthorized',
                 data: null,
                 extensions: [{ field: null, message: 'Failed to save refresh token' }],
@@ -75,7 +75,7 @@ export class AuthService {
         const refreshToken = createSessionResult.data.refreshToken;
 
         return {
-            status: ResultStatus.Success,
+            status: ResultStatus.Success_200,
             data: { accessToken, refreshToken },
             extensions: [],
         };
@@ -89,7 +89,7 @@ export class AuthService {
 
         if (!user)
             return {
-                status: ResultStatus.NotFound,
+                status: ResultStatus.NotFound_404,
                 data: null,
                 errorMessage: "Not Found",
                 extensions: [{ field: loginOrEmail, message: "Not Found" }]
@@ -99,14 +99,14 @@ export class AuthService {
 
         if (!isPassCorrect)
             return {
-                status: ResultStatus.Unauthorized,
+                status: ResultStatus.Unauthorized_401,
                 data: null,
                 errorMessage: 'Unauthorized',
                 extensions: [{ field: 'password', message: 'Wrong password' }],
             };
 
         return {
-            status: ResultStatus.Success,
+            status: ResultStatus.Success_200,
             data: user,
             extensions: [],
         };
@@ -118,12 +118,11 @@ export class AuthService {
         email: string
     ): Promise<Result<string | null>> {
 
-        const userByLogin = await usersService.findByLoginOrEmail(login)
-        const userByEmail = await usersService.findByLoginOrEmail(email)
-
+        const userByLogin = await usersService.findByLoginOrEmail(login);
+        const userByEmail = await usersService.findByLoginOrEmail(email);
         if (userByLogin || userByEmail) {
             return {
-                status: ResultStatus.BadRequest,
+                status: ResultStatus.BadRequest_400,
                 errorMessage: 'Bad Request',
                 data: null,
                 extensions: [{ field: userByLogin ? 'login' : 'email', message: 'Already Registered' }],
@@ -155,7 +154,7 @@ export class AuthService {
             .catch(er => console.error('error in send email:', er));
 
         return {
-            status: ResultStatus.NoContent,
+            status: ResultStatus.NoContent_204,
             data: createdId,
             extensions: [],
         };
@@ -167,7 +166,7 @@ export class AuthService {
 
         if (!userByEmail) {
             return {
-                status: ResultStatus.BadRequest,
+                status: ResultStatus.BadRequest_400,
                 errorMessage: 'Bad Request',
                 data: null,
                 extensions: [{ field: 'email', message: 'Invalid email' }],
@@ -176,17 +175,17 @@ export class AuthService {
 
         if (userByEmail.emailConfirmation.isConfirmed) {
             return {
-                status: ResultStatus.BadRequest,
+                status: ResultStatus.BadRequest_400,
                 errorMessage: 'Bad Request',
                 data: null,
                 extensions: [{ field: 'email', message: 'Email confirmed' }],
             }
         }
 
-        const confirmationCode = randomUUID()
-        const expirationDate = new Date(Date.now() + 60 * 60 * 1000).toISOString()
+        const confirmationCode = randomUUID();
+        const expirationDate = new Date(Date.now() + 60 * 60 * 1000).toISOString();
 
-        await usersRepository.updateEmailConfirmationCode(email, confirmationCode, expirationDate);
+        await usersRepository.updateConfirmationCode(email, confirmationCode, expirationDate);
 
         try {
             await nodemailerService.sendEmail(
@@ -199,7 +198,40 @@ export class AuthService {
         }
 
         return {
-            status: ResultStatus.NoContent,
+            status: ResultStatus.NoContent_204,
+            data: null,
+            extensions: [],
+        };
+    }
+
+    async resetPassword(email: string): Promise<Result<string | null>> {
+
+        const userByEmail = await usersService.findByLoginOrEmail(email)
+        if (!userByEmail || !userByEmail.emailConfirmation.isConfirmed) {
+            return {
+                status: ResultStatus.NoContent_204,
+                data: null,
+                extensions: [],
+            }
+        }
+
+        const confirmationCode = randomUUID();
+        const expirationDate = new Date(Date.now() + 60 * 60 * 1000).toISOString();
+
+        await usersRepository.updateConfirmationCode(email, confirmationCode, expirationDate);
+
+        try {
+            await nodemailerService.sendEmail(
+                email,
+                confirmationCode,
+                emailExamples.passwordRecoveryEmail
+            )
+        } catch (e) {
+            console.error('error in send email:', e);
+        }
+
+        return {
+            status: ResultStatus.NoContent_204,
             data: null,
             extensions: [],
         };
@@ -211,7 +243,7 @@ export class AuthService {
 
         if (!result) {
             return {
-                status: ResultStatus.BadRequest,
+                status: ResultStatus.BadRequest_400,
                 errorMessage: 'Bad Request',
                 data: null,
                 extensions: [{ field: 'code', message: 'Incorrect code' }],
@@ -219,7 +251,7 @@ export class AuthService {
         }
 
         return {
-            status: ResultStatus.NoContent,
+            status: ResultStatus.NoContent_204,
             data: null,
             extensions: [],
 
@@ -234,7 +266,7 @@ export class AuthService {
         const tokensPairResult = await authService._createTokensPair(userId, deviceId);
         if (!tokensPairResult.data) {
             return {
-                status: ResultStatus.Unauthorized,
+                status: ResultStatus.Unauthorized_401,
                 data: null,
                 errorMessage: 'Unauthorized',
                 extensions: [{ field: 'refreshToken', message: 'Refresh token is invalid or expired' }]
@@ -244,7 +276,7 @@ export class AuthService {
         const refreshTokenPayload = await jwtService.decodeToken(tokensPairResult.data.refreshToken);
         if (!refreshTokenPayload || typeof refreshTokenPayload.iat !== 'number') {
             return {
-                status: ResultStatus.BadRequest,
+                status: ResultStatus.BadRequest_400,
                 errorMessage: 'Bad Request',
                 data: null,
                 extensions: [{ field: null, message: 'Can\'t decode token' }],
@@ -256,7 +288,7 @@ export class AuthService {
 
         if (!updateIatResult) {
             return {
-                status: ResultStatus.Unauthorized,
+                status: ResultStatus.Unauthorized_401,
                 data: null,
                 errorMessage: 'Unauthorized',
                 extensions: [{ field: 'Iat', message: 'Can\'t update iat' }]
@@ -270,7 +302,7 @@ export class AuthService {
         const isDeletedSession = await authRepository.deleteSession(deviceId);
         if (!isDeletedSession) {
             return {
-                status: ResultStatus.Unauthorized,
+                status: ResultStatus.Unauthorized_401,
                 errorMessage: 'Session not found or already inactive',
                 data: null,
                 extensions: [{ field: 'Session', message: 'Session not found or already inactive' }]
@@ -278,7 +310,7 @@ export class AuthService {
         }
 
         return {
-            status: ResultStatus.NoContent,
+            status: ResultStatus.NoContent_204,
             data: null,
             extensions: []
         };
@@ -289,7 +321,7 @@ export class AuthService {
 
         if (!result) {
             return {
-                status: ResultStatus.Unauthorized,
+                status: ResultStatus.Unauthorized_401,
                 errorMessage: 'Unauthorized',
                 data: null,
                 extensions: [{ field: 'Session', message: 'Session not found' }],
@@ -297,7 +329,7 @@ export class AuthService {
         }
 
         return {
-            status: ResultStatus.Success,
+            status: ResultStatus.Success_200,
             data: result,
             extensions: [],
         };
@@ -309,7 +341,7 @@ export class AuthService {
 
         if (!tokensPairResult.data) {
             return {
-                status: ResultStatus.Unauthorized,
+                status: ResultStatus.Unauthorized_401,
                 data: null,
                 errorMessage: 'Unauthorized',
                 extensions: [{ field: 'refreshToken', message: 'Refresh token is invalid or expired' }]
@@ -326,7 +358,7 @@ export class AuthService {
             typeof refreshTokenPayload.iat !== 'number'
         ) {
             return {
-                status: ResultStatus.BadRequest,
+                status: ResultStatus.BadRequest_400,
                 errorMessage: 'Bad Request',
                 data: null,
                 extensions: [{ field: null, message: 'Can\'t decode token' }],
@@ -348,7 +380,7 @@ export class AuthService {
         await authRepository.saveSession(session);
 
         return {
-            status: ResultStatus.Success,
+            status: ResultStatus.Success_200,
             data: { accessToken, refreshToken },
             extensions: [],
         };
@@ -363,7 +395,7 @@ export class AuthService {
 
         if (!accessToken) {
             return {
-                status: ResultStatus.Unauthorized,
+                status: ResultStatus.Unauthorized_401,
                 data: null,
                 errorMessage: "Failed to generate access token",
                 extensions: []
@@ -372,7 +404,7 @@ export class AuthService {
 
         if (!refreshToken) {
             return {
-                status: ResultStatus.Unauthorized,
+                status: ResultStatus.Unauthorized_401,
                 data: null,
                 errorMessage: "Failed to generate refresh token",
                 extensions: []
@@ -380,7 +412,7 @@ export class AuthService {
         }
 
         return {
-            status: ResultStatus.Success,
+            status: ResultStatus.Success_200,
             data: { accessToken, refreshToken },
             extensions: []
         };

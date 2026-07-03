@@ -1,16 +1,16 @@
-import {ObjectId, WithId} from "mongodb";
-import {userCollection} from "../../../db/mongo.db";
-import {RepositoryNotFoundError} from "../../../core/errors/repository-not-found.error";
-import {IUserDB} from "../types/user.db.interface";
-import {User} from "../types/user";
-import {ResultStatus} from "../../../core/result/resultCode";
-import {Result} from "../../../core/result/result.type";
+import { ObjectId, WithId } from "mongodb";
+import { userCollection } from "../../../db/mongo.db";
+import { RepositoryNotFoundError } from "../../../core/errors/repository-not-found.error";
+import { IUserDB } from "../types/user.db.interface";
+import { User } from "../types/user";
+import { ResultStatus } from "../../../core/result/resultCode";
+import { Result } from "../../../core/result/result.type";
 
 export class UsersRepository {
 
     async findByLoginOrEmail(loginOrEmail: string): Promise<WithId<IUserDB> | null> {
         return userCollection.findOne({
-            $or: [{email: loginOrEmail}, {login: loginOrEmail}],
+            $or: [{ email: loginOrEmail }, { login: loginOrEmail }],
         });
     }
 
@@ -20,10 +20,10 @@ export class UsersRepository {
             {
                 'emailConfirmation.confirmationCode': code,
                 'emailConfirmation.isConfirmed': false,
-                'emailConfirmation.expirationDate': {$gt: new Date().toISOString()}
+                'emailConfirmation.expirationDate': { $gt: new Date().toISOString() }
             },
             {
-                $set: {'emailConfirmation.isConfirmed': true}
+                $set: { 'emailConfirmation.isConfirmed': true }
             },
             {
                 returnDocument: 'after'
@@ -31,14 +31,14 @@ export class UsersRepository {
         );
     }
 
-    async updateEmailConfirmationCode(
+    async updateConfirmationCode(
         email: string,
         confirmationCode: string,
         expirationDate: string
     ): Promise<Result> {
 
         await userCollection.updateOne(
-            {email: email},
+            { email: email },
             {
                 $set: {
                     "emailConfirmation.confirmationCode": confirmationCode,
@@ -48,14 +48,14 @@ export class UsersRepository {
         );
 
         return {
-            status: ResultStatus.NoContent,
+            status: ResultStatus.NoContent_204,
             data: null,
             extensions: [],
         }
     }
 
     async findByIdOrFail(id: string): Promise<WithId<User>> {
-        const res = await userCollection.findOne({_id: new ObjectId(id)});
+        const res = await userCollection.findOne({ _id: new ObjectId(id) });
 
         if (!res) {
             throw new RepositoryNotFoundError('User not exist');
@@ -71,7 +71,7 @@ export class UsersRepository {
     }
 
     async delete(id: string): Promise<void> {
-        const deleteResult = await userCollection.deleteOne({_id: new ObjectId(id)});
+        const deleteResult = await userCollection.deleteOne({ _id: new ObjectId(id) });
 
         if (deleteResult.deletedCount < 1) {
             throw new RepositoryNotFoundError("User not exist");

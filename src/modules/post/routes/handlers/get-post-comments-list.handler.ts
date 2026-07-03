@@ -15,7 +15,7 @@ export async function getPostCommentListHandler(
         const postId = req.params.postId;
         const postResult = await postsService.findById(postId);
 
-        if (postResult.status !== ResultStatus.Success) {
+        if (postResult.status !== ResultStatus.Success_200) {
             return res
                 .status(resultCodeToHttpException(postResult.status))
                 .send(postResult.extensions);
@@ -33,7 +33,7 @@ export async function getPostCommentListHandler(
             postId,
         );
 
-        if (result.status !== ResultStatus.Success) {
+        if (result.status !== ResultStatus.Success_200) {
             return res
                 .status(resultCodeToHttpException(result.status))
                 .send(result.extensions);

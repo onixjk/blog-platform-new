@@ -13,7 +13,7 @@ export async function getCommentHandler(
 
         const result = await commentQueryRepository.findById(id)
 
-        if (result.status !== ResultStatus.Success) {
+        if (result.status !== ResultStatus.Success_200) {
             return res
                 .status(resultCodeToHttpException(result.status))
                 .send(result.extensions);

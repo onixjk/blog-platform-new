@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { LoginInputDto } from "../../input/login.input-dto";
+import { LoginInputDto } from "../../types/login.input-dto";
 import { HttpStatuses } from "../../../../core/types/http-statuses";
 import { ResultStatus } from "../../../../core/result/resultCode";
 import { resultCodeToHttpException } from "../../../../core/result/resultCodeToHttpException";
@@ -21,7 +21,7 @@ export async function loginUserHandler(
 
     const result = await authService.loginUser(loginOrEmail, password, browserName, clientIp);
 
-    if (result.status !== ResultStatus.Success) {
+    if (result.status !== ResultStatus.Success_200) {
         res.clearCookie(cookie_name);
         return res.status(resultCodeToHttpException(result.status)).send(result.extensions);
     }

@@ -15,7 +15,7 @@ export async function registrationHandler(
 
         const result = await authService.registerUser(login, password, email);
 
-        if (result.status !== ResultStatus.NoContent)
+        if (result.status !== ResultStatus.NoContent_204)
             return res
                 .status(resultCodeToHttpException(result.status))
                 .send({ errorsMessages: result.extensions });

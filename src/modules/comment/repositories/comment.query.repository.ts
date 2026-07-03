@@ -16,7 +16,7 @@ export class CommentQueryRepository {
 
         if (!comment) {
             return {
-                status: ResultStatus.NotFound,
+                status: ResultStatus.NotFound_404,
                 data: null,
                 errorMessage: 'Not Found',
                 extensions: [{field: null, message: 'Comment doesn\'t exist'}],
@@ -24,7 +24,7 @@ export class CommentQueryRepository {
         }
 
         return {
-            status: ResultStatus.Success,
+            status: ResultStatus.Success_200,
             data: mapToCommentOutput(comment),
             extensions: [],
         }
@@ -53,7 +53,7 @@ export class CommentQueryRepository {
         });
 
         return {
-            status: ResultStatus.Success,
+            status: ResultStatus.Success_200,
             data: paginatedData,
             extensions: []
         };

@@ -6,7 +6,7 @@ import { UserOutput } from "../routes/output/user-output";
 import { IPagination } from "../types/pagination";
 import { mapToUserListPaginatedOutput } from "../routes/mapers/map-to-user-list-paginated-output.util";
 import { mapToUserOutput } from "../routes/mapers/map-to-user-output.util";
-import { MeOutput } from "../../auth/output/me-output";
+import { MeOutput } from "../../auth/types/me-output";
 import { mapToMeOutput } from "../../auth/mapers/map-to-me-output.util";
 
 export class UsersQueryRepository {
