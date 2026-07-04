@@ -8,7 +8,13 @@ const loginValidation = body('login')
     .matches(/^[a-zA-Z0-9_-]*$/)
     .withMessage('Invalid login format, must match the pattern')
 
-export const passwordValidation = body('password')
+const passwordValidation = body('password')
+    .exists().withMessage('Password is required')
+    .isString().withMessage('Password should be string')
+    .trim().isLength({min: 6, max: 20})
+    .withMessage('Length of password is not correct');
+
+export const newPasswordValidation = body('newPassword')
     .exists().withMessage('Password is required')
     .isString().withMessage('Password should be string')
     .trim().isLength({min: 6, max: 20})

@@ -1,10 +1,13 @@
 import { Router } from "express";
-import { inputValidationResultMiddleware } from "../../../core/middlewares/validation/input-validation-result.middleware";
+import {
+    inputValidationResultMiddleware
+} from "../../../core/middlewares/validation/input-validation-result.middleware";
 import { loginUserHandler } from "./handlers/post-login-user.handler";
 import {
+    emailValidation,
     loginOrEmailValidation,
+    newPasswordValidation,
     userInputValidation,
-    emailValidation, passwordValidation,
 } from "../../user/middlewares/user.input-dto.validation-middlewares";
 import { accessTokenGuard } from "../middlewares/access-token.guard";
 import { getMeHandler } from "./handlers/get-me.handler";
@@ -70,7 +73,7 @@ authRouter
 
     .post('/new-password',
         rateLimitGuard,
-        passwordValidation,
+        newPasswordValidation,
         inputValidationResultMiddleware,
         newPasswordHandler
     )
