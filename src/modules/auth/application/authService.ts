@@ -211,7 +211,7 @@ export class AuthService {
     async resetPassword(email: string): Promise<Result<string | null>> {
 
         const userByEmail = await usersService.findByLoginOrEmail(email)
-        if (!userByEmail || !userByEmail.emailConfirmation.isConfirmed) {
+        if (!userByEmail) {
             return {
                 status: ResultStatus.NoContent_204,
                 data: null,
