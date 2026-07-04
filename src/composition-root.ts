@@ -18,7 +18,9 @@ import { BlogsRepository } from "./modules/blog/repositories/blogs.repository";
 import { BlogsService } from "./modules/blog/application/blogs.service";
 import { AuthRepository } from "./modules/auth/repositories/auth.repository";
 import { AuthService } from "./modules/auth/application/authService";
+import { EmailExamples } from "./modules/auth/adapters/email-examples";
 
+export const emailExamples = new EmailExamples();
 export const nodemailerService = new NodemailerService();
 export const jwtService = new JwtService();
 export const bcryptService = new BcryptService();
