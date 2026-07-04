@@ -4,7 +4,6 @@ import { IUserDB } from "../../user/types/user.db.interface";
 import { WithId } from "mongodb";
 import { Result } from "../../../core/result/result.type";
 import { randomUUID } from "node:crypto";
-import { emailExamples } from "../adapters/email-examples";
 import { UsersRepository } from "../../user/repositories/usersRepository";
 import { AuthRepository } from "../repositories/auth.repository";
 import { SessionDto } from "../types/session.dto";
@@ -16,6 +15,7 @@ import {
     authRepository,
     authService,
     bcryptService,
+    emailExamples,
     jwtService,
     nodemailerService,
     usersRepository,
