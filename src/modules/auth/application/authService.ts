@@ -19,7 +19,7 @@ import {
     jwtService,
     nodemailerService,
     usersRepository,
-    usersService
+    usersService,
 } from "../../../composition-root";
 
 
@@ -140,8 +140,12 @@ export class AuthService {
                 confirmationCode: randomUUID(),
                 expirationDate: new Date(Date.now() + 60 * 60 * 1000).toISOString(),
                 isConfirmed: false,
+            },
+            passwordRecovery: {
+                recoveryCode: null,
+                expirationDate: null,
             }
-        };
+        }
 
         const createdId = await usersRepository.create(newUser);
 
@@ -234,6 +238,44 @@ export class AuthService {
             status: ResultStatus.NoContent_204,
             data: null,
             extensions: [],
+        };
+    }
+
+    async updatePassword(newPassword: string, recoveryCode: string): Promise<Result<boolean | null>> {
+        const userResult = await usersService.findByRecoveryCode(recoveryCode);
+        if (
+            !userResult.data ||
+            !userResult.data.passwordRecovery.recoveryCode ||
+            !userResult.data.passwordRecovery.expirationDate
+        ) {
+            return {
+                status: ResultStatus.BadRequest_400,
+                errorMessage: 'Bad Request',
+                data: null,
+                extensions: [{ field: 'Recovery code', message: 'Invalid or expired code' }],
+            };
+        }
+
+        const newPasswordHash = await bcryptService.generateHash(newPassword);
+
+        const isUpdatedResult = await usersService.updatePasswordAndClearRecovery(
+            userResult.data._id.toString(),
+            newPasswordHash
+        );
+
+        if (!isUpdatedResult.data) {
+            return {
+                status: ResultStatus.BadRequest_400,
+                errorMessage: 'Bad Request',
+                data: null,
+                extensions: isUpdatedResult.extensions,
+            };
+        }
+
+        return {
+            status: ResultStatus.Success_200,
+            data: isUpdatedResult.data,
+            extensions: []
         };
     }
 

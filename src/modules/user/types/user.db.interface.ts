@@ -8,4 +8,8 @@ export interface IUserDB {
         expirationDate: string;
         isConfirmed: boolean;
     }
+    passwordRecovery: {
+        recoveryCode: string | null;
+        expirationDate: string | null;
+    }
 }

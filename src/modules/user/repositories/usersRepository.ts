@@ -14,6 +14,13 @@ export class UsersRepository {
         });
     }
 
+    async findByRecoveryCode(recoveryCode: string): Promise<WithId<IUserDB> | null> {
+        return userCollection.findOne({
+            "passwordRecovery.recoveryCode": recoveryCode,
+            "passwordRecovery.expirationDate": { $gt: new Date().toISOString() }
+        });
+    }
+
     async updateEmailConfirmationStatus(code: string): Promise<WithId<IUserDB> | null> {
 
         return await userCollection.findOneAndUpdate(
@@ -52,6 +59,20 @@ export class UsersRepository {
             data: null,
             extensions: [],
         }
+    }
+
+    async updatePasswordAndClearRecovery(userId: string, newPasswordHash: string): Promise<boolean> {
+        const result = await userCollection.updateOne(
+            { _id: new ObjectId(userId) },
+            {
+                $set: {
+                    passwordHash: newPasswordHash,
+                    "passwordRecovery.recoveryCode": null,
+                    "passwordRecovery.expirationDate": null
+                }
+            }
+        )
+        return result.matchedCount > 0;
     }
 
     async findByIdOrFail(id: string): Promise<WithId<User>> {

@@ -6,6 +6,8 @@ import { IUserDB } from "../types/user.db.interface";
 import { BcryptService } from "../../auth/adapters/bcrypt.service";
 import { randomUUID } from "node:crypto";
 import { bcryptService, usersRepository } from "../../../composition-root";
+import { ResultStatus } from "../../../core/result/resultCode";
+import { Result } from "../../../core/result/result.type";
 
 export class UsersService {
 
@@ -23,8 +25,47 @@ export class UsersService {
         return usersRepository.findByLoginOrEmail(loginOrEmail);
     }
 
+    async findByRecoveryCode(recoveryCode: string): Promise<Result<WithId<IUserDB> | null>> {
+        const user = await usersRepository.findByRecoveryCode(recoveryCode);
+
+        if (!user) {
+            return {
+                status: ResultStatus.BadRequest_400,
+                errorMessage: 'Bad Request',
+                data: null,
+                extensions: [{ field: 'Recovery code', message: 'Recovery code not found' }],
+            };
+        }
+
+        return {
+            status: ResultStatus.Success_200,
+            data: user,
+            extensions: [],
+        };
+    }
+
     async updateEmailConfirmationStatus(code: string): Promise<WithId<IUserDB> | null> {
         return usersRepository.updateEmailConfirmationStatus(code);
+    }
+
+    async updatePasswordAndClearRecovery(userId: string, passwordHash: string): Promise<Result<boolean>> {
+
+        const result = await usersRepository.updatePasswordAndClearRecovery(userId, passwordHash);
+
+        if (!result) {
+            return {
+                status: ResultStatus.BadRequest_400,
+                errorMessage: 'Bad Request',
+                data: result,
+                extensions: [{ field: 'User id', message: 'Invalid user id' }],
+            };
+        }
+
+        return {
+            status: ResultStatus.Success_200,
+            data: result,
+            extensions: [],
+        };
     }
 
     async create(dto: UserInputDto): Promise<string> {
@@ -52,6 +93,10 @@ export class UsersService {
                 confirmationCode: randomUUID(),
                 expirationDate: new Date().toISOString(),
                 isConfirmed: false,
+            },
+            passwordRecovery: {
+                recoveryCode: null,
+                expirationDate: null,
             }
         }
 
