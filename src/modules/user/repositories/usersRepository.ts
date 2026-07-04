@@ -38,7 +38,7 @@ export class UsersRepository {
         );
     }
 
-    async updateConfirmationCode(
+    async updateEmailConfirmationCode(
         email: string,
         confirmationCode: string,
         expirationDate: string
@@ -48,7 +48,30 @@ export class UsersRepository {
             { email: email },
             {
                 $set: {
-                    "passwordRecovery.recoveryCode": confirmationCode,
+                    "emailConfirmation.confirmationCode": confirmationCode,
+                    "emailConfirmation.expirationDate": expirationDate,
+                }
+            }
+        );
+
+        return {
+            status: ResultStatus.NoContent_204,
+            data: null,
+            extensions: [],
+        }
+    }
+
+    async updatePasswordRecoveryCode(
+        email: string,
+        recoveryCode: string,
+        expirationDate: string
+    ): Promise<Result> {
+
+        await userCollection.updateOne(
+            { email: email },
+            {
+                $set: {
+                    "passwordRecovery.recoveryCode": recoveryCode,
                     "passwordRecovery.expirationDate": expirationDate,
                 }
             }

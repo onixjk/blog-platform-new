@@ -189,7 +189,7 @@ export class AuthService {
         const confirmationCode = randomUUID();
         const expirationDate = new Date(Date.now() + 60 * 60 * 1000).toISOString();
 
-        await usersRepository.updateConfirmationCode(email, confirmationCode, expirationDate);
+        await usersRepository.updateEmailConfirmationCode(email, confirmationCode, expirationDate);
 
         try {
             await nodemailerService.sendEmail(
@@ -219,15 +219,15 @@ export class AuthService {
             }
         }
 
-        const confirmationCode = randomUUID();
+        const recoveryCode = randomUUID();
         const expirationDate = new Date(Date.now() + 60 * 60 * 1000).toISOString();
 
-        await usersRepository.updateConfirmationCode(email, confirmationCode, expirationDate);
+        await usersRepository.updatePasswordRecoveryCode(email, recoveryCode, expirationDate);
 
         try {
             await nodemailerService.sendEmail(
                 email,
-                confirmationCode,
+                recoveryCode,
                 emailExamples.passwordRecoveryEmail
             )
         } catch (e) {
