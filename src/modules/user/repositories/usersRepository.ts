@@ -48,8 +48,8 @@ export class UsersRepository {
             { email: email },
             {
                 $set: {
-                    "emailConfirmation.confirmationCode": confirmationCode,
-                    "emailConfirmation.expirationDate": expirationDate,
+                    "passwordRecovery.recoveryCode": confirmationCode,
+                    "passwordRecovery.expirationDate": expirationDate,
                 }
             }
         );
