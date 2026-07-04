@@ -252,7 +252,7 @@ export class AuthService {
                 status: ResultStatus.BadRequest_400,
                 errorMessage: 'Bad Request',
                 data: null,
-                extensions: [{ field: 'Recovery code', message: 'Invalid or expired code' }],
+                extensions: [{ field: 'recoveryCode', message: 'Invalid or expired code' }],
             };
         }
 

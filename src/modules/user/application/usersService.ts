@@ -33,7 +33,7 @@ export class UsersService {
                 status: ResultStatus.BadRequest_400,
                 errorMessage: 'Bad Request',
                 data: null,
-                extensions: [{ field: 'Recovery code', message: 'Recovery code not found' }],
+                extensions: [{ field: 'recoveryCode', message: 'Recovery code not found' }],
             };
         }
 
