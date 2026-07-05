@@ -1,16 +1,11 @@
-import { UsersService } from "../../user/application/usersService";
 import { ResultStatus } from "../../../core/result/resultCode";
 import { IUserDB } from "../../user/types/user.db.interface";
 import { WithId } from "mongodb";
 import { Result } from "../../../core/result/result.type";
 import { randomUUID } from "node:crypto";
-import { UsersRepository } from "../../user/repositories/usersRepository";
-import { AuthRepository } from "../repositories/auth.repository";
 import { SessionDto } from "../types/session.dto";
 import { Session } from "../types/session";
 import { TokensPair } from "../types/tokensPair";
-import { JwtService } from "../adapters/jwt.service";
-import { BcryptService } from "../adapters/bcrypt.service";
 import {
     authRepository,
     bcryptService,
@@ -24,21 +19,8 @@ import {
 
 export class AuthService {
 
-    constructor(
-        public jwtService: JwtService,
-        public bcryptService: BcryptService,
-        public usersService: UsersService,
-        public usersRepository: UsersRepository,
-        public authRepository: AuthRepository,
-    ) {
-    }
 
-    async loginUser(
-        loginOrEmail: string,
-        password: string,
-        browserName: string,
-        clientIp: string,
-    ): Promise<Result<TokensPair | null>> {
+    async loginUser(loginOrEmail: string, password: string, browserName: string, clientIp: string,): Promise<Result<TokensPair | null>> {
 
         const userCredentialsResult = await this.checkUserCredentials(loginOrEmail, password);
 
@@ -80,10 +62,7 @@ export class AuthService {
         };
     }
 
-    async checkUserCredentials(
-        loginOrEmail: string,
-        password: string,
-    ): Promise<Result<WithId<IUserDB> | null>> {
+    async checkUserCredentials(loginOrEmail: string, password: string,): Promise<Result<WithId<IUserDB> | null>> {
         const user = await usersService.findByLoginOrEmail(loginOrEmail);
 
         if (!user)
@@ -111,11 +90,7 @@ export class AuthService {
         };
     }
 
-    async registerUser(
-        login: string,
-        password: string,
-        email: string
-    ): Promise<Result<string | null>> {
+    async registerUser(login: string, password: string, email: string): Promise<Result<string | null>> {
 
         const userByLogin = await usersService.findByLoginOrEmail(login);
         const userByEmail = await usersService.findByLoginOrEmail(email);
@@ -190,12 +165,22 @@ export class AuthService {
 
         await usersRepository.updateEmailConfirmationCode(email, confirmationCode, expirationDate);
 
-        nodemailerService.sendEmail(
-            email,
-            confirmationCode,
-            emailExamples.registrationEmail
-        )
-            .catch(e => console.error('error in send email:', e));
+        try {
+            await nodemailerService.sendEmail(
+                email,
+                confirmationCode,
+                emailExamples.registrationEmail
+            )
+        } catch (e) {
+            console.error('error in send email:', e);
+        }
+
+        // nodemailerService.sendEmail(
+        //     email,
+        //     confirmationCode,
+        //     emailExamples.registrationEmail
+        // )
+        //     .catch(e => console.error('error in send email:', e));
 
 
         return {
