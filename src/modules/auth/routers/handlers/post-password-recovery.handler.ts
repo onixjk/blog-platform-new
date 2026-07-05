@@ -11,7 +11,7 @@ export async function passwordRecoveryHandler(
 ) {
     const { email } = req.body;
 
-    const result = await authService.resetPassword(email);
+    const result = await authService.sendPasswordRecoveryCode(email);
 
     if (result.status !== ResultStatus.NoContent_204)
         return res

@@ -190,15 +190,13 @@ export class AuthService {
 
         await usersRepository.updateEmailConfirmationCode(email, confirmationCode, expirationDate);
 
-        try {
-            await nodemailerService.sendEmail(
-                email,
-                confirmationCode,
-                emailExamples.registrationEmail
-            )
-        } catch (e) {
-            console.error('error in send email:', e);
-        }
+        nodemailerService.sendEmail(
+            email,
+            confirmationCode,
+            emailExamples.registrationEmail
+        )
+            .catch(e => console.error('error in send email:', e));
+
 
         return {
             status: ResultStatus.NoContent_204,
@@ -207,7 +205,7 @@ export class AuthService {
         };
     }
 
-    async resetPassword(email: string): Promise<Result<string | null>> {
+    async sendPasswordRecoveryCode(email: string): Promise<Result<string | null>> {
 
         const userByEmail = await usersService.findByLoginOrEmail(email)
         if (!userByEmail) {
