@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import { HttpStatuses } from "../../../../core/types/http-statuses";
 import { errorsHandler } from "../../../../core/errors/errors.handler";
-import { PostInputDto } from "../input/post.input-dto";
+import { PostInputDto } from "../../types/input/post.input-dto";
 import { postsService } from "../../../../composition-root";
 
 export async function updatePostHandler(

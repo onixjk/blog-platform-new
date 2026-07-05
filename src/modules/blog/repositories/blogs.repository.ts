@@ -1,6 +1,6 @@
 import {blogCollection} from "../../../db/mongo.db";
 import {ObjectId, WithId} from "mongodb";
-import {BlogInputDto} from "../routes/input/blog.input-dto";
+import {BlogInputDto} from "../types/input/blog.input-dto";
 import {Blog} from "../types/blog";
 import {RepositoryNotFoundError} from "../../../core/errors/repository-not-found.error";
 

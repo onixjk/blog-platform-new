@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import { errorsHandler } from "../../../../core/errors/errors.handler";
-import { CommentInputDto } from "../../../comment/routes/input/comment-input.dto";
+import { CommentInputDto } from "../../../comment/types/input/comment-input.dto";
 import { ResultStatus } from "../../../../core/result/resultCode";
 import { resultCodeToHttpException } from "../../../../core/result/resultCodeToHttpException";
 import { commentQueryRepository, commentService } from "../../../../composition-root";

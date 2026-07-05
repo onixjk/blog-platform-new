@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { LoginInputDto } from "../../types/login.input-dto";
+import { LoginInputDto } from "../../types/input/login.input-dto";
 import { HttpStatuses } from "../../../../core/types/http-statuses";
 import { ResultStatus } from "../../../../core/result/resultCode";
 import { resultCodeToHttpException } from "../../../../core/result/resultCodeToHttpException";

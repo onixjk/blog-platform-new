@@ -1,7 +1,7 @@
 import {WithId} from 'mongodb';
 import {Blog} from "../../types/blog";
-import {BlogOutput} from "../output/blog-output";
-import {BlogListPaginatedOutput} from "../output/blog-list-paginated.output.ts";
+import {BlogOutput} from "../../types/output/blog-output";
+import {BlogListPaginatedOutput} from "../../types/output/blog-list-paginated.output.ts";
 
 export function mapToBlogListPaginatedOutput(
     blogs: WithId<Blog>[],

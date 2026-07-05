@@ -1,9 +1,9 @@
 import {postCollection} from "../../../db/mongo.db";
-import {PostQueryInput} from "../routes/input/post-query.input";
-import {PostListPaginatedOutput} from "../routes/output/post-list-paginated.output";
+import {PostQueryInput} from "../types/input/post-query.input";
+import {PostListPaginatedOutput} from "../types/output/post-list-paginated.output";
 import {mapToPostListPaginatedOutput} from "../routes/mapers/map-to-post-list-paginated-output.util";
 import {ObjectId} from "mongodb";
-import {PostOutput} from "../routes/output/post-output";
+import {PostOutput} from "../types/output/post-output";
 import {mapToPostOutput} from "../routes/mapers/map-to-post-output.util";
 
 export class PostsQueryRepository {

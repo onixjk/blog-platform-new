@@ -1,9 +1,9 @@
 import { WithId } from "mongodb";
-import { CommentCreateDto } from "../routes/input/comment-create.dto";
+import { CommentCreateDto } from "../types/input/comment-create.dto";
 import { Comment } from "../types/comment";
 import { CommentRepository } from "../repositories/comment.repository";
 import { UsersService, } from "../../user/application/usersService";
-import { CommentUpdateDto } from "../routes/input/comment-update.dto";
+import { CommentUpdateDto } from "../types/input/comment-update.dto";
 import { Result } from "../../../core/result/result.type";
 import { ResultStatus } from "../../../core/result/resultCode";
 import { commentRepository, postsService, usersService } from "../../../composition-root";

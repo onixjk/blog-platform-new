@@ -1,12 +1,12 @@
 import { Request, Response } from "express";
-import { RegistrationConfirmationCode } from "../../types/registration-confirmation-code";
 import { ResultStatus } from "../../../../core/result/resultCode";
+import { RegistrationConfirmationCodeInput } from "../../types/input/registration-confirmation-code.input";
 import { resultCodeToHttpException } from "../../../../core/result/resultCodeToHttpException";
 import { HttpStatuses } from "../../../../core/types/http-statuses";
 import { authService } from "../../../../composition-root";
 
 export async function registrationConfirmationHandler(
-    req: Request<{}, {}, RegistrationConfirmationCode>,
+    req: Request<{}, {}, RegistrationConfirmationCodeInput>,
     res: Response,
 ) {
     const { code } = req.body

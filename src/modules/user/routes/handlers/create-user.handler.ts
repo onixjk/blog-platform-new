@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import { errorsHandler } from "../../../../core/errors/errors.handler";
 import { HttpStatuses } from "../../../../core/types/http-statuses";
-import { UserInputDto } from "../input/user.input-dto";
+import { UserInputDto } from "../../types/input/user.input-dto";
 import { usersQueryRepository, usersService } from "../../../../composition-root";
 
 export async function createUserHandler(

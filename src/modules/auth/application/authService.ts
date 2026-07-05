@@ -13,7 +13,6 @@ import { JwtService } from "../adapters/jwt.service";
 import { BcryptService } from "../adapters/bcrypt.service";
 import {
     authRepository,
-    authService,
     bcryptService,
     emailExamples,
     jwtService,
@@ -41,7 +40,7 @@ export class AuthService {
         clientIp: string,
     ): Promise<Result<TokensPair | null>> {
 
-        const userCredentialsResult = await authService.checkUserCredentials(loginOrEmail, password);
+        const userCredentialsResult = await this.checkUserCredentials(loginOrEmail, password);
 
         if (userCredentialsResult.status !== ResultStatus.Success_200 || !userCredentialsResult.data) {
             return {
@@ -305,7 +304,7 @@ export class AuthService {
         refreshToken: string
     } | null>> {
 
-        const tokensPairResult = await authService._createTokensPair(userId, deviceId);
+        const tokensPairResult = await this._createTokensPair(userId, deviceId);
         if (!tokensPairResult.data) {
             return {
                 status: ResultStatus.Unauthorized_401,
@@ -379,7 +378,7 @@ export class AuthService {
 
     async _createSession(sessionDto: SessionDto): Promise<Result<TokensPair | null>> {
         const deviceId = randomUUID();
-        const tokensPairResult = await authService._createTokensPair(sessionDto.userId, deviceId)
+        const tokensPairResult = await this._createTokensPair(sessionDto.userId, deviceId)
 
         if (!tokensPairResult.data) {
             return {

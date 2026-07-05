@@ -1,6 +1,6 @@
 import {WithId} from "mongodb";
 import {Comment} from "../../types/comment";
-import {CommentOutput} from "../output/comment-output";
+import {CommentOutput} from "../../types/output/comment-output";
 
 export function mapToCommentOutput(comment: WithId<Comment>): CommentOutput {
     return {

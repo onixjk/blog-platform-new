@@ -9,10 +9,10 @@ import {idValidation, postIdValidation} from "../../../core/middlewares/validati
 import {
     paginationAndSortingValidation
 } from "../../../core/middlewares/validation/query-pagination-sorting.validation-middleware";
-import {PostSortField} from "./input/post-sort-field";
+import {PostSortField} from "../types/input/post-sort-field";
 import {postInputValidation} from "../middlewares/post.input-dto.validation-middlewares";
 import {inputValidationResultMiddleware} from "../../../core/middlewares/validation/input-validation-result.middleware";
-import {CommentSortField} from "../../comment/routes/input/comment-sort-field";
+import {CommentSortField} from "../../comment/types/input/comment-sort-field";
 import {getPostCommentListHandler} from "./handlers/get-post-comments-list.handler";
 import {accessTokenGuard} from "../../auth/middlewares/access-token.guard";
 import {commentInputValidation} from "../../comment/middlewares/comment.input-dto.validation-middlewares";

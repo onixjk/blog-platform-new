@@ -3,7 +3,7 @@ import { errorsHandler } from "../../../../core/errors/errors.handler";
 import { HttpStatuses } from "../../../../core/types/http-statuses";
 import { matchedData } from "express-validator";
 import { setDefaultSortAndPaginationIfNotExist } from "../../../../core/helpers/set-default-sort-and-pagination";
-import { UserQueryInput } from "../input/user-query.input";
+import { UserQueryInput } from "../../types/input/user-query.input";
 import { usersQueryRepository } from "../../../../composition-root";
 
 export async function getUserListHandler(

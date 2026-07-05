@@ -1,5 +1,5 @@
 import {WithId} from "mongodb";
-import {PostOutput} from "../output/post-output";
+import {PostOutput} from "../../types/output/post-output";
 import {Post} from "../../types/post";
 
 export function mapToPostOutput(post: WithId<Post>): PostOutput {

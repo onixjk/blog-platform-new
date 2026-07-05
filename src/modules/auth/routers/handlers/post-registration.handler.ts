@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { UserInputDto } from "../../../user/routes/input/user.input-dto";
+import { UserInputDto } from "../../../user/types/input/user.input-dto";
 import { HttpStatuses } from "../../../../core/types/http-statuses";
 import { ResultStatus } from "../../../../core/result/resultCode";
 import { resultCodeToHttpException } from "../../../../core/result/resultCodeToHttpException";

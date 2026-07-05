@@ -1,6 +1,6 @@
 import {WithId} from "mongodb";
-import {CommentListPaginatedOutput} from "../output/comment-list-paginated.output";
-import {CommentOutput} from "../output/comment-output";
+import {CommentListPaginatedOutput} from "../../types/output/comment-list-paginated.output";
+import {CommentOutput} from "../../types/output/comment-output";
 import {Comment} from "../../types/comment";
 
 export function mapToCommentListPaginatedOutput(

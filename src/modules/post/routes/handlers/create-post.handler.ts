@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import { errorsHandler } from "../../../../core/errors/errors.handler";
 import { HttpStatuses } from "../../../../core/types/http-statuses";
-import { PostInputDto } from "../input/post.input-dto";
+import { PostInputDto } from "../../types/input/post.input-dto";
 import { postsQueryRepository, postsService } from "../../../../composition-root";
 
 export async function createPostHandler(

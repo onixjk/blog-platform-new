@@ -1,6 +1,6 @@
 import { WithId } from "mongodb";
 import { User } from "../types/user";
-import { UserInputDto } from "../routes/input/user.input-dto";
+import { UserInputDto } from "../types/input/user.input-dto";
 import { UsersRepository } from "../repositories/usersRepository";
 import { IUserDB } from "../types/user.db.interface";
 import { BcryptService } from "../../auth/adapters/bcrypt.service";

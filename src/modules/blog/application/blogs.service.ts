@@ -1,4 +1,4 @@
-import { BlogInputDto } from "../routes/input/blog.input-dto";
+import { BlogInputDto } from "../types/input/blog.input-dto";
 import { Blog } from "../types/blog";
 import { WithId } from "mongodb";
 import { blogsRepository, postsService } from "../../../composition-root";

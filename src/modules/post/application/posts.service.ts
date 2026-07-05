@@ -1,5 +1,5 @@
 import { WithId } from "mongodb";
-import { PostInputDto } from "../routes/input/post.input-dto";
+import { PostInputDto } from "../types/input/post.input-dto";
 import { Post } from "../types/post";
 import { Result } from "../../../core/result/result.type";
 import { PostsRepository } from "../repositories/posts.repository";

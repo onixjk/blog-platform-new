@@ -1,12 +1,12 @@
 import { Request, Response } from "express";
-import { RegistrationEmailResending } from "../../types/registration-email-resending";
+import { RegistrationEmailResendingInput } from "../../types/input/registration-email-resending.input";
 import { ResultStatus } from "../../../../core/result/resultCode";
 import { resultCodeToHttpException } from "../../../../core/result/resultCodeToHttpException";
 import { HttpStatuses } from "../../../../core/types/http-statuses";
 import { authService } from "../../../../composition-root";
 
 export async function registrationEmailResendingHandler(
-    req: Request<{}, {}, RegistrationEmailResending>,
+    req: Request<{}, {}, RegistrationEmailResendingInput>,
     res: Response,
 ) {
     const { email } = req.body;

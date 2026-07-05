@@ -1,6 +1,6 @@
 import {WithId} from "mongodb";
 import {User} from "../../types/user";
-import {UserOutput} from "../output/user-output";
+import {UserOutput} from "../../types/output/user-output";
 
 export function mapToUserOutput(user: WithId<User>): UserOutput {
     return {

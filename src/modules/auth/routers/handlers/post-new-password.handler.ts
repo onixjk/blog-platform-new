@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { NewPasswordRecoveryInput } from "../../types/new-password-recovery.input";
+import { NewPasswordRecoveryInput } from "../../types/input/new-password-recovery.input";
 import { authService } from "../../../../composition-root";
 import { ResultStatus } from "../../../../core/result/resultCode";
 import { resultCodeToHttpException } from "../../../../core/result/resultCodeToHttpException";

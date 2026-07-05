@@ -12,9 +12,9 @@ import {superAdminGuardMiddleware} from "../../auth/middlewares/super-admin.guar
 import {
     paginationAndSortingValidation
 } from "../../../core/middlewares/validation/query-pagination-sorting.validation-middleware";
-import {BlogSortField} from "./input/blog-sort-field";
+import {BlogSortField} from "../types/input/blog-sort-field";
 import {getBlogPostListHandler} from "./handlers/get-blog-post-list.handler";
-import {PostSortField} from "../../post/routes/input/post-sort-field";
+import {PostSortField} from "../../post/types/input/post-sort-field";
 import {blogInputValidation} from "../middlewares/blog.input-dto.validation-middlewares";
 import {blogPostInputValidation} from "../../post/middlewares/post.input-dto.validation-middlewares";
 import {createBlogPostHandler} from "./handlers/create-blog-post.handler";
