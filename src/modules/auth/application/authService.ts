@@ -229,12 +229,12 @@ export class AuthService {
             console.error('error in send email:', e);
         }
 
-        // nodemailerService.sendEmail(
-        //     email,
-        //     recoveryCode,
-        //     emailExamples.passwordRecoveryEmail
-        // )
-        //     .catch(e => console.error('error in send email:', e));
+        nodemailerService.sendEmail(
+            email,
+            recoveryCode,
+            emailExamples.passwordRecoveryEmail
+        )
+            .catch(e => console.error('error in send email:', e));
 
 
         return {
