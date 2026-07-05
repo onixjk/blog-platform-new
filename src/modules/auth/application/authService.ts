@@ -219,15 +219,15 @@ export class AuthService {
 
         await usersRepository.updatePasswordRecoveryCode(email, recoveryCode, expirationDate);
 
-        try {
-            await nodemailerService.sendEmail(
-                email,
-                recoveryCode,
-                emailExamples.passwordRecoveryEmail
-            )
-        } catch (e) {
-            console.error('error in send email:', e);
-        }
+        // try {
+        //     await nodemailerService.sendEmail(
+        //         email,
+        //         recoveryCode,
+        //         emailExamples.passwordRecoveryEmail
+        //     )
+        // } catch (e) {
+        //     console.error('error in send email:', e);
+        // }
 
         nodemailerService.sendEmail(
             email,
