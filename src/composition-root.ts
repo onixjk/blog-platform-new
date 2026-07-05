@@ -47,9 +47,9 @@ export const blogsService = new BlogsService(blogsRepository, postsService);
 
 export const authRepository = new AuthRepository();
 export const authService = new AuthService(
-    // jwtService,
-    // bcryptService,
-    // usersService,
-    // usersRepository,
-    // authRepository
+    jwtService,
+    bcryptService,
+    usersService,
+    usersRepository,
+    authRepository
 );
