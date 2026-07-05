@@ -1,11 +1,16 @@
+import { UsersService } from "../../user/application/usersService";
 import { ResultStatus } from "../../../core/result/resultCode";
 import { IUserDB } from "../../user/types/user.db.interface";
 import { WithId } from "mongodb";
 import { Result } from "../../../core/result/result.type";
 import { randomUUID } from "node:crypto";
+import { UsersRepository } from "../../user/repositories/usersRepository";
+import { AuthRepository } from "../repositories/auth.repository";
 import { SessionDto } from "../types/session.dto";
 import { Session } from "../types/session";
 import { TokensPair } from "../types/tokensPair";
+import { JwtService } from "../adapters/jwt.service";
+import { BcryptService } from "../adapters/bcrypt.service";
 import {
     authRepository,
     bcryptService,
@@ -19,8 +24,16 @@ import {
 
 export class AuthService {
 
+    constructor(
+        public jwtService: JwtService,
+        public bcryptService: BcryptService,
+        public usersService: UsersService,
+        public usersRepository: UsersRepository,
+        public authRepository: AuthRepository,
+    ) {
+    }
 
-    async loginUser(loginOrEmail: string, password: string, browserName: string, clientIp: string,): Promise<Result<TokensPair | null>> {
+    async loginUser(loginOrEmail: string, password: string, browserName: string, clientIp: string): Promise<Result<TokensPair | null>> {
 
         const userCredentialsResult = await this.checkUserCredentials(loginOrEmail, password);
 
