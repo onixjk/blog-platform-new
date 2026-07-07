@@ -10,26 +10,26 @@ import { inject, injectable } from "inversify";
 import { container } from "../../../composition-root";
 import { PostsService } from "../../post/application/posts.service";
 
-const commentRepository = container.get(CommentRepository);
-const usersService = container.get(UsersService);
-const postsService = container.get(PostsService);
+// const commentRepository = container.get(CommentRepository);
+// const usersService = container.get(UsersService);
+// const postsService = container.get(PostsService);
 
 @injectable()
 export class CommentService {
 
     constructor(
-        @inject(CommentRepository) public commentRepository: CommentRepository,
-        @inject(UsersService) public usersService: UsersService,
-        @inject(PostsService) public postsService: PostsService,
+        @inject(CommentRepository) private commentRepository: CommentRepository,
+        @inject(UsersService) private usersService: UsersService,
+        @inject(PostsService) private postsService: PostsService,
     ) {
     }
 
     async findById(id: string): Promise<Result<WithId<Comment> | null>> {
-        return commentRepository.findById(id);
+        return this.commentRepository.findById(id);
     }
 
     async create(dto: CommentCreateDto): Promise<Result<string | null>> {
-        const postResult = await postsService.findById(dto.postId);
+        const postResult = await this.postsService.findById(dto.postId);
 
         if (postResult.status === ResultStatus.NotFound_404 || !postResult.data) {
             return {
@@ -40,7 +40,7 @@ export class CommentService {
             }
         }
 
-        const user = await usersService.findByIdOrFail(dto.userId);
+        const user = await this.usersService.findByIdOrFail(dto.userId);
 
         const newComment: Comment = {
             postId: dto.postId,
@@ -52,7 +52,7 @@ export class CommentService {
             createdAt: new Date().toISOString(),
         }
 
-        return commentRepository.create(newComment);
+        return this.commentRepository.create(newComment);
     }
 
     async update(dto: CommentUpdateDto): Promise<Result> {
@@ -77,7 +77,7 @@ export class CommentService {
             }
         }
 
-        return await commentRepository.update(dto);
+        return await this.commentRepository.update(dto);
     }
 
     async delete(id: string, userId: string): Promise<Result<WithId<Comment> | null>> {
@@ -101,10 +101,10 @@ export class CommentService {
             }
         }
 
-        return await commentRepository.delete(id);
+        return await this.commentRepository.delete(id);
     }
 
     async deleteAllByPostId(postId: string): Promise<Result> {
-        return await commentRepository.deleteAllByPostId(postId);
+        return await this.commentRepository.deleteAllByPostId(postId);
     }
 }

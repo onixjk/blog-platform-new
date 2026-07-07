@@ -5,16 +5,16 @@ import { inject, injectable } from "inversify";
 import { UsersRepository } from "../../user/repositories/usersRepository";
 import { container } from "../../../composition-root";
 
-const deviceRepository = container.get(DeviceRepository);
+// const deviceRepository = container.get(DeviceRepository);
 
 @injectable()
 export class DeviceService {
 
-    constructor(@inject(UsersRepository) public deviceRepository: DeviceRepository) {
+    constructor(@inject(DeviceRepository) private deviceRepository: DeviceRepository) {
     }
 
     async deleteSessionById(userId: string, deviceId: string): Promise<Result> {
-        const session = await deviceRepository.findSessionById(deviceId);
+        const session = await this.deviceRepository.findSessionById(deviceId);
         if (!session) {
             return {
                 status: ResultStatus.NotFound_404,
@@ -33,7 +33,7 @@ export class DeviceService {
             };
         }
 
-        const isDeleted = await deviceRepository.deleteSessionById(deviceId);
+        const isDeleted = await this.deviceRepository.deleteSessionById(deviceId);
         if (!isDeleted) {
             return {
                 status: ResultStatus.NotFound_404,
@@ -51,7 +51,7 @@ export class DeviceService {
     }
 
     async deleteOtherSessions(userId: string, deviceId: string): Promise<Result> {
-        const isCompleted = await deviceRepository.deleteOtherSessions(userId, deviceId);
+        const isCompleted = await this.deviceRepository.deleteOtherSessions(userId, deviceId);
 
         if (!isCompleted) {
             return {

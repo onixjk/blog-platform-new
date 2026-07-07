@@ -16,25 +16,25 @@ import { EmailExamples } from "../adapters/email-examples";
 import { inject, injectable } from "inversify";
 import { container } from "../../../composition-root";
 
-const jwtService = container.get(JwtService);
-const bcryptService = container.get(BcryptService);
-const usersService = container.get(UsersService);
-const usersRepository = container.get(UsersRepository);
-const authRepository = container.get(AuthRepository);
-const nodemailerService = container.get(NodemailerService);
-const emailExamples = container.get(EmailExamples);
+// const jwtService = container.get(JwtService);
+// const bcryptService = container.get(BcryptService);
+// const usersService = container.get(UsersService);
+// const usersRepository = container.get(UsersRepository);
+// const authRepository = container.get(AuthRepository);
+// const nodemailerService = container.get(NodemailerService);
+// const emailExamples = container.get(EmailExamples);
 
 @injectable()
 export class AuthService {
 
     constructor(
-        @inject(JwtService) public jwtService: JwtService,
-        @inject(BcryptService) public bcryptService: BcryptService,
-        @inject(UsersService) public usersService: UsersService,
-        @inject(UsersRepository) public usersRepository: UsersRepository,
-        @inject(AuthRepository) public authRepository: AuthRepository,
-        @inject(NodemailerService) public nodemailerService: NodemailerService,
-        @inject(EmailExamples) public emailExamples: EmailExamples,
+        @inject(JwtService) private jwtService: JwtService,
+        @inject(BcryptService) private bcryptService: BcryptService,
+        @inject(UsersService) private usersService: UsersService,
+        @inject(UsersRepository) private usersRepository: UsersRepository,
+        @inject(AuthRepository) private authRepository: AuthRepository,
+        @inject(NodemailerService) private nodemailerService: NodemailerService,
+        @inject(EmailExamples) private emailExamples: EmailExamples,
     ) {
     }
 
@@ -81,7 +81,7 @@ export class AuthService {
     }
 
     async checkUserCredentials(loginOrEmail: string, password: string,): Promise<Result<WithId<IUserDB> | null>> {
-        const user = await usersService.findByLoginOrEmail(loginOrEmail);
+        const user = await this.usersService.findByLoginOrEmail(loginOrEmail);
 
         if (!user)
             return {
@@ -91,7 +91,7 @@ export class AuthService {
                 extensions: [{ field: loginOrEmail, message: "Not Found" }]
             };
 
-        const isPassCorrect = await bcryptService.checkPassword(password, user.passwordHash);
+        const isPassCorrect = await this.bcryptService.checkPassword(password, user.passwordHash);
 
         if (!isPassCorrect)
             return {
@@ -110,8 +110,8 @@ export class AuthService {
 
     async registerUser(login: string, password: string, email: string): Promise<Result<string | null>> {
 
-        const userByLogin = await usersService.findByLoginOrEmail(login);
-        const userByEmail = await usersService.findByLoginOrEmail(email);
+        const userByLogin = await this.usersService.findByLoginOrEmail(login);
+        const userByEmail = await this.usersService.findByLoginOrEmail(email);
         if (userByLogin || userByEmail) {
             return {
                 status: ResultStatus.BadRequest_400,
@@ -121,7 +121,7 @@ export class AuthService {
             }
         }
 
-        const passwordHash = await bcryptService.generateHash(password);
+        const passwordHash = await this.bcryptService.generateHash(password);
 
         const newUser: IUserDB = {
             login: login,
@@ -139,13 +139,13 @@ export class AuthService {
             }
         }
 
-        const createdId = await usersRepository.create(newUser);
+        const createdId = await this.usersRepository.create(newUser);
 
-        nodemailerService //todo
+        this.nodemailerService //todo
             .sendEmail(
                 newUser.email,
                 newUser.emailConfirmation.confirmationCode,
-                emailExamples.registrationEmail
+                this.emailExamples.registrationEmail
             )
             .catch(er => console.error('error in send email:', er));
 
@@ -158,7 +158,7 @@ export class AuthService {
 
     async resendEmailConfirmationCode(email: string): Promise<Result<string | null>> {
 
-        const userByEmail = await usersService.findByLoginOrEmail(email)
+        const userByEmail = await this.usersService.findByLoginOrEmail(email)
 
         if (!userByEmail) {
             return {
@@ -181,12 +181,12 @@ export class AuthService {
         const confirmationCode = randomUUID();
         const expirationDate = new Date(Date.now() + 60 * 60 * 1000).toISOString();
 
-        await usersRepository.updateEmailConfirmationCode(email, confirmationCode, expirationDate);
+        await this.usersRepository.updateEmailConfirmationCode(email, confirmationCode, expirationDate);
 
-        nodemailerService.sendEmail(
+        this.nodemailerService.sendEmail(
             email,
             confirmationCode,
-            emailExamples.registrationEmail
+            this.emailExamples.registrationEmail
         )
             .catch(e => console.error('error in send email:', e));
 
@@ -200,7 +200,7 @@ export class AuthService {
 
     async sendPasswordRecoveryCode(email: string): Promise<Result<string | null>> {
 
-        const userByEmail = await usersService.findByLoginOrEmail(email)
+        const userByEmail = await this.usersService.findByLoginOrEmail(email)
         if (!userByEmail) {
             return {
                 status: ResultStatus.NoContent_204,
@@ -212,13 +212,13 @@ export class AuthService {
         const recoveryCode = randomUUID();
         const expirationDate = new Date(Date.now() + 60 * 60 * 1000).toISOString();
 
-        await usersRepository.updatePasswordRecoveryCode(email, recoveryCode, expirationDate);
+        await this.usersRepository.updatePasswordRecoveryCode(email, recoveryCode, expirationDate);
 
         try {
-            await nodemailerService.sendEmail(
+            await this.nodemailerService.sendEmail(
                 email,
                 recoveryCode,
-                emailExamples.passwordRecoveryEmail
+                this.emailExamples.passwordRecoveryEmail
             )
         } catch (e) {
             console.error('error in send email:', e);
@@ -232,7 +232,7 @@ export class AuthService {
     }
 
     async updatePassword(newPassword: string, recoveryCode: string): Promise<Result<boolean | null>> {
-        const userResult = await usersService.findByRecoveryCode(recoveryCode);
+        const userResult = await this.usersService.findByRecoveryCode(recoveryCode);
         if (
             !userResult.data ||
             !userResult.data.passwordRecovery.recoveryCode ||
@@ -246,9 +246,9 @@ export class AuthService {
             };
         }
 
-        const newPasswordHash = await bcryptService.generateHash(newPassword);
+        const newPasswordHash = await this.bcryptService.generateHash(newPassword);
 
-        const isUpdatedResult = await usersService.updatePasswordAndClearRecovery(
+        const isUpdatedResult = await this.usersService.updatePasswordAndClearRecovery(
             userResult.data._id.toString(),
             newPasswordHash
         );
@@ -271,7 +271,7 @@ export class AuthService {
 
     async confirmEmail(code: string): Promise<Result> {
 
-        const result = await usersService.updateEmailConfirmationStatus(code);
+        const result = await this.usersService.updateEmailConfirmationStatus(code);
 
         if (!result) {
             return {
@@ -305,7 +305,7 @@ export class AuthService {
             };
         }
 
-        const refreshTokenPayload = await jwtService.decodeToken(tokensPairResult.data.refreshToken);
+        const refreshTokenPayload = await this.jwtService.decodeToken(tokensPairResult.data.refreshToken);
         if (!refreshTokenPayload || typeof refreshTokenPayload.iat !== 'number') {
             return {
                 status: ResultStatus.BadRequest_400,
@@ -316,7 +316,7 @@ export class AuthService {
         }
 
         const iatDate = new Date(refreshTokenPayload.iat * 1000);
-        const updateIatResult = await authRepository.updateIat(deviceId, iatDate);
+        const updateIatResult = await this.authRepository.updateIat(deviceId, iatDate);
 
         if (!updateIatResult) {
             return {
@@ -331,7 +331,7 @@ export class AuthService {
     }
 
     async deleteSession(deviceId: string): Promise<Result> {
-        const isDeletedSession = await authRepository.deleteSession(deviceId);
+        const isDeletedSession = await this.authRepository.deleteSession(deviceId);
         if (!isDeletedSession) {
             return {
                 status: ResultStatus.Unauthorized_401,
@@ -349,7 +349,7 @@ export class AuthService {
     }
 
     async findSession(deviceId: string): Promise<Result<Session | null>> {
-        const result = await authRepository.findSession(deviceId);
+        const result = await this.authRepository.findSession(deviceId);
 
         if (!result) {
             return {
@@ -383,7 +383,7 @@ export class AuthService {
         const accessToken = tokensPairResult.data.accessToken;
         const refreshToken = tokensPairResult.data.refreshToken;
 
-        const refreshTokenPayload = await jwtService.decodeToken(tokensPairResult.data.refreshToken);
+        const refreshTokenPayload = await this.jwtService.decodeToken(tokensPairResult.data.refreshToken);
 
         if (!refreshTokenPayload ||
             typeof refreshTokenPayload.exp !== 'number' ||
@@ -409,7 +409,7 @@ export class AuthService {
             exp: expDate,
         }
 
-        await authRepository.saveSession(session);
+        await this.authRepository.saveSession(session);
 
         return {
             status: ResultStatus.Success_200,
@@ -421,8 +421,8 @@ export class AuthService {
     async _createTokensPair(userId: string, deviceId: string): Promise<Result<TokensPair | null>> {
 
         const [accessToken, refreshToken] = await Promise.all([
-            jwtService.createAccessToken(userId),
-            jwtService.createRefreshToken(userId, deviceId),
+            this.jwtService.createAccessToken(userId),
+            this.jwtService.createRefreshToken(userId, deviceId),
         ]);
 
         if (!accessToken) {

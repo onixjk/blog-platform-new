@@ -11,29 +11,29 @@ import { ResultStatus } from "../../../core/result/resultCode";
 import { Result } from "../../../core/result/result.type";
 import { inject, injectable } from "inversify";
 
-const usersRepository = container.get(UsersRepository);
-const bcryptService = container.get(BcryptService);
+// const usersRepository = container.get(UsersRepository);
+// const bcryptService = container.get(BcryptService);
 
 @injectable()
 export class UsersService {
 
     constructor(
-        @inject(UsersRepository) public usersRepository: UsersRepository,
-        @inject(BcryptService) public bcryptService: BcryptService,
+        @inject(UsersRepository) private usersRepository: UsersRepository,
+        @inject(BcryptService) private bcryptService: BcryptService,
     ) {
 
     }
 
     async findByIdOrFail(id: string): Promise<WithId<User>> {
-        return usersRepository.findByIdOrFail(id);
+        return this.usersRepository.findByIdOrFail(id);
     }
 
     async findByLoginOrEmail(loginOrEmail: string): Promise<WithId<IUserDB> | null> {
-        return usersRepository.findByLoginOrEmail(loginOrEmail);
+        return this.usersRepository.findByLoginOrEmail(loginOrEmail);
     }
 
     async findByRecoveryCode(recoveryCode: string): Promise<Result<WithId<IUserDB> | null>> {
-        const user = await usersRepository.findByRecoveryCode(recoveryCode);
+        const user = await this.usersRepository.findByRecoveryCode(recoveryCode);
 
         if (!user) {
             return {
@@ -52,12 +52,12 @@ export class UsersService {
     }
 
     async updateEmailConfirmationStatus(code: string): Promise<WithId<IUserDB> | null> {
-        return usersRepository.updateEmailConfirmationStatus(code);
+        return this.usersRepository.updateEmailConfirmationStatus(code);
     }
 
     async updatePasswordAndClearRecovery(userId: string, passwordHash: string): Promise<Result<boolean>> {
 
-        const result = await usersRepository.updatePasswordAndClearRecovery(userId, passwordHash);
+        const result = await this.usersRepository.updatePasswordAndClearRecovery(userId, passwordHash);
 
         if (!result) {
             return {
@@ -77,19 +77,19 @@ export class UsersService {
 
     async create(dto: UserInputDto): Promise<string> {
 
-        const userByLogin = await usersRepository.findByLoginOrEmail(dto.login);
+        const userByLogin = await this.usersRepository.findByLoginOrEmail(dto.login);
 
         if (userByLogin?.login === dto.login) {
             throw new Error("Login already exist");
         }
 
-        const userByEmail = await usersRepository.findByLoginOrEmail(dto.email);
+        const userByEmail = await this.usersRepository.findByLoginOrEmail(dto.email);
 
         if (userByEmail?.email === dto.email) {
             throw new Error("Email already exist");
         }
 
-        const passwordHash = await bcryptService.generateHash(dto.password);
+        const passwordHash = await this.bcryptService.generateHash(dto.password);
 
         const newUser: IUserDB = {
             login: dto.login,
@@ -107,11 +107,11 @@ export class UsersService {
             }
         }
 
-        return usersRepository.create(newUser);
+        return this.usersRepository.create(newUser);
     }
 
     async delete(id: string): Promise<void> {
-        await usersRepository.delete(id);
+        await this.usersRepository.delete(id);
         return;
     }
 }

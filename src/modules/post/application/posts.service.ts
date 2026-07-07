@@ -8,30 +8,30 @@ import { BlogsService } from "../../blog/application/blogs.service";
 import { CommentService } from "../../comment/application/comment.service";
 import { container } from "../../../composition-root";
 
-const postsRepository = container.get(PostsRepository);
-const blogsService = container.get(BlogsService);
-const commentService = container.get(CommentService);
+// const postsRepository = container.get(PostsRepository);
+// const blogsService = container.get(BlogsService);
+// const commentService = container.get(CommentService);
 
 @injectable()
 export class PostsService {
 
     constructor(
-        @inject(PostsRepository) public postRepository: PostsRepository,
-        @inject(BlogsService) public blogsService: BlogsService,
-        @inject(CommentService) public commentService: CommentService,
+        @inject(PostsRepository) private postsRepository: PostsRepository,
+        @inject(BlogsService) private blogsService: BlogsService,
+        @inject(CommentService) private commentService: CommentService,
     ) {
     }
 
     async findById(id: string): Promise<Result<WithId<Post> | null>> {
-        return postsRepository.findById(id);
+        return this.postsRepository.findById(id);
     }
 
     async findByIdOrFail(id: string): Promise<WithId<Post>> {
-        return postsRepository.findByIdOrFail(id);
+        return this.postsRepository.findByIdOrFail(id);
     }
 
     async create(dto: PostInputDto): Promise<string> {
-        const blog = await blogsService.findByIdOrFail(dto.blogId);
+        const blog = await this.blogsService.findByIdOrFail(dto.blogId);
 
         const newPost: Post = {
             title: dto.title,
@@ -42,30 +42,30 @@ export class PostsService {
             createdAt: new Date().toISOString(),
         }
 
-        return postsRepository.create(newPost);
+        return this.postsRepository.create(newPost);
     }
 
     async update(id: string, dto: PostInputDto): Promise<void> {
-        const blog = await blogsService.findByIdOrFail(dto.blogId);
+        const blog = await this.blogsService.findByIdOrFail(dto.blogId);
 
-        await postsRepository.update(id, dto, blog.name);
+        await this.postsRepository.update(id, dto, blog.name);
         return;
     }
 
     async updateBlogName(blogId: string, blogName: string): Promise<void> {
-        await postsRepository.updateAllBlogNames(blogId, blogName);
+        await this.postsRepository.updateAllBlogNames(blogId, blogName);
 
         return;
     }
 
     async delete(id: string): Promise<void> {
-        await commentService.deleteAllByPostId(id)
-        await postsRepository.delete(id);
+        await this.commentService.deleteAllByPostId(id)
+        await this.postsRepository.delete(id);
         return;
     }
 
     async deleteAllByBlogId(blogId: string): Promise<void> {
-        await postsRepository.deleteAllByBlogId(blogId);
+        await this.postsRepository.deleteAllByBlogId(blogId);
         return;
     }
 }
