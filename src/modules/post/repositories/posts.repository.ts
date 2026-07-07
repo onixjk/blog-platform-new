@@ -1,22 +1,24 @@
-import {ObjectId, WithId} from "mongodb";
-import {postCollection} from "../../../db/mongo.db";
-import {RepositoryNotFoundError} from "../../../core/errors/repository-not-found.error";
-import {Post} from "../types/post";
-import {PostInputDto} from "../types/input/post.input-dto";
-import {Result} from "../../../core/result/result.type";
-import {ResultStatus} from "../../../core/result/resultCode";
+import { ObjectId, WithId } from "mongodb";
+import { postCollection } from "../../../db/mongo.db";
+import { RepositoryNotFoundError } from "../../../core/errors/repository-not-found.error";
+import { Post } from "../types/post";
+import { PostInputDto } from "../types/input/post.input-dto";
+import { Result } from "../../../core/result/result.type";
+import { ResultStatus } from "../../../core/result/resultCode";
+import { injectable } from "inversify";
 
+@injectable()
 export class PostsRepository {
 
     async findById(id: string): Promise<Result<WithId<Post> | null>> {
-        const post = await postCollection.findOne({_id: new ObjectId(id)});
+        const post = await postCollection.findOne({ _id: new ObjectId(id) });
 
         if (!post) {
             return {
                 status: ResultStatus.NotFound_404,
                 data: null,
                 errorMessage: 'Not Found',
-                extensions: [{field: null, message: 'Post not exist'}],
+                extensions: [{ field: null, message: 'Post not exist' }],
             }
         }
 
@@ -28,7 +30,7 @@ export class PostsRepository {
     }
 
     async findByIdOrFail(id: string): Promise<WithId<Post>> {
-        const res = await postCollection.findOne({_id: new ObjectId(id)});
+        const res = await postCollection.findOne({ _id: new ObjectId(id) });
 
         if (!res) {
             throw new RepositoryNotFoundError('Post not exist');
@@ -81,7 +83,7 @@ export class PostsRepository {
     }
 
     async delete(id: string): Promise<void> {
-        const deleteResult = await postCollection.deleteOne({_id: new ObjectId(id)});
+        const deleteResult = await postCollection.deleteOne({ _id: new ObjectId(id) });
 
         if (deleteResult.deletedCount < 1) {
             throw new RepositoryNotFoundError("Post not exist");
@@ -91,7 +93,7 @@ export class PostsRepository {
     }
 
     async deleteAllByBlogId(blogId: string): Promise<void> {
-        await postCollection.deleteMany({blogId: blogId});
+        await postCollection.deleteMany({ blogId: blogId });
 
         return;
     }

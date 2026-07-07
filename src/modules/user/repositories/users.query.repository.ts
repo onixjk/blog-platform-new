@@ -8,7 +8,9 @@ import { mapToUserListPaginatedOutput } from "../routes/mapers/map-to-user-list-
 import { mapToUserOutput } from "../routes/mapers/map-to-user-output.util";
 import { MeOutput } from "../../auth/types/output/me-output";
 import { mapToMeOutput } from "../../auth/mapers/map-to-me-output.util";
+import { injectable } from "inversify";
 
+@injectable()
 export class UsersQueryRepository {
 
     async findMany(

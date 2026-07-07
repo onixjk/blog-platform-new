@@ -6,13 +6,21 @@ import { UsersService, } from "../../user/application/usersService";
 import { CommentUpdateDto } from "../types/input/comment-update.dto";
 import { Result } from "../../../core/result/result.type";
 import { ResultStatus } from "../../../core/result/resultCode";
-import { commentRepository, postsService, usersService } from "../../../composition-root";
+import { inject, injectable } from "inversify";
+import { container } from "../../../composition-root";
+import { PostsService } from "../../post/application/posts.service";
 
+const commentRepository = container.get(CommentRepository);
+const usersService = container.get(UsersService);
+const postsService = container.get(PostsService);
+
+@injectable()
 export class CommentService {
 
     constructor(
-        public commentRepository: CommentRepository,
-        public usersService: UsersService,
+        @inject(CommentRepository) public commentRepository: CommentRepository,
+        @inject(UsersService) public usersService: UsersService,
+        @inject(PostsService) public postsService: PostsService,
     ) {
     }
 

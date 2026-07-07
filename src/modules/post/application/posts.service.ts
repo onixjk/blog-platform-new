@@ -3,11 +3,23 @@ import { PostInputDto } from "../types/input/post.input-dto";
 import { Post } from "../types/post";
 import { Result } from "../../../core/result/result.type";
 import { PostsRepository } from "../repositories/posts.repository";
-import { blogsService, commentService, postsRepository } from "../../../composition-root";
+import { inject, injectable } from "inversify";
+import { BlogsService } from "../../blog/application/blogs.service";
+import { CommentService } from "../../comment/application/comment.service";
+import { container } from "../../../composition-root";
 
+const postsRepository = container.get(PostsRepository);
+const blogsService = container.get(BlogsService);
+const commentService = container.get(CommentService);
+
+@injectable()
 export class PostsService {
 
-    constructor(public postRepository: PostsRepository) {
+    constructor(
+        @inject(PostsRepository) public postRepository: PostsRepository,
+        @inject(BlogsService) public blogsService: BlogsService,
+        @inject(CommentService) public commentService: CommentService,
+    ) {
     }
 
     async findById(id: string): Promise<Result<WithId<Post> | null>> {

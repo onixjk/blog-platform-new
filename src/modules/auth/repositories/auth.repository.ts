@@ -1,7 +1,9 @@
 import { sessionCollection } from "../../../db/mongo.db";
 import { WithId } from "mongodb";
 import { Session } from "../types/session";
+import { injectable } from "inversify";
 
+@injectable()
 export class AuthRepository {
 
     async saveSession(session: Session): Promise<void> {

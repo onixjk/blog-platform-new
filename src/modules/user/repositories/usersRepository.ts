@@ -5,7 +5,9 @@ import { IUserDB } from "../types/user.db.interface";
 import { User } from "../types/user";
 import { ResultStatus } from "../../../core/result/resultCode";
 import { Result } from "../../../core/result/result.type";
+import { injectable } from "inversify";
 
+@injectable()
 export class UsersRepository {
 
     async findByLoginOrEmail(loginOrEmail: string): Promise<WithId<IUserDB> | null> {

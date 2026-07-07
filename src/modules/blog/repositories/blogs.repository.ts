@@ -1,13 +1,15 @@
-import {blogCollection} from "../../../db/mongo.db";
-import {ObjectId, WithId} from "mongodb";
-import {BlogInputDto} from "../types/input/blog.input-dto";
-import {Blog} from "../types/blog";
-import {RepositoryNotFoundError} from "../../../core/errors/repository-not-found.error";
+import { blogCollection } from "../../../db/mongo.db";
+import { ObjectId, WithId } from "mongodb";
+import { BlogInputDto } from "../types/input/blog.input-dto";
+import { Blog } from "../types/blog";
+import { RepositoryNotFoundError } from "../../../core/errors/repository-not-found.error";
+import { injectable } from "inversify";
 
+@injectable()
 export class BlogsRepository {
 
     async findByIdOrFail(id: string): Promise<WithId<Blog>> {
-        const blog = await blogCollection.findOne({_id: new ObjectId(id)});
+        const blog = await blogCollection.findOne({ _id: new ObjectId(id) });
 
         if (!blog) {
             throw new RepositoryNotFoundError('Blog not exist');
@@ -44,7 +46,7 @@ export class BlogsRepository {
     }
 
     async delete(id: string): Promise<void> {
-        const deleteResult = await blogCollection.deleteOne({_id: new ObjectId(id)});
+        const deleteResult = await blogCollection.deleteOne({ _id: new ObjectId(id) });
 
         if (deleteResult.deletedCount < 1) {
             throw new RepositoryNotFoundError('Blog not exist');

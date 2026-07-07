@@ -1,3 +1,4 @@
+import 'reflect-metadata'
 import { WithId } from "mongodb";
 import { User } from "../types/user";
 import { UserInputDto } from "../types/input/user.input-dto";
@@ -5,16 +6,22 @@ import { UsersRepository } from "../repositories/usersRepository";
 import { IUserDB } from "../types/user.db.interface";
 import { BcryptService } from "../../auth/adapters/bcrypt.service";
 import { randomUUID } from "node:crypto";
-import { bcryptService, usersRepository } from "../../../composition-root";
+import { container } from "../../../composition-root";
 import { ResultStatus } from "../../../core/result/resultCode";
 import { Result } from "../../../core/result/result.type";
+import { inject, injectable } from "inversify";
 
+const usersRepository = container.get(UsersRepository);
+const bcryptService = container.get(BcryptService);
+
+@injectable()
 export class UsersService {
 
     constructor(
-        public usersRepository: UsersRepository,
-        public bcryptService: BcryptService,
+        @inject(UsersRepository) public usersRepository: UsersRepository,
+        @inject(BcryptService) public bcryptService: BcryptService,
     ) {
+
     }
 
     async findByIdOrFail(id: string): Promise<WithId<User>> {

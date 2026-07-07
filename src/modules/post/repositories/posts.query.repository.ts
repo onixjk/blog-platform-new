@@ -5,7 +5,9 @@ import {mapToPostListPaginatedOutput} from "../routes/mapers/map-to-post-list-pa
 import {ObjectId} from "mongodb";
 import {PostOutput} from "../types/output/post-output";
 import {mapToPostOutput} from "../routes/mapers/map-to-post-output.util";
+import { injectable } from "inversify";
 
+@injectable()
 export class PostsQueryRepository {
 
     async findMany(

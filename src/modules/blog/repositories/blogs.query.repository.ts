@@ -1,24 +1,26 @@
-import {blogCollection} from "../../../db/mongo.db";
-import {BlogQueryInput} from "../types/input/blog-query.input";
-import {mapToBlogListPaginatedOutput} from "../routes/mapers/map-to-blog-list-paginated-output.util";
-import {BlogListPaginatedOutput} from "../types/output/blog-list-paginated.output.ts";
-import {ObjectId} from "mongodb";
-import {mapToBlogOutput} from "../routes/mapers/map-to-blog-output.util";
-import {BlogOutput} from "../types/output/blog-output";
+import { blogCollection } from "../../../db/mongo.db";
+import { BlogQueryInput } from "../types/input/blog-query.input";
+import { mapToBlogListPaginatedOutput } from "../routes/mapers/map-to-blog-list-paginated-output.util";
+import { BlogListPaginatedOutput } from "../types/output/blog-list-paginated.output.ts";
+import { ObjectId } from "mongodb";
+import { mapToBlogOutput } from "../routes/mapers/map-to-blog-output.util";
+import { BlogOutput } from "../types/output/blog-output";
+import { injectable } from "inversify";
 
+@injectable()
 export class BlogsQueryRepository {
     async findMany(queryDto: BlogQueryInput): Promise<BlogListPaginatedOutput> {
-        const {pageNumber, pageSize, sortBy, sortDirection, searchNameTerm: searchNameTerm} = queryDto;
+        const { pageNumber, pageSize, sortBy, sortDirection, searchNameTerm: searchNameTerm } = queryDto;
         const skip = (pageNumber - 1) * pageSize;
         const filter: any = {};
 
         if (searchNameTerm) {
-            filter.name = {$regex: searchNameTerm, $options: 'i'};
+            filter.name = { $regex: searchNameTerm, $options: 'i' };
         }
 
         const items = await blogCollection
             .find(filter)
-            .sort({[sortBy]: sortDirection})
+            .sort({ [sortBy]: sortDirection })
             .skip(skip)
             .limit(pageSize)
             .toArray();
@@ -33,7 +35,7 @@ export class BlogsQueryRepository {
     }
 
     async findById(id: string): Promise<BlogOutput | null> {
-        const blog = await blogCollection.findOne({_id: new ObjectId(id)});
+        const blog = await blogCollection.findOne({ _id: new ObjectId(id) });
 
         return blog ? mapToBlogOutput(blog) : null;
     }

@@ -1,11 +1,17 @@
 import { Result } from "../../../core/result/result.type";
 import { DeviceRepository } from "../repositoryes/device.repository";
 import { ResultStatus } from "../../../core/result/resultCode";
-import { deviceRepository } from "../../../composition-root";
+import { inject, injectable } from "inversify";
+import { UsersRepository } from "../../user/repositories/usersRepository";
+import { container } from "../../../composition-root";
 
+const deviceRepository = container.get(DeviceRepository);
+
+@injectable()
 export class DeviceService {
 
-    constructor(public deviceRepository: DeviceRepository) {}
+    constructor(@inject(UsersRepository) public deviceRepository: DeviceRepository) {
+    }
 
     async deleteSessionById(userId: string, deviceId: string): Promise<Result> {
         const session = await deviceRepository.findSessionById(deviceId);

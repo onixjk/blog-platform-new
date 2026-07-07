@@ -1,12 +1,14 @@
 import { Device } from "../types/device.";
 import { sessionCollection } from "../../../db/mongo.db";
+import { injectable } from "inversify";
 
+@injectable()
 export class DeviceQueryRepository {
 
     async findMany(userId: string): Promise<Device[]> {
 
         const sessions = await sessionCollection
-            .find({user_id: userId})
+            .find({ user_id: userId })
             .toArray();
 
         return sessions.map((session) => ({

@@ -1,25 +1,26 @@
-import {commentCollection} from "../../../db/mongo.db";
-import {ObjectId} from "mongodb";
-import {mapToCommentListPaginatedOutput} from "../routes/mapers/map-to-comment-list-paginated-output.util";
-import {CommentQueryInput} from "../types/input/comment-query.input";
-import {CommentListPaginatedOutput} from "../types/output/comment-list-paginated.output";
-import {CommentOutput} from "../types/output/comment-output";
-import {mapToCommentOutput} from "../routes/mapers/map-to-comment-output.util";
-import {ResultStatus} from "../../../core/result/resultCode";
-import {Result} from "../../../core/result/result.type";
+import { commentCollection } from "../../../db/mongo.db";
+import { ObjectId } from "mongodb";
+import { mapToCommentListPaginatedOutput } from "../routes/mapers/map-to-comment-list-paginated-output.util";
+import { CommentQueryInput } from "../types/input/comment-query.input";
+import { CommentListPaginatedOutput } from "../types/output/comment-list-paginated.output";
+import { CommentOutput } from "../types/output/comment-output";
+import { mapToCommentOutput } from "../routes/mapers/map-to-comment-output.util";
+import { ResultStatus } from "../../../core/result/resultCode";
+import { Result } from "../../../core/result/result.type";
+import { injectable } from "inversify";
 
+@injectable()
 export class CommentQueryRepository {
 
-    async findById(id: string): Promise<Result<CommentOutput | null>>
-    {
-        const comment = await commentCollection.findOne({_id: new ObjectId(id)});
+    async findById(id: string): Promise<Result<CommentOutput | null>> {
+        const comment = await commentCollection.findOne({ _id: new ObjectId(id) });
 
         if (!comment) {
             return {
                 status: ResultStatus.NotFound_404,
                 data: null,
                 errorMessage: 'Not Found',
-                extensions: [{field: null, message: 'Comment doesn\'t exist'}],
+                extensions: [{ field: null, message: 'Comment doesn\'t exist' }],
             }
         }
 
@@ -34,13 +35,13 @@ export class CommentQueryRepository {
         queryDto: CommentQueryInput,
         postId: string,
     ): Promise<Result<CommentListPaginatedOutput>> {
-        const {pageNumber, pageSize, sortBy, sortDirection} = queryDto;
+        const { pageNumber, pageSize, sortBy, sortDirection } = queryDto;
         const skip = (pageNumber - 1) * pageSize;
-        const filter = {'postId': postId};
+        const filter = { 'postId': postId };
 
         const items = await commentCollection
             .find(filter)
-            .sort({[sortBy]: sortDirection})
+            .sort({ [sortBy]: sortDirection })
             .skip(skip)
             .limit(pageSize)
             .toArray();

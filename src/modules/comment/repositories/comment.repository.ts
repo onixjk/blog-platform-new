@@ -4,7 +4,9 @@ import { Comment } from "../types/comment";
 import { CommentUpdateDto } from "../types/input/comment-update.dto";
 import { ResultStatus } from "../../../core/result/resultCode";
 import { Result } from "../../../core/result/result.type";
+import { injectable } from "inversify";
 
+@injectable()
 export class CommentRepository {
 
     async findById(id: string): Promise<Result<WithId<Comment> | null>> {

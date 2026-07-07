@@ -11,25 +11,30 @@ import { Session } from "../types/session";
 import { TokensPair } from "../types/tokensPair";
 import { JwtService } from "../adapters/jwt.service";
 import { BcryptService } from "../adapters/bcrypt.service";
-import {
-    authRepository,
-    bcryptService,
-    emailExamples,
-    jwtService,
-    nodemailerService,
-    usersRepository,
-    usersService,
-} from "../../../composition-root";
+import { NodemailerService } from "../adapters/nodemailer.service";
+import { EmailExamples } from "../adapters/email-examples";
+import { inject, injectable } from "inversify";
+import { container } from "../../../composition-root";
 
+const jwtService = container.get(JwtService);
+const bcryptService = container.get(BcryptService);
+const usersService = container.get(UsersService);
+const usersRepository = container.get(UsersRepository);
+const authRepository = container.get(AuthRepository);
+const nodemailerService = container.get(NodemailerService);
+const emailExamples = container.get(EmailExamples);
 
+@injectable()
 export class AuthService {
 
     constructor(
-        public jwtService: JwtService,
-        public bcryptService: BcryptService,
-        public usersService: UsersService,
-        public usersRepository: UsersRepository,
-        public authRepository: AuthRepository,
+        @inject(JwtService) public jwtService: JwtService,
+        @inject(BcryptService) public bcryptService: BcryptService,
+        @inject(UsersService) public usersService: UsersService,
+        @inject(UsersRepository) public usersRepository: UsersRepository,
+        @inject(AuthRepository) public authRepository: AuthRepository,
+        @inject(NodemailerService) public nodemailerService: NodemailerService,
+        @inject(EmailExamples) public emailExamples: EmailExamples,
     ) {
     }
 
