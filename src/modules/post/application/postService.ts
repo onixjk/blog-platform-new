@@ -8,7 +8,7 @@ import { BlogService } from "../../blog/application/blog.service";
 import { CommentRepository } from "../../comment/repositories/comment.repository";
 
 @injectable()
-class PostService {
+export class PostService {
 
     constructor(
         @inject(PostRepository) private postRepository: PostRepository,
