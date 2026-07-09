@@ -5,6 +5,7 @@ import {DomainError} from './domain.error';
 import {createErrorMessages} from "../middlewares/validation/input-validation-result.middleware";
 
 export function errorsHandler(error: unknown, res: Response): void {
+    console.error("=== КРИТИЧЕСКАЯ ОШИБКА НА СЕРВЕРЕ ===", error);
 
     if (error instanceof RepositoryNotFoundError) {
         const httpStatus = HttpStatuses.NotFound_404;
