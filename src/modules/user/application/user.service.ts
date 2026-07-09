@@ -13,22 +13,22 @@ import { UserRepository } from "../repositories/user.repository";
 export class UserService {
 
     constructor(
-        @inject(UserRepository) private usersRepository: UserRepository,
+        @inject(UserRepository) private userRepository: UserRepository,
         @inject(BcryptService) private bcryptService: BcryptService,
     ) {
 
     }
 
     async findByIdOrFail(id: string): Promise<WithId<User>> {
-        return this.usersRepository.findByIdOrFail(id);
+        return this.userRepository.findByIdOrFail(id);
     }
 
     async findByLoginOrEmail(loginOrEmail: string): Promise<WithId<IUserDB> | null> {
-        return this.usersRepository.findByLoginOrEmail(loginOrEmail);
+        return this.userRepository.findByLoginOrEmail(loginOrEmail);
     }
 
     async findByRecoveryCode(recoveryCode: string): Promise<Result<WithId<IUserDB> | null>> {
-        const user = await this.usersRepository.findByRecoveryCode(recoveryCode);
+        const user = await this.userRepository.findByRecoveryCode(recoveryCode);
 
         if (!user) {
             return {
@@ -47,12 +47,12 @@ export class UserService {
     }
 
     async updateEmailConfirmationStatus(code: string): Promise<WithId<IUserDB> | null> {
-        return this.usersRepository.updateEmailConfirmationStatus(code);
+        return this.userRepository.updateEmailConfirmationStatus(code);
     }
 
     async updatePasswordAndClearRecovery(userId: string, passwordHash: string): Promise<Result<boolean>> {
 
-        const result = await this.usersRepository.updatePasswordAndClearRecovery(userId, passwordHash);
+        const result = await this.userRepository.updatePasswordAndClearRecovery(userId, passwordHash);
 
         if (!result) {
             return {
@@ -72,13 +72,13 @@ export class UserService {
 
     async create(dto: UserInputDto): Promise<string> {
 
-        const userByLogin = await this.usersRepository.findByLoginOrEmail(dto.login);
+        const userByLogin = await this.userRepository.findByLoginOrEmail(dto.login);
 
         if (userByLogin?.login === dto.login) {
             throw new Error("Login already exist");
         }
 
-        const userByEmail = await this.usersRepository.findByLoginOrEmail(dto.email);
+        const userByEmail = await this.userRepository.findByLoginOrEmail(dto.email);
 
         if (userByEmail?.email === dto.email) {
             throw new Error("Email already exist");
@@ -102,11 +102,11 @@ export class UserService {
             }
         }
 
-        return this.usersRepository.create(newUser);
+        return this.userRepository.create(newUser);
     }
 
     async delete(id: string): Promise<void> {
-        await this.usersRepository.delete(id);
+        await this.userRepository.delete(id);
         return;
     }
 }

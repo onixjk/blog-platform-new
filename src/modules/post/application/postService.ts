@@ -11,22 +11,22 @@ import { CommentRepository } from "../../comment/repositories/comment.repository
 class PostService {
 
     constructor(
-        @inject(PostRepository) private postsRepository: PostRepository,
-        @inject(BlogService) private blogsService: BlogService,
+        @inject(PostRepository) private postRepository: PostRepository,
+        @inject(BlogService) private blogService: BlogService,
         @inject(CommentRepository) private commentRepository: CommentRepository,
     ) {
     }
 
     async findById(id: string): Promise<Result<WithId<Post> | null>> {
-        return this.postsRepository.findById(id);
+        return this.postRepository.findById(id);
     }
 
     async findByIdOrFail(id: string): Promise<WithId<Post>> {
-        return this.postsRepository.findByIdOrFail(id);
+        return this.postRepository.findByIdOrFail(id);
     }
 
     async create(dto: PostInputDto): Promise<string> {
-        const blog = await this.blogsService.findByIdOrFail(dto.blogId);
+        const blog = await this.blogService.findByIdOrFail(dto.blogId);
 
         const newPost: Post = {
             title: dto.title,
@@ -37,30 +37,30 @@ class PostService {
             createdAt: new Date().toISOString(),
         }
 
-        return this.postsRepository.create(newPost);
+        return this.postRepository.create(newPost);
     }
 
     async update(id: string, dto: PostInputDto): Promise<void> {
-        const blog = await this.blogsService.findByIdOrFail(dto.blogId);
+        const blog = await this.blogService.findByIdOrFail(dto.blogId);
 
-        await this.postsRepository.update(id, dto, blog.name);
+        await this.postRepository.update(id, dto, blog.name);
         return;
     }
 
     async updateBlogName(blogId: string, blogName: string): Promise<void> {
-        await this.postsRepository.updateAllBlogNames(blogId, blogName);
+        await this.postRepository.updateAllBlogNames(blogId, blogName);
 
         return;
     }
 
     async delete(id: string): Promise<void> {
         await this.commentRepository.deleteAllByPostId(id)
-        await this.postsRepository.delete(id);
+        await this.postRepository.delete(id);
         return;
     }
 
     async deleteAllByBlogId(blogId: string): Promise<void> {
-        await this.postsRepository.deleteAllByBlogId(blogId);
+        await this.postRepository.deleteAllByBlogId(blogId);
         return;
     }
 }

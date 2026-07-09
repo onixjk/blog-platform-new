@@ -10,13 +10,13 @@ import { container } from "../../../composition-root";
 export class BlogService {
 
     constructor(
-        @inject(BlogRepository) private blogsRepository: BlogRepository,
+        @inject(BlogRepository) private blogRepository: BlogRepository,
         // @inject(PostService) private postService: PostService,
     ) {
     }
 
     async findByIdOrFail(id: string): Promise<WithId<Blog>> {
-        return this.blogsRepository.findByIdOrFail(id);
+        return this.blogRepository.findByIdOrFail(id);
     }
 
     async create(dto: BlogInputDto): Promise<string> {
@@ -28,13 +28,13 @@ export class BlogService {
             isMembership: false,
         }
 
-        return this.blogsRepository.create(newBlog);
+        return this.blogRepository.create(newBlog);
     }
 
     async update(id: string, dto: BlogInputDto): Promise<void> {
         const postService = container.get(PostService);
         await postService.updateBlogName(id, dto.name);
-        await this.blogsRepository.update(id, dto);
+        await this.blogRepository.update(id, dto);
 
         return;
     }
@@ -42,7 +42,7 @@ export class BlogService {
     async delete(id: string): Promise<void> {
         const postService = container.get(PostService);
         await postService.deleteAllByBlogId(id)
-        await this.blogsRepository.delete(id);
+        await this.blogRepository.delete(id);
 
         return;
     }
