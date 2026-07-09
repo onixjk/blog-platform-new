@@ -6,7 +6,7 @@ import { RepositoryNotFoundError } from "../../../core/errors/repository-not-fou
 import { injectable } from "inversify";
 
 @injectable()
-export class BlogsRepository {
+export class BlogRepository {
 
     async findByIdOrFail(id: string): Promise<WithId<Blog>> {
         const blog = await blogCollection.findOne({ _id: new ObjectId(id) });

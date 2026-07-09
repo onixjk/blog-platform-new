@@ -8,7 +8,7 @@ import { BlogOutput } from "../types/output/blog-output";
 import { injectable } from "inversify";
 
 @injectable()
-export class BlogsQueryRepository {
+export class BlogQueryRepository {
     async findMany(queryDto: BlogQueryInput): Promise<BlogListPaginatedOutput> {
         const { pageNumber, pageSize, sortBy, sortDirection, searchNameTerm: searchNameTerm } = queryDto;
         const skip = (pageNumber - 1) * pageSize;

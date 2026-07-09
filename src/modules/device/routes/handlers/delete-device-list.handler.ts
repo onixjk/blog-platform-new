@@ -2,12 +2,14 @@ import { Request, Response } from 'express';
 import { HttpStatuses } from "../../../../core/types/http-statuses";
 import { ResultStatus } from "../../../../core/result/resultCode";
 import { resultCodeToHttpException } from "../../../../core/result/resultCodeToHttpException";
-import { deviceService } from "../../../../composition-root";
+import { DeviceService } from "../../application/device.service";
 
-export async function deleteDeviceListHandler(
+export const deleteDeviceListHandler = (
+    deviceService: DeviceService
+) => async (
     req: Request,
     res: Response
-) {
+) => {
     const userId = req.user?.id;
     const currentDeviceId = req.deviceId;
 

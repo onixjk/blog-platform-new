@@ -1,10 +1,8 @@
-import { UsersService } from "../../user/application/usersService";
 import { ResultStatus } from "../../../core/result/resultCode";
 import { IUserDB } from "../../user/types/user.db.interface";
 import { WithId } from "mongodb";
 import { Result } from "../../../core/result/result.type";
 import { randomUUID } from "node:crypto";
-import { UsersRepository } from "../../user/repositories/usersRepository";
 import { AuthRepository } from "../repositories/auth.repository";
 import { SessionDto } from "../types/session.dto";
 import { Session } from "../types/session";
@@ -14,15 +12,8 @@ import { BcryptService } from "../adapters/bcrypt.service";
 import { NodemailerService } from "../adapters/nodemailer.service";
 import { EmailExamples } from "../adapters/email-examples";
 import { inject, injectable } from "inversify";
-import { container } from "../../../composition-root";
-
-// const jwtService = container.get(JwtService);
-// const bcryptService = container.get(BcryptService);
-// const usersService = container.get(UsersService);
-// const usersRepository = container.get(UsersRepository);
-// const authRepository = container.get(AuthRepository);
-// const nodemailerService = container.get(NodemailerService);
-// const emailExamples = container.get(EmailExamples);
+import { UserService } from "../../user/application/user.service";
+import { UserRepository } from "../../user/repositories/user.repository";
 
 @injectable()
 export class AuthService {
@@ -30,8 +21,8 @@ export class AuthService {
     constructor(
         @inject(JwtService) private jwtService: JwtService,
         @inject(BcryptService) private bcryptService: BcryptService,
-        @inject(UsersService) private usersService: UsersService,
-        @inject(UsersRepository) private usersRepository: UsersRepository,
+        @inject(UserService) private usersService: UserService,
+        @inject(UserRepository) private usersRepository: UserRepository,
         @inject(AuthRepository) private authRepository: AuthRepository,
         @inject(NodemailerService) private nodemailerService: NodemailerService,
         @inject(EmailExamples) private emailExamples: EmailExamples,

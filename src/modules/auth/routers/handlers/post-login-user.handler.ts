@@ -3,12 +3,14 @@ import { LoginInputDto } from "../../types/input/login.input-dto";
 import { HttpStatuses } from "../../../../core/types/http-statuses";
 import { ResultStatus } from "../../../../core/result/resultCode";
 import { resultCodeToHttpException } from "../../../../core/result/resultCodeToHttpException";
-import { authService } from "../../../../composition-root";
+import { AuthService } from "../../application/auth.service";
 
-export async function loginUserHandler(
+export const loginUserHandler = (
+    authService: AuthService,
+) => async (
     req: Request<{}, {}, LoginInputDto>,
     res: Response,
-) {
+) => {
     const { loginOrEmail, password } = req.body;
     const forwardedFor = req.headers['x-forwarded-for'];
     const clientIp = (Array.isArray(forwardedFor) ?

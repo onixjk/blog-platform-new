@@ -1,12 +1,14 @@
-import {Request, Response} from "express";
-import {HttpStatuses} from "../../../../core/types/http-statuses";
-import {ResultStatus} from "../../../../core/result/resultCode";
-import { authService } from "../../../../composition-root";
+import { Request, Response } from "express";
+import { HttpStatuses } from "../../../../core/types/http-statuses";
+import { ResultStatus } from "../../../../core/result/resultCode";
+import { AuthService } from "../../application/auth.service";
 
-export async function logoutHandler(
+export const logoutHandler = (
+    authService: AuthService,
+) => async (
     req: Request,
     res: Response,
-) {
+) => {
     const deviceId = req.deviceId;
     if (!deviceId) {
         return res.sendStatus(HttpStatuses.Unauthorized_401);

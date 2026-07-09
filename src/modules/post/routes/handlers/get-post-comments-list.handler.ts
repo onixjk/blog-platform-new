@@ -5,15 +5,19 @@ import { errorsHandler } from "../../../../core/errors/errors.handler";
 import { CommentQueryInput } from "../../../comment/types/input/comment-query.input";
 import { ResultStatus } from "../../../../core/result/resultCode";
 import { resultCodeToHttpException } from "../../../../core/result/resultCodeToHttpException";
-import { commentQueryRepository, postsService } from "../../../../composition-root";
+import { PostService } from "../../application/postService";
+import { CommentQueryRepository } from "../../../comment/repositories/comment.query.repository";
 
-export async function getPostCommentListHandler(
+export const getPostCommentListHandler = (
+    postService: PostService,
+    commentQueryRepository: CommentQueryRepository,
+) => async (
     req: Request<{ postId: string }, {}, {}, {}>,
     res: Response
-) {
+) => {
     try {
         const postId = req.params.postId;
-        const postResult = await postsService.findById(postId);
+        const postResult = await postService.findById(postId);
 
         if (postResult.status !== ResultStatus.Success_200) {
             return res

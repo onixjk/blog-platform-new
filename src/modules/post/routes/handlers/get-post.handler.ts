@@ -1,18 +1,22 @@
 import { Request, Response } from 'express';
 import { errorsHandler } from "../../../../core/errors/errors.handler";
 import { HttpStatuses } from "../../../../core/types/http-statuses";
-import { postsQueryRepository, postsService } from "../../../../composition-root";
+import { PostService } from "../../application/postService";
+import { PostQueryRepository } from "../../repositories/post.query.repository";
 
-export async function getPostHandler(
+export const getPostHandler = (
+    postService: PostService,
+    postQueryRepository: PostQueryRepository,
+) => async (
     req: Request<{ id: string }>,
     res: Response
-) {
+) => {
     try {
         const id = req.params.id;
 
-        await postsService.findByIdOrFail(id);
+        await postService.findByIdOrFail(id);
 
-        const postOutput = await postsQueryRepository.findById(id)
+        const postOutput = await postQueryRepository.findById(id)
 
         res.status(HttpStatuses.Ok_200).send(postOutput);
     } catch (e: unknown) {

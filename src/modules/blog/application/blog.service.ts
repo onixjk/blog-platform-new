@@ -1,20 +1,16 @@
 import { BlogInputDto } from "../types/input/blog.input-dto";
 import { Blog } from "../types/blog";
 import { WithId } from "mongodb";
-import { PostsService } from "../../post/application/posts.service";
-import { BlogsRepository } from "../repositories/blogs.repository";
+import { PostService } from "../../post/application/postService";
+import { BlogRepository } from "../repositories/blogRepository";
 import { inject, injectable } from "inversify";
-import { container } from "../../../composition-root";
-
-// const blogsRepository = container.get(BlogsRepository);
-// const postsService = container.get(PostsService);
 
 @injectable()
-export class BlogsService {
+export class BlogService {
 
     constructor(
-        @inject(BlogsRepository) private blogsRepository: BlogsRepository,
-        @inject(PostsService) private postsService: PostsService,
+        @inject(BlogRepository) private blogsRepository: BlogRepository,
+        @inject(PostService) private postsService: PostService,
     ) {
     }
 

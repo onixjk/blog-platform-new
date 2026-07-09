@@ -1,6 +1,9 @@
-import {NextFunction, Request, Response} from 'express';
-import {HttpStatuses} from "../../../core/types/http-statuses";
-import { jwtService } from "../../../composition-root";
+import { NextFunction, Request, Response } from 'express';
+import { HttpStatuses } from "../../../core/types/http-statuses";
+import { JwtService } from "../adapters/jwt.service";
+import { container } from "../../../composition-root";
+
+const jwtService = container.get(JwtService);
 
 export const accessTokenGuard = async (req: Request, res: Response, next: NextFunction) => {
 
@@ -19,9 +22,9 @@ export const accessTokenGuard = async (req: Request, res: Response, next: NextFu
         return;
     }
 
-    const {userId} = payload;
+    const { userId } = payload;
 
-    req.user = {id: userId};
+    req.user = { id: userId };
 
     next();
     return;

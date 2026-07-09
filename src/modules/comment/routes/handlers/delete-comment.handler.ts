@@ -2,12 +2,14 @@ import { Request, Response } from "express";
 import { errorsHandler } from "../../../../core/errors/errors.handler";
 import { ResultStatus } from "../../../../core/result/resultCode";
 import { resultCodeToHttpException } from "../../../../core/result/resultCodeToHttpException";
-import { commentService } from "../../../../composition-root";
+import { CommentService } from "../../application/comment.service";
 
-export async function deleteCommentHandler(
+export const deleteCommentHandler = (
+    commentService: CommentService
+) => async (
     req: Request<{ id: string }>,
     res: Response
-) {
+) => {
     try {
         const commentId = req.params.id;
         const userId = req.user.id!;

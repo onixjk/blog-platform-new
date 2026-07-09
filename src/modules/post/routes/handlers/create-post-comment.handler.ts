@@ -3,12 +3,16 @@ import { errorsHandler } from "../../../../core/errors/errors.handler";
 import { CommentInputDto } from "../../../comment/types/input/comment-input.dto";
 import { ResultStatus } from "../../../../core/result/resultCode";
 import { resultCodeToHttpException } from "../../../../core/result/resultCodeToHttpException";
-import { commentQueryRepository, commentService } from "../../../../composition-root";
+import { CommentService } from "../../../comment/application/comment.service";
+import { CommentQueryRepository } from "../../../comment/repositories/comment.query.repository";
 
-export async function createPostCommentHandler(
+export const createPostCommentHandler = (
+    commentService: CommentService,
+    commentQueryRepository: CommentQueryRepository,
+) => async (
     req: Request<{ postId: string }, {}, CommentInputDto>,
     res: Response
-) {
+) => {
     try {
         const { postId } = req.params;
         const userId = req.user.id!;

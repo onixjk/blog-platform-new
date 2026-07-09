@@ -1,11 +1,13 @@
 import { Request, Response } from 'express';
 import { HttpStatuses } from "../../../../core/types/http-statuses";
-import { deviceQueryRepository } from "../../../../composition-root";
+import { DeviceQueryRepository } from "../../repositoryes/device.query.repository";
 
-export async function getDeviceListHandler(
+export const getDeviceListHandler = (
+    deviceQueryRepository: DeviceQueryRepository
+) => async  (
     req: Request,
     res: Response
-) {
+) => {
     const userId = req.user?.id;
     if (!userId) {
         return res.sendStatus(HttpStatuses.Unauthorized_401);

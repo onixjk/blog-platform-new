@@ -23,13 +23,19 @@ import useragent from "express-useragent";
 import { rateLimitGuard } from "../middlewares/rate-limit.guard";
 import { passwordRecoveryHandler } from "./handlers/post-password-recovery.handler";
 import { newPasswordHandler } from "./handlers/post-new-password.handler";
+import { container } from "../../../composition-root";
+import { UserQueryRepository } from "../../user/repositories/user.query.repository";
+import { AuthService } from "../application/auth.service";
 
 export const authRouter = Router({});
+
+const userQueryRepository = container.get(UserQueryRepository);
+const authService = container.get(AuthService);
 
 authRouter
     .get('/me',
         accessTokenGuard,
-        getMeHandler,
+        getMeHandler(userQueryRepository),
     )
 
     .post('/login',
@@ -37,50 +43,50 @@ authRouter
         loginOrEmailValidation,
         inputValidationResultMiddleware,
         useragent.express(),
-        loginUserHandler
+        loginUserHandler(authService)
     )
 
     .post('/registration',
         rateLimitGuard,
         userInputValidation,
         inputValidationResultMiddleware,
-        registrationHandler,
+        registrationHandler(authService),
     )
 
     .post('/registration-confirmation',
         rateLimitGuard,
         confirmationCodeInputValidation,
         inputValidationResultMiddleware,
-        registrationConfirmationHandler
+        registrationConfirmationHandler(authService)
     )
 
     .post('/registration-email-resending',
         rateLimitGuard,
         emailInputValidation,
         inputValidationResultMiddleware,
-        registrationEmailResendingHandler
+        registrationEmailResendingHandler(authService)
     )
 
     .post('/refresh-token',
         refreshTokenGuard,
-        refreshTokenHandler
+        refreshTokenHandler(authService)
     )
 
     .post('/logout',
         refreshTokenGuard,
-        logoutHandler
+        logoutHandler(authService)
     )
 
     .post('/new-password',
         rateLimitGuard,
         newPasswordValidation,
         inputValidationResultMiddleware,
-        newPasswordHandler
+        newPasswordHandler(authService)
     )
 
     .post('/password-recovery',
         rateLimitGuard,
         emailValidation,
         inputValidationResultMiddleware,
-        passwordRecoveryHandler
+        passwordRecoveryHandler(authService)
     )

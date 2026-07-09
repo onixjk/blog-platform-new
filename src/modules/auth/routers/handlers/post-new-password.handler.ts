@@ -1,14 +1,16 @@
 import { Request, Response } from "express";
 import { NewPasswordRecoveryInput } from "../../types/input/new-password-recovery.input";
-import { authService } from "../../../../composition-root";
 import { ResultStatus } from "../../../../core/result/resultCode";
 import { resultCodeToHttpException } from "../../../../core/result/resultCodeToHttpException";
 import { HttpStatuses } from "../../../../core/types/http-statuses";
+import { AuthService } from "../../application/auth.service";
 
-export async function newPasswordHandler(
+export const newPasswordHandler = (
+    authService: AuthService,
+) => async (
     req: Request<{}, {}, NewPasswordRecoveryInput>,
     res: Response,
-) {
+) => {
     const { newPassword, recoveryCode } = req.body;
 
     const result = await authService.updatePassword(newPassword, recoveryCode);

@@ -8,7 +8,7 @@ import {mapToPostOutput} from "../routes/mapers/map-to-post-output.util";
 import { injectable } from "inversify";
 
 @injectable()
-export class PostsQueryRepository {
+export class PostQueryRepository {
 
     async findMany(
         queryDto: PostQueryInput

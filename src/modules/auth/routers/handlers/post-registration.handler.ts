@@ -4,12 +4,14 @@ import { HttpStatuses } from "../../../../core/types/http-statuses";
 import { ResultStatus } from "../../../../core/result/resultCode";
 import { resultCodeToHttpException } from "../../../../core/result/resultCodeToHttpException";
 import { errorsHandler } from "../../../../core/errors/errors.handler";
-import { authService } from "../../../../composition-root";
+import { AuthService } from "../../application/auth.service";
 
-export async function registrationHandler(
+export const registrationHandler = (
+    authService: AuthService,
+) => async (
     req: Request<{}, {}, UserInputDto>,
     res: Response,
-) {
+) => {
     try {
         const { login, password, email } = req.body;
 

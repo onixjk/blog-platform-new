@@ -8,7 +8,7 @@ import { Result } from "../../../core/result/result.type";
 import { injectable } from "inversify";
 
 @injectable()
-export class UsersRepository {
+export class UserRepository {
 
     async findByLoginOrEmail(loginOrEmail: string): Promise<WithId<IUserDB> | null> {
         return userCollection.findOne({

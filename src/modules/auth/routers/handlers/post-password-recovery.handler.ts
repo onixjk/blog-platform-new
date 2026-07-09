@@ -1,14 +1,16 @@
 import { Request, Response } from "express";
 import { PasswordRecoveryInput } from "../../types/input/password-recovery.input";
-import { authService } from "../../../../composition-root";
 import { ResultStatus } from "../../../../core/result/resultCode";
 import { resultCodeToHttpException } from "../../../../core/result/resultCodeToHttpException";
 import { HttpStatuses } from "../../../../core/types/http-statuses";
+import { AuthService } from "../../application/auth.service";
 
-export async function passwordRecoveryHandler(
+export const passwordRecoveryHandler = (
+    authService: AuthService,
+) => async (
     req: Request<{}, {}, PasswordRecoveryInput>,
     res: Response,
-) {
+) => {
     const { email } = req.body;
 
     const result = await authService.sendPasswordRecoveryCode(email);

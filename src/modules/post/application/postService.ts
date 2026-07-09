@@ -2,22 +2,17 @@ import { WithId } from "mongodb";
 import { PostInputDto } from "../types/input/post.input-dto";
 import { Post } from "../types/post";
 import { Result } from "../../../core/result/result.type";
-import { PostsRepository } from "../repositories/posts.repository";
 import { inject, injectable } from "inversify";
-import { BlogsService } from "../../blog/application/blogs.service";
 import { CommentService } from "../../comment/application/comment.service";
-import { container } from "../../../composition-root";
-
-// const postsRepository = container.get(PostsRepository);
-// const blogsService = container.get(BlogsService);
-// const commentService = container.get(CommentService);
+import { PostRepository } from "../repositories/post.repository";
+import { BlogService } from "../../blog/application/blog.service";
 
 @injectable()
-export class PostsService {
+export class PostService {
 
     constructor(
-        @inject(PostsRepository) private postsRepository: PostsRepository,
-        @inject(BlogsService) private blogsService: BlogsService,
+        @inject(PostRepository) private postsRepository: PostRepository,
+        @inject(BlogService) private blogsService: BlogService,
         @inject(CommentService) private commentService: CommentService,
     ) {
     }

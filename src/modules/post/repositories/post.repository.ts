@@ -8,7 +8,7 @@ import { ResultStatus } from "../../../core/result/resultCode";
 import { injectable } from "inversify";
 
 @injectable()
-export class PostsRepository {
+export class PostRepository {
 
     async findById(id: string): Promise<Result<WithId<Post> | null>> {
         const post = await postCollection.findOne({ _id: new ObjectId(id) });

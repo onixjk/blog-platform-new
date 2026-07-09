@@ -4,12 +4,14 @@ import { CommentInputDto } from "../../types/input/comment-input.dto";
 import { ResultStatus } from "../../../../core/result/resultCode";
 import { resultCodeToHttpException } from "../../../../core/result/resultCodeToHttpException";
 import { HttpStatuses } from "../../../../core/types/http-statuses";
-import { commentService } from "../../../../composition-root";
+import { CommentService } from "../../application/comment.service";
 
-export async function updateCommentHandler(
+export const updateCommentHandler = (
+    commentService: CommentService,
+) => async (
     req: Request<{ id: string }, {}, CommentInputDto>,
     res: Response
-) {
+) => {
     try {
         const commentId = req.params.id;
         const userId = req.user.id!;

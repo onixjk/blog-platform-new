@@ -1,6 +1,11 @@
 import { NextFunction, Request, Response } from 'express';
 import { HttpStatuses } from "../../../core/types/http-statuses";
-import { authService, jwtService } from "../../../composition-root";
+import { container } from "../../../composition-root";
+import { JwtService } from "../adapters/jwt.service";
+import { AuthService } from "../application/auth.service";
+
+const jwtService = container.get(JwtService);
+const authService = container.get(AuthService);
 
 export const refreshTokenGuard = async (
     req: Request,

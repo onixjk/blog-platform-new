@@ -11,7 +11,7 @@ import { mapToMeOutput } from "../../auth/mapers/map-to-me-output.util";
 import { injectable } from "inversify";
 
 @injectable()
-export class UsersQueryRepository {
+export class UserQueryRepository {
 
     async findMany(
         queryDto: UserQueryInput

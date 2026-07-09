@@ -3,12 +3,14 @@ import { ResultStatus } from "../../../../core/result/resultCode";
 import { RegistrationConfirmationCodeInput } from "../../types/input/registration-confirmation-code.input";
 import { resultCodeToHttpException } from "../../../../core/result/resultCodeToHttpException";
 import { HttpStatuses } from "../../../../core/types/http-statuses";
-import { authService } from "../../../../composition-root";
+import { AuthService } from "../../application/auth.service";
 
-export async function registrationConfirmationHandler(
+export const registrationConfirmationHandler = (
+    authService: AuthService,
+) => async (
     req: Request<{}, {}, RegistrationConfirmationCodeInput>,
     res: Response,
-) {
+) => {
     const { code } = req.body
 
     if (!code) {

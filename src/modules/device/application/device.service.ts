@@ -2,10 +2,6 @@ import { Result } from "../../../core/result/result.type";
 import { DeviceRepository } from "../repositoryes/device.repository";
 import { ResultStatus } from "../../../core/result/resultCode";
 import { inject, injectable } from "inversify";
-import { UsersRepository } from "../../user/repositories/usersRepository";
-import { container } from "../../../composition-root";
-
-// const deviceRepository = container.get(DeviceRepository);
 
 @injectable()
 export class DeviceService {

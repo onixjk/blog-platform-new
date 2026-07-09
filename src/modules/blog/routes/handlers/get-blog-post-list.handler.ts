@@ -4,15 +4,19 @@ import { PostQueryInput } from "../../../post/types/input/post-query.input";
 import { HttpStatuses } from "../../../../core/types/http-statuses";
 import { matchedData } from "express-validator";
 import { setDefaultSortAndPaginationIfNotExist } from "../../../../core/helpers/set-default-sort-and-pagination";
-import { blogsService, postsQueryRepository } from "../../../../composition-root";
+import { PostQueryRepository } from "../../../post/repositories/post.query.repository";
+import { BlogService } from "../../application/blog.service";
 
-export async function getBlogPostListHandler(
+export const getBlogPostListHandler = (
+    blogService: BlogService,
+    postsQueryRepository: PostQueryRepository,
+) => async (
     req: Request<{ blogId: string }, {}, {}, {}>,
     res: Response
-) {
+) => {
     try {
         const blogId = req.params.blogId;
-        await blogsService.findByIdOrFail(blogId);
+        await blogService.findByIdOrFail(blogId);
 
         const sanitizedQuery = matchedData<PostQueryInput>(req, {
             locations: ['query'],

@@ -2,12 +2,14 @@ import { Request, Response } from "express";
 import { errorsHandler } from "../../../../core/errors/errors.handler";
 import { ResultStatus } from "../../../../core/result/resultCode";
 import { resultCodeToHttpException } from "../../../../core/result/resultCodeToHttpException";
-import { commentQueryRepository } from "../../../../composition-root";
+import { CommentQueryRepository } from "../../repositories/comment.query.repository";
 
-export async function getCommentHandler(
+export const getCommentHandler = (
+    commentQueryRepository: CommentQueryRepository
+) => async (
     req: Request<{ id: string }>,
     res: Response
-) {
+) => {
     try {
         const id = req.params.id;
 
