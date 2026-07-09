@@ -1,17 +1,16 @@
 import { BlogInputDto } from "../types/input/blog.input-dto";
 import { Blog } from "../types/blog";
 import { WithId } from "mongodb";
-import PostService from "../../post/application/postService";
 import { BlogRepository } from "../repositories/blogRepository";
 import { inject, injectable } from "inversify";
-import { container } from "../../../composition-root";
+import { PostRepository } from "../../post/repositories/post.repository";
 
 @injectable()
 export class BlogService {
 
     constructor(
         @inject(BlogRepository) private blogRepository: BlogRepository,
-        // @inject(PostService) private postService: PostService,
+        @inject(PostRepository) private postRepository: PostRepository,
     ) {
     }
 
@@ -32,16 +31,14 @@ export class BlogService {
     }
 
     async update(id: string, dto: BlogInputDto): Promise<void> {
-        const postService = container.get(PostService);
-        await postService.updateBlogName(id, dto.name);
+        await this.postRepository.updateAllBlogNames(id, dto.name);
         await this.blogRepository.update(id, dto);
 
         return;
     }
 
     async delete(id: string): Promise<void> {
-        const postService = container.get(PostService);
-        await postService.deleteAllByBlogId(id)
+        await this.postRepository.deleteAllByBlogId(id)
         await this.blogRepository.delete(id);
 
         return;
