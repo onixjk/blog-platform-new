@@ -25,33 +25,33 @@ import { AuthService } from "./modules/auth/application/auth.service";
 
 export const container = new Container();
 
-container.bind(EmailExamples).toSelf();
-container.bind(NodemailerService).toSelf();
-container.bind(JwtService).toSelf();
-container.bind(BcryptService).toSelf();
+container.bind(EmailExamples).toSelf().inSingletonScope;
+container.bind(NodemailerService).toSelf().inSingletonScope;
+container.bind(JwtService).toSelf().inSingletonScope;
+container.bind(BcryptService).toSelf().inSingletonScope;
 
-container.bind(UserQueryRepository).toSelf();
-container.bind(UserRepository).toSelf();
-container.bind(UserService).toSelf();
+container.bind(UserQueryRepository).toSelf().inSingletonScope;
+container.bind(UserRepository).toSelf().inSingletonScope;
+container.bind(UserService).toSelf().inSingletonScope;
 
-container.bind(PostQueryRepository).toSelf();
-container.bind(PostRepository).toSelf();
-container.bind(PostService).toSelf();
+container.bind(PostQueryRepository).toSelf().inSingletonScope;
+container.bind(PostRepository).toSelf().inSingletonScope;
+container.bind(PostService).toSelf().inSingletonScope;
 
-container.bind(DeviceQueryRepository).toSelf();
-container.bind(DeviceRepository).toSelf();
-container.bind(DeviceService).toSelf();
+container.bind(DeviceQueryRepository).toSelf().inSingletonScope;
+container.bind(DeviceRepository).toSelf().inSingletonScope;
+container.bind(DeviceService).toSelf().inSingletonScope;
 
-container.bind(CommentQueryRepository).toSelf();
-container.bind(CommentRepository).toSelf();
-container.bind(CommentService).toSelf();
+container.bind(CommentQueryRepository).toSelf().inSingletonScope;
+container.bind(CommentRepository).toSelf().inSingletonScope;
+container.bind(CommentService).toSelf().inSingletonScope;
 
-container.bind(BlogQueryRepository).toSelf();
-container.bind(BlogRepository).toSelf();
-container.bind(BlogService).toSelf();
+container.bind(BlogQueryRepository).toSelf().inSingletonScope;
+container.bind(BlogRepository).toSelf().inSingletonScope;
+container.bind(BlogService).toSelf().inSingletonScope;
 
-container.bind(AuthRepository).toSelf();
-container.bind(AuthService).toSelf();
+container.bind(AuthRepository).toSelf().inSingletonScope;
+container.bind(AuthService).toSelf().inSingletonScope;
 
 
 // export const emailExamples = new EmailExamples();
