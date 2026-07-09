@@ -2,7 +2,7 @@ import { Request, Response } from 'express';
 import { HttpStatuses } from "../../../../core/types/http-statuses";
 import { errorsHandler } from "../../../../core/errors/errors.handler";
 import { PostInputDto } from "../../types/input/post.input-dto";
-import { PostService } from "../../application/postService";
+import PostService from "../../application/postService";
 
 export const updatePostHandler = (
     postService: PostService

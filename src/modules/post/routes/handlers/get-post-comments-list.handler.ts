@@ -5,7 +5,7 @@ import { errorsHandler } from "../../../../core/errors/errors.handler";
 import { CommentQueryInput } from "../../../comment/types/input/comment-query.input";
 import { ResultStatus } from "../../../../core/result/resultCode";
 import { resultCodeToHttpException } from "../../../../core/result/resultCodeToHttpException";
-import { PostService } from "../../application/postService";
+import PostService from "../../application/postService";
 import { CommentQueryRepository } from "../../../comment/repositories/comment.query.repository";
 
 export const getPostCommentListHandler = (

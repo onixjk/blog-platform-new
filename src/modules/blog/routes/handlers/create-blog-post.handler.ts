@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 import { errorsHandler } from "../../../../core/errors/errors.handler";
 import { HttpStatuses } from "../../../../core/types/http-statuses";
 import { BlogPostInputDto } from "../../../post/types/input/blog-post.input-dto";
-import { PostService } from "../../../post/application/postService";
+import PostService from "../../../post/application/postService";
 import { PostQueryRepository } from "../../../post/repositories/post.query.repository";
 
 export const createBlogPostHandler = (

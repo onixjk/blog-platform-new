@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import { errorsHandler } from "../../../../core/errors/errors.handler";
 import { HttpStatuses } from "../../../../core/types/http-statuses";
-import { PostService } from "../../application/postService";
+import PostService from "../../application/postService";
 
 export const deletePostHandler = (
     postService: PostService

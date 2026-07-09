@@ -6,16 +6,16 @@ import { CommentUpdateDto } from "../types/input/comment-update.dto";
 import { Result } from "../../../core/result/result.type";
 import { ResultStatus } from "../../../core/result/resultCode";
 import { inject, injectable } from "inversify";
-import { PostService } from "../../post/application/postService";
 import { UserService } from "../../user/application/user.service";
+import { PostRepository } from "../../post/repositories/post.repository";
 
 @injectable()
 export class CommentService {
 
     constructor(
         @inject(CommentRepository) private commentRepository: CommentRepository,
-        @inject(UserService) private usersService: UserService,
-        @inject(PostService) private postsService: PostService,
+        @inject(UserService) private userService: UserService,
+        @inject(PostRepository) private postRepository: PostRepository,
     ) {
     }
 
@@ -24,7 +24,7 @@ export class CommentService {
     }
 
     async create(dto: CommentCreateDto): Promise<Result<string | null>> {
-        const postResult = await this.postsService.findById(dto.postId);
+        const postResult = await this.postRepository.findById(dto.postId);
 
         if (postResult.status === ResultStatus.NotFound_404 || !postResult.data) {
             return {
@@ -35,7 +35,7 @@ export class CommentService {
             }
         }
 
-        const user = await this.usersService.findByIdOrFail(dto.userId);
+        const user = await this.userService.findByIdOrFail(dto.userId);
 
         const newComment: Comment = {
             postId: dto.postId,

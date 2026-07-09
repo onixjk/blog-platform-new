@@ -19,7 +19,7 @@ import {
 import { getBlogListHandler } from "./handlers/get-blog-list.handler";
 import { getBlogPostListHandler } from "./handlers/get-blog-post-list.handler";
 import { container } from "../../../composition-root";
-import { PostService } from "../../post/application/postService";
+import PostService from "../../post/application/postService";
 import { PostQueryRepository } from "../../post/repositories/post.query.repository";
 import { BlogService } from "../application/blog.service";
 import { BlogQueryRepository } from "../repositories/blog.query.repository";

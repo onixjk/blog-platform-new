@@ -3,17 +3,17 @@ import { PostInputDto } from "../types/input/post.input-dto";
 import { Post } from "../types/post";
 import { Result } from "../../../core/result/result.type";
 import { inject, injectable } from "inversify";
-import { CommentService } from "../../comment/application/comment.service";
 import { PostRepository } from "../repositories/post.repository";
 import { BlogService } from "../../blog/application/blog.service";
+import { CommentRepository } from "../../comment/repositories/comment.repository";
 
 @injectable()
-export class PostService {
+class PostService {
 
     constructor(
         @inject(PostRepository) private postsRepository: PostRepository,
         @inject(BlogService) private blogsService: BlogService,
-        @inject(CommentService) private commentService: CommentService,
+        @inject(CommentRepository) private commentRepository: CommentRepository,
     ) {
     }
 
@@ -54,7 +54,7 @@ export class PostService {
     }
 
     async delete(id: string): Promise<void> {
-        await this.commentService.deleteAllByPostId(id)
+        await this.commentRepository.deleteAllByPostId(id)
         await this.postsRepository.delete(id);
         return;
     }
@@ -64,3 +64,5 @@ export class PostService {
         return;
     }
 }
+
+export default PostService
