@@ -21,7 +21,7 @@ import { commentInputValidation } from "../../comment/middlewares/comment.input-
 import { createPostCommentHandler } from "./handlers/create-post-comment.handler";
 import { container } from "../../../composition-root";
 import { PostQueryRepository } from "../repositories/post.query.repository";
-import PostService from "../application/postService";
+import { PostService } from "../application/postService";
 import { CommentQueryRepository } from "../../comment/repositories/comment.query.repository";
 import { CommentService } from "../../comment/application/comment.service";
 
