@@ -1,6 +1,6 @@
 import 'reflect-metadata'
 import { Container } from "inversify";
-import PostService from "./modules/post/application/postService";
+import { PostService } from "./modules/post/application/postService";
 import { DeviceRepository } from "./modules/device/repositoryes/device.repository";
 import { BcryptService } from "./modules/auth/adapters/bcrypt.service";
 import { NodemailerService } from "./modules/auth/adapters/nodemailer.service";
