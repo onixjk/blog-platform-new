@@ -1,8 +1,4 @@
 import { Router } from 'express';
-import { getBlogHandler } from "./handlers/get-blog.handler";
-import { createBlogHandler } from "./handlers/create-blog.handler";
-import { updateBlogHandler } from "./handlers/update-blog.handler";
-import { deleteBlogHandler } from "./handlers/delete-blog.handler";
 import { blogIdValidation, idValidation, } from "../../../core/middlewares/validation/params-id.validation-middleware";
 import { superAdminGuardMiddleware } from "../../auth/middlewares/super-admin.guard-middleware";
 import {
@@ -12,57 +8,48 @@ import { BlogSortField } from "../types/input/blog-sort-field";
 import { PostSortField } from "../../post/types/input/post-sort-field";
 import { blogInputValidation } from "../middlewares/blog.input-dto.validation-middlewares";
 import { blogPostInputValidation } from "../../post/middlewares/post.input-dto.validation-middlewares";
-import { createBlogPostHandler } from "./handlers/create-blog-post.handler";
 import {
     inputValidationResultMiddleware
 } from "../../../core/middlewares/validation/input-validation-result.middleware";
-import { getBlogListHandler } from "./handlers/get-blog-list.handler";
-import { getBlogPostListHandler } from "./handlers/get-blog-post-list.handler";
 import { container } from "../../../composition-root";
-import { PostQueryRepository } from "../../post/repositories/post.query.repository";
-import { BlogService } from "../application/blog.service";
-import { BlogQueryRepository } from "../repositories/blog.query.repository";
-import { PostService } from "../../post/application/postService";
+import { BlogController } from "../controllers/blog.controller";
 
 export const blogRouter = Router({});
 
-const postService = container.get(PostService);
-const postQueryRepository = container.get(PostQueryRepository);
-const blogService = container.get(BlogService);
-const blogQueryRepository = container.get(BlogQueryRepository);
+const blogController = container.get(BlogController);
 
 blogRouter
     .get('',
         paginationAndSortingValidation(BlogSortField),
         inputValidationResultMiddleware,
-        getBlogListHandler(blogQueryRepository),
+        blogController.getBlogList.bind(blogController),
     )
 
     .get('/:id',
         idValidation,
         inputValidationResultMiddleware,
-        getBlogHandler(blogService, blogQueryRepository),
+        blogController.getBlog.bind(blogController),
     )
 
     .get('/:blogId/posts',
         blogIdValidation,
         paginationAndSortingValidation(PostSortField),
         inputValidationResultMiddleware,
-        getBlogPostListHandler(blogService, postQueryRepository),
+        blogController.getBlogPostList.bind(blogController),
     )
 
     .post('',
         superAdminGuardMiddleware,
         blogInputValidation,
         inputValidationResultMiddleware,
-        createBlogHandler(blogService, blogQueryRepository),
+        blogController.createBlog.bind(blogController),
     )
 
     .post('/:blogId/posts',
         superAdminGuardMiddleware,
         blogPostInputValidation,
         inputValidationResultMiddleware,
-        createBlogPostHandler(postService, postQueryRepository),
+        blogController.createBlogPost.bind(blogController),
     )
 
     .put('/:id',
@@ -70,12 +57,12 @@ blogRouter
         idValidation,
         blogInputValidation,
         inputValidationResultMiddleware,
-        updateBlogHandler(blogService),
+        blogController.updateBlog.bind(blogController),
     )
 
     .delete('/:id',
         superAdminGuardMiddleware,
         idValidation,
         inputValidationResultMiddleware,
-        deleteBlogHandler(blogService),
+        blogController.deleteBlog.bind(blogController),
     );
