@@ -1,7 +1,7 @@
 import { UserQueryRepository } from "../../user/repositories/user.query.repository";
 import { Request, Response } from "express";
 import { HttpStatuses } from "../../../core/types/http-statuses";
-import { inject } from "inversify";
+import { inject, injectable } from "inversify";
 import { AuthService } from "../application/auth.service";
 import { LoginInputDto } from "../types/input/login.input-dto";
 import { ResultStatus } from "../../../core/result/resultCode";
@@ -13,6 +13,7 @@ import { errorsHandler } from "../../../core/errors/errors.handler";
 import { RegistrationConfirmationCodeInput } from "../types/input/registration-confirmation-code.input";
 import { RegistrationEmailResendingInput } from "../types/input/registration-email-resending.input";
 
+@injectable()
 export class AuthController {
 
     constructor(
