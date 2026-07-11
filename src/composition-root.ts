@@ -21,6 +21,7 @@ import { UserService } from "./modules/user/application/user.service";
 import { BlogQueryRepository } from "./modules/blog/repositories/blog.query.repository";
 import { BlogService } from "./modules/blog/application/blog.service";
 import { AuthService } from "./modules/auth/application/auth.service";
+import { AuthController } from "./modules/auth/controllers/auth.controller";
 
 
 export const container = new Container();
@@ -52,3 +53,5 @@ container.bind(BlogService).toSelf().inSingletonScope;
 
 container.bind(AuthRepository).toSelf().inSingletonScope;
 container.bind(AuthService).toSelf().inSingletonScope;
+
+container.bind(AuthController).toSelf().inSingletonScope();

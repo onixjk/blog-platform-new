@@ -1,4 +1,4 @@
-import { Request, Response, Router } from "express";
+import { Router } from "express";
 import {
     inputValidationResultMiddleware
 } from "../../../core/middlewares/validation/input-validation-result.middleware";
@@ -16,9 +16,6 @@ import useragent from "express-useragent";
 import { rateLimitGuard } from "../middlewares/rate-limit.guard";
 import { container } from "../../../composition-root";
 import { AuthController } from "../controllers/auth.controller";
-import { UserInputDto } from "../../user/types/input/user.input-dto";
-import { RegistrationConfirmationCodeInput } from "../types/input/registration-confirmation-code.input";
-import { RegistrationEmailResendingInput } from "../types/input/registration-email-resending.input";
 
 export const authRouter = Router({});
 
@@ -31,8 +28,8 @@ authRouter
     .get('/me',
         accessTokenGuard,
         // getMeHandler(userQueryRepository),
-        // authController.getMe.bind(authController),
-        (req, res) => authController.getMe(req, res),
+        authController.getMe.bind(authController),
+        // (req, res) => authController.getMe(req, res),
     )
 
     .post('/login',
@@ -41,8 +38,8 @@ authRouter
         inputValidationResultMiddleware,
         useragent.express(),
         // loginUserHandler(authService)
-        // authController.loginUser.bind(authController),
-        (req, res) => authController.loginUser(req, res),
+        authController.loginUser.bind(authController),
+        // (req, res) => authController.loginUser(req, res),
     )
 
     .post('/registration',
@@ -50,8 +47,8 @@ authRouter
         userInputValidation,
         inputValidationResultMiddleware,
         // registrationHandler(authService),
-        // authController.registration.bind(authController),
-        (req: Request<{}, {}, UserInputDto>, res: Response) => authController.registration(req, res),
+        authController.registration.bind(authController),
+        // (req: Request<{}, {}, UserInputDto>, res: Response) => authController.registration(req, res),
     )
 
     .post('/registration-confirmation',
@@ -59,8 +56,8 @@ authRouter
         confirmationCodeInputValidation,
         inputValidationResultMiddleware,
         // registrationConfirmationHandler(authService)
-        // authController.registrationConfirmation.bind(authController),
-        (req: Request<{}, {}, RegistrationConfirmationCodeInput>, res: Response) => authController.registrationConfirmation(req, res),
+        authController.registrationConfirmation.bind(authController),
+        // (req: Request<{}, {}, RegistrationConfirmationCodeInput>, res: Response) => authController.registrationConfirmation(req, res),
     )
 
     .post('/registration-email-resending',
@@ -68,22 +65,22 @@ authRouter
         emailInputValidation,
         inputValidationResultMiddleware,
         // registrationEmailResendingHandler(authService)
-        // authController.registrationEmailResending.bind(authController),
-        (req: Request<{}, {}, RegistrationEmailResendingInput>, res: Response) => authController.registrationEmailResending(req, res),
+        authController.registrationEmailResending.bind(authController),
+        // (req: Request<{}, {}, RegistrationEmailResendingInput>, res: Response) => authController.registrationEmailResending(req, res),
     )
 
     .post('/refresh-token',
         refreshTokenGuard,
         // refreshTokenHandler(authService)
-        // authController.refreshToken.bind(authController),
-        (req, res) => authController.refreshToken(req, res),
+        authController.refreshToken.bind(authController),
+        // (req, res) => authController.refreshToken(req, res),
     )
 
     .post('/logout',
         refreshTokenGuard,
         // logoutHandler(authService)
-        // authController.logout.bind(authController),
-        (req, res) => authController.logout(req, res),
+        authController.logout.bind(authController),
+        // (req, res) => authController.logout(req, res),
     )
 
     .post('/new-password',
@@ -91,8 +88,8 @@ authRouter
         newPasswordValidation,
         inputValidationResultMiddleware,
         // newPasswordHandler(authService)
-        // authController.newPassword.bind(authController),
-        (req, res) => authController.newPassword(req, res),
+        authController.newPassword.bind(authController),
+        // (req, res) => authController.newPassword(req, res),
     )
 
     .post('/password-recovery',
@@ -100,6 +97,6 @@ authRouter
         emailValidation,
         inputValidationResultMiddleware,
         // passwordRecoveryHandler(authService)
-        // authController.passwordRecovery.bind(authController),
-        (req, res) => authController.passwordRecovery(req, res),
+        authController.passwordRecovery.bind(authController),
+        // (req, res) => authController.passwordRecovery(req, res),
     )
