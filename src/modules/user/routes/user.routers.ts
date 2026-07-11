@@ -4,41 +4,36 @@ import {
     paginationAndSortingValidation
 } from "../../../core/middlewares/validation/query-pagination-sorting.validation-middleware";
 import { UserSortField } from "../types/input/user-sort-field";
-import { getUserListHandler } from "./handlers/get-user-list.handler";
 import {
     inputValidationResultMiddleware
 } from "../../../core/middlewares/validation/input-validation-result.middleware";
 import { userInputValidation } from "../middlewares/user.input-dto.validation-middlewares";
-import { createUserHandler } from "./handlers/create-user.handler";
 import { idValidation } from "../../../core/middlewares/validation/params-id.validation-middleware";
-import { deleteUserHandler } from "./handlers/delete-user.handler";
 import { container } from "../../../composition-root";
-import { UserQueryRepository } from "../repositories/user.query.repository";
-import { UserService } from "../application/user.service";
+import { UserController } from "../controllers/user.controller";
 
 export const userRouter = Router({});
 
-const userQueryRepository = container.get(UserQueryRepository);
-const userService = container.get(UserService);
+const userController = container.get(UserController);
 
 userRouter
     .get('',
         superAdminGuardMiddleware,
         paginationAndSortingValidation(UserSortField),
         inputValidationResultMiddleware,
-        getUserListHandler(userQueryRepository),
+        userController.getUserList.bind(userController),
     )
 
     .post('',
         superAdminGuardMiddleware,
         userInputValidation,
         inputValidationResultMiddleware,
-        createUserHandler(userService, userQueryRepository),
+        userController.createUser.bind(userController),
     )
 
     .delete('/:id',
         superAdminGuardMiddleware,
         idValidation,
         inputValidationResultMiddleware,
-        deleteUserHandler(userService),
+        userController.deleteUser.bind(userController),
     );

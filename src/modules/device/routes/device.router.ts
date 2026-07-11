@@ -3,34 +3,29 @@ import { deviceIdValidation } from "../../../core/middlewares/validation/params-
 import {
     inputValidationResultMiddleware
 } from "../../../core/middlewares/validation/input-validation-result.middleware";
-import { getDeviceListHandler } from "./handlers/get-device-list.handler";
-import { deleteDeviceHandler } from "./handlers/delete-device.handler";
 import { refreshTokenGuard } from "../../auth/middlewares/refreshTokenGuard";
-import { deleteDeviceListHandler } from "./handlers/delete-device-list.handler";
 import { container } from "../../../composition-root";
-import { DeviceQueryRepository } from "../repositoryes/device.query.repository";
-import { DeviceService } from "../application/device.service";
+import { DeviceController } from "../controllers/device.controller";
 
 export const deviceRouter = Router({});
 
-const deviceQueryRepository = container.get(DeviceQueryRepository)
-const deviceService = container.get(DeviceService)
+const deviceController = container.get(DeviceController)
 
 deviceRouter
     .get('/devices',
         refreshTokenGuard,
-        getDeviceListHandler(deviceQueryRepository)
+        deviceController.getDeviceList.bind(deviceController)
     )
 
     .delete('/devices/:deviceId',
         refreshTokenGuard,
         deviceIdValidation,
         inputValidationResultMiddleware,
-        deleteDeviceHandler(deviceService)
+        deviceController.deleteDevice.bind(deviceController)
     )
 
     .delete('/devices',
         refreshTokenGuard,
         inputValidationResultMiddleware,
-        deleteDeviceListHandler(deviceService)
+        deviceController.deleteDeviceList.bind(deviceController)
     )

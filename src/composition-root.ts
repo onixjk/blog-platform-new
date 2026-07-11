@@ -23,6 +23,10 @@ import { BlogService } from "./modules/blog/application/blog.service";
 import { AuthService } from "./modules/auth/application/auth.service";
 import { AuthController } from "./modules/auth/controllers/auth.controller";
 import { BlogController } from "./modules/blog/controllers/blog.controller";
+import { CommentController } from "./modules/comment/controllers/comment.controller";
+import { DeviceController } from "./modules/device/controllers/device.controller";
+import { PostController } from "./modules/post/controllers/post.controller";
+import { UserController } from "./modules/user/controllers/user.controller";
 
 
 export const container = new Container();
@@ -57,3 +61,7 @@ container.bind(AuthService).toSelf().inSingletonScope;
 
 container.bind(AuthController).toSelf().inSingletonScope();
 container.bind(BlogController).toSelf().inSingletonScope();
+container.bind(CommentController).toSelf().inSingletonScope();
+container.bind(DeviceController).toSelf().inSingletonScope();
+container.bind(PostController).toSelf().inSingletonScope();
+container.bind(UserController).toSelf().inSingletonScope();

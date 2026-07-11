@@ -1,10 +1,5 @@
 import { Router } from 'express';
 import { superAdminGuardMiddleware } from "../../auth/middlewares/super-admin.guard-middleware";
-import { getPostListHandler } from "./handlers/get-post-list.handler";
-import { getPostHandler } from "./handlers/get-post.handler";
-import { createPostHandler } from "./handlers/create-post.handler";
-import { updatePostHandler } from "./handlers/update-post.handler";
-import { deletePostHandler } from "./handlers/delete-post.handler";
 import { idValidation, postIdValidation } from "../../../core/middlewares/validation/params-id.validation-middleware";
 import {
     paginationAndSortingValidation
@@ -15,56 +10,48 @@ import {
     inputValidationResultMiddleware
 } from "../../../core/middlewares/validation/input-validation-result.middleware";
 import { CommentSortField } from "../../comment/types/input/comment-sort-field";
-import { getPostCommentListHandler } from "./handlers/get-post-comments-list.handler";
 import { accessTokenGuard } from "../../auth/middlewares/access-token.guard";
 import { commentInputValidation } from "../../comment/middlewares/comment.input-dto.validation-middlewares";
-import { createPostCommentHandler } from "./handlers/create-post-comment.handler";
 import { container } from "../../../composition-root";
-import { PostQueryRepository } from "../repositories/post.query.repository";
-import { PostService } from "../application/postService";
-import { CommentQueryRepository } from "../../comment/repositories/comment.query.repository";
-import { CommentService } from "../../comment/application/comment.service";
+import { PostController } from "../controllers/post.controller";
 
 export const postRouter = Router({});
 
-const postQueryRepository = container.get(PostQueryRepository);
-const postService = container.get(PostService);
-const commentQueryRepository = container.get(CommentQueryRepository);
-const commentService = container.get(CommentService);
+const postController = container.get(PostController);
 
 
 postRouter
     .get('',
         paginationAndSortingValidation(PostSortField),
         inputValidationResultMiddleware,
-        getPostListHandler(postQueryRepository),
+        postController.getPostList.bind(postController)
     )
 
     .get('/:id',
         idValidation,
         inputValidationResultMiddleware,
-        getPostHandler(postService, postQueryRepository)
+        postController.getPost.bind(postController)
     )
 
     .get('/:postId/comments',
         postIdValidation,
         paginationAndSortingValidation(CommentSortField),
         inputValidationResultMiddleware,
-        getPostCommentListHandler(postService, commentQueryRepository),
+        postController.getPostCommentList.bind(postController)
     )
 
     .post('',
         superAdminGuardMiddleware,
         postInputValidation,
         inputValidationResultMiddleware,
-        createPostHandler(postService, postQueryRepository),
+        postController.createPost.bind(postController)
     )
 
     .post('/:postId/comments',
         accessTokenGuard,
         commentInputValidation,
         inputValidationResultMiddleware,
-        createPostCommentHandler(commentService, commentQueryRepository),
+        postController.createPostComment.bind(postController)
     )
 
     .put('/:id',
@@ -72,12 +59,12 @@ postRouter
         idValidation,
         postInputValidation,
         inputValidationResultMiddleware,
-        updatePostHandler(postService),
+        postController.updatePost.bind(postController)
     )
 
     .delete('/:id',
         superAdminGuardMiddleware,
         idValidation,
         inputValidationResultMiddleware,
-        deletePostHandler(postService),
+        postController.deletePost.bind(postController)
     );
