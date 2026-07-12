@@ -7,11 +7,7 @@ import { AuthService } from "../application/auth.service";
 const jwtService = container.get(JwtService);
 const authService = container.get(AuthService);
 
-export const refreshTokenGuard = async (
-    req: Request,
-    res: Response,
-    next: NextFunction
-) => {
+export const refreshTokenGuard = async (req: Request, res: Response, next: NextFunction) => {
 
     const refreshToken = req.cookies.refreshToken;
     if (!refreshToken) {
