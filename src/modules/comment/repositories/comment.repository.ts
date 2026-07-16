@@ -1,91 +1,31 @@
-import { ObjectId, WithId } from "mongodb";
-import { commentCollection } from "../../../db/mongo.db";
 import { Comment } from "../types/comment";
-import { CommentUpdateDto } from "../types/input/comment-update.dto";
-import { ResultStatus } from "../../../core/result/resultCode";
-import { Result } from "../../../core/result/result.type";
 import { injectable } from "inversify";
+import { CommentModel } from "../../../db/mongo.db";
+import { HydratedDocument } from "mongoose";
 
 @injectable()
 export class CommentRepository {
 
-    async findById(id: string): Promise<Result<WithId<Comment> | null>> {
-        const comment = await commentCollection.findOne({ _id: new ObjectId(id) });
-
-        if (!comment) {
-            return {
-                status: ResultStatus.NotFound_404,
-                data: null,
-                errorMessage: 'Not Found',
-                extensions: [{ field: null, message: 'Comment not exist' }],
-            }
-        }
-
-        return {
-            status: ResultStatus.Success_200,
-            data: comment,
-            extensions: [],
-        };
+    async findById(id: string): Promise<HydratedDocument<Comment> | null> {
+        return CommentModel.findById(id);
     }
 
-    async create(newComment: Comment): Promise<Result<string>> {
-        const insertResult = await commentCollection.insertOne(newComment);
+    async save(document: HydratedDocument<Comment>): Promise<string> {
+        const savedComment = await document.save();
 
-        return {
-            status: ResultStatus.Created_201,
-            data: insertResult.insertedId.toString(),
-            extensions: [],
-        }
+        return savedComment.id;
     }
 
-    async update(dto: CommentUpdateDto): Promise<Result> {
-        const updateResult = await commentCollection.updateOne(
-            { _id: new ObjectId(dto.commentId) },
-            { $set: { content: dto.content, } }
-        );
+    async delete(commentId: string): Promise<boolean> {
 
-        if (updateResult.matchedCount < 1) {
-            return {
-                status: ResultStatus.NotFound_404,
-                data: null,
-                errorMessage: 'Not Found',
-                extensions: [{ field: null, message: 'Comment doesn\'t exist' }],
-            }
-        }
+        const deleteResult = await CommentModel.deleteOne({ _id: commentId });
 
-        return {
-            status: ResultStatus.NoContent_204,
-            data: null,
-            extensions: [],
-        }
+        return deleteResult.deletedCount > 0;
     }
 
-    async delete(commentId: string): Promise<Result> {
-        const deleteResult = await commentCollection.deleteOne({ _id: new ObjectId(commentId) });
+    async deleteAllByPostId(postId: string): Promise<boolean> {
+        const deleteResult = await CommentModel.deleteMany({ postId: postId });
 
-        if (deleteResult.deletedCount < 1) {
-            return {
-                status: ResultStatus.NotFound_404,
-                data: null,
-                errorMessage: 'Not Found',
-                extensions: [{ field: null, message: 'Comment doesn\'t exist' }],
-            }
-        }
-
-        return {
-            status: ResultStatus.NoContent_204,
-            data: null,
-            extensions: [],
-        }
-    }
-
-    async deleteAllByPostId(postId: string): Promise<Result> {
-        await commentCollection.deleteMany({ postId: postId });
-
-        return {
-            status: ResultStatus.NoContent_204,
-            data: null,
-            extensions: [],
-        };
+        return deleteResult.acknowledged;
     }
 }

@@ -76,55 +76,36 @@ import { Post } from "../modules/post/types/post";
 import { IUserDB } from "../modules/user/types/user.db.interface";
 import { Comment } from "../modules/comment/types/comment";
 import { Session } from "../modules/auth/types/session";
-import { Device } from "../modules/device/types/device.";
 import { ApiRequestLog } from "../modules/auth/types/api-request-log";
 
-// 1. Создаем схемы. Настройки TTL-индексов (expires) переехали сюда
 const ApiRequestSchema = new Schema<ApiRequestLog>({
-    date: { type: Date, required: true, expires: 10 } // TTL-индекс на 10 секунд
+    date: { type: Date, required: true, expires: 10 }
 }, { strict: false });
 
 const SessionSchema = new Schema<Session>({
-    exp: { type: Date, required: true, expires: 0 } // TTL-индекс по времени жизни сессии
+    exp: { type: Date, required: true, expires: 0 }
 }, { strict: false });
 
-// Для остальных коллекций делаем пустые схемы, чтобы Mongoose не резал "лишние" поля
 const BlogSchema = new Schema<Blog>({}, { strict: false });
 const PostSchema = new Schema<Post>({}, { strict: false });
 const UserSchema = new Schema<IUserDB>({}, { strict: false });
 const CommentSchema = new Schema<Comment>({}, { strict: false });
-const DeviceSchema = new Schema<Device>({}, { strict: false });
 
-// 2. Экспортируем старые переменные коллекций (как тип any, чтобы старый код репозиториев не ругался)
-export let blogCollection: any;
-export let postCollection: any;
-export let userCollection: any;
-export let commentCollection: any;
-export let sessionCollection: any;
-export let deviceCollection: any;
-export let apiRequestsCollection: any;
+export let BlogModel = mongoose.model<Blog>('blogs', BlogSchema);
+export let PostModel = mongoose.model<Post>('posts', PostSchema);
+export let UserModel = mongoose.model<IUserDB>('users', UserSchema);
+export let CommentModel = mongoose.model<Comment>('comments', CommentSchema);
+export let SessionModel = mongoose.model<Session>('sessions', SessionSchema);
+export let ApiRequestsModel = mongoose.model<ApiRequestLog>('apiRequests', ApiRequestSchema);
 
-// 3. Функция подключения, которую вы вызываете в bootstrap
 export async function runDB(url: string): Promise<void> {
     try {
-        // Подключаемся к MongoDB Атласу и явно передаем имя базы из SETTINGS
         await mongoose.connect(url, {
             dbName: SETTINGS.DB_NAME
         });
-
         console.log('✅ Connected to the database via Mongoose');
-
-        // Связываем старые переменные коллекций с созданными моделями Mongoose
-        blogCollection = mongoose.model<Blog>('blogs', BlogSchema);
-        postCollection = mongoose.model<Post>('posts', PostSchema);
-        userCollection = mongoose.model<IUserDB>('users', UserSchema);
-        commentCollection = mongoose.model<Comment>('comments', CommentSchema);
-        sessionCollection = mongoose.model<Session>('sessions', SessionSchema);
-        deviceCollection = mongoose.model<Device>('devices', DeviceSchema);
-        apiRequestsCollection = mongoose.model<ApiRequestLog>('apiRequests', ApiRequestSchema);
-
     } catch (e) {
         await mongoose.disconnect();
-        throw new Error(`❌ Database not connected: ${e}`);
+        throw new Error(`❌ Database not connected: ${ e }`);
     }
 }

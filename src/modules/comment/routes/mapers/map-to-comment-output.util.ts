@@ -1,8 +1,7 @@
-import {WithId} from "mongodb";
-import {Comment} from "../../types/comment";
-import {CommentOutput} from "../../types/output/comment-output";
+import { Comment } from "../../types/comment";
+import { CommentOutput } from "../../types/output/comment-output";
 
-export function mapToCommentOutput(comment: WithId<Comment>): CommentOutput {
+export function mapToCommentOutput(comment: Comment & { _id: any }): CommentOutput {
     return {
         id: comment._id.toString(),
         content: comment.content,

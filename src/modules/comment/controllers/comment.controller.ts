@@ -2,7 +2,6 @@ import { inject, injectable } from "inversify";
 import { Request, Response } from "express";
 import { ResultStatus } from "../../../core/result/resultCode";
 import { resultCodeToHttpException } from "../../../core/result/resultCodeToHttpException";
-import { errorsHandler } from "../../../core/errors/errors.handler";
 import { CommentService } from "../application/comment.service";
 import { CommentQueryRepository } from "../repositories/comment.query.repository";
 import { CommentInputDto } from "../types/input/comment-input.dto";
@@ -17,63 +16,51 @@ export class CommentController {
     ) {}
 
     async getComment(req: Request<{ id: string }>, res: Response) {
-        try {
-            const id = req.params.id;
 
-            const result = await this.commentQueryRepository.findById(id)
+        const id = req.params.id;
+        if (!id) return res.sendStatus(HttpStatuses.NotFound_404);
 
-            if (result.status !== ResultStatus.Success_200) {
-                return res
-                    .status(resultCodeToHttpException(result.status))
-                    .send(result.extensions);
-            }
+        const commentOutput = await this.commentQueryRepository.findById(id)
+        if (!commentOutput) return res.sendStatus(HttpStatuses.NotFound_404);
 
-            return res
-                .status(resultCodeToHttpException(result.status))
-                .send(result.data);
-        } catch (e: unknown) {
-            errorsHandler(e, res);
-        }
+        res.status(HttpStatuses.Ok_200).send(commentOutput);
     }
 
     async updateComment(req: Request<{ id: string }, {}, CommentInputDto>, res: Response) {
-        try {
-            const commentId = req.params.id;
-            const userId = req.user.id!;
 
-            const commentData = { commentId, userId, ...req.body }
+        const commentId = req.params.id;
+        if (!commentId) return res.sendStatus(HttpStatuses.NotFound_404);
 
-            const result = await this.commentService.update(commentData);
+        const userId = req.user.id!;
 
-            if (result.status !== ResultStatus.NoContent_204) {
-                return res
-                    .status(resultCodeToHttpException(result.status))
-                    .send(result.extensions);
-            }
+        const commentData = { commentId, userId, ...req.body }
 
-            return res.sendStatus(HttpStatuses.NoContent_204)
-        } catch (e: unknown) {
-            errorsHandler(e, res);
+        const result = await this.commentService.update(commentData);
+
+        if (result.status !== ResultStatus.Success) {
+            return res
+                .status(resultCodeToHttpException(result.status))
+                .send({ errorsMessages: result.extensions });
         }
+
+        return res.sendStatus(HttpStatuses.NoContent_204)
     }
 
     async deleteComment(req: Request<{ id: string }>, res: Response) {
-        try {
-            const commentId = req.params.id;
-            const userId = req.user.id!;
 
-            const result = await this.commentService.delete(commentId, userId);
+        const commentId = req.params.id;
+        if (!commentId) return res.sendStatus(HttpStatuses.NotFound_404);
 
-            if (result.status !== ResultStatus.NoContent_204) {
-                return res
-                    .status(resultCodeToHttpException(result.status))
-                    .send(result.extensions);
-            }
+        const userId = req.user.id!;
 
-            return res.sendStatus(resultCodeToHttpException(result.status))
+        const result = await this.commentService.delete(commentId, userId);
 
-        } catch (e: unknown) {
-            errorsHandler(e, res);
+        if (result.status !== ResultStatus.Success) {
+            return res
+                .status(resultCodeToHttpException(result.status))
+                .send({ errorsMessages: result.extensions });
         }
+
+        res.sendStatus(HttpStatuses.NoContent_204);
     }
 }

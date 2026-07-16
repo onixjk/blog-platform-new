@@ -1,6 +1,5 @@
 import { ResultStatus } from "../../../core/result/resultCode";
 import { IUserDB } from "../../user/types/user.db.interface";
-import { WithId } from "mongodb";
 import { Result } from "../../../core/result/result.type";
 import { randomUUID } from "node:crypto";
 import { AuthRepository } from "../repositories/auth.repository";
@@ -14,6 +13,8 @@ import { EmailExamples } from "../adapters/email-examples";
 import { inject, injectable } from "inversify";
 import { UserService } from "../../user/application/user.service";
 import { UserRepository } from "../../user/repositories/user.repository";
+import { SessionModel } from "../../../db/mongo.db";
+import { HydratedDocument } from "mongoose";
 
 @injectable()
 export class AuthService {
@@ -21,19 +22,17 @@ export class AuthService {
     constructor(
         @inject(JwtService) private jwtService: JwtService,
         @inject(BcryptService) private bcryptService: BcryptService,
-        @inject(UserService) private usersService: UserService,
-        @inject(UserRepository) private usersRepository: UserRepository,
+        @inject(UserService) private userService: UserService,
+        @inject(UserRepository) private userRepository: UserRepository,
         @inject(AuthRepository) private authRepository: AuthRepository,
         @inject(NodemailerService) private nodemailerService: NodemailerService,
         @inject(EmailExamples) private emailExamples: EmailExamples,
-    ) {
-    }
+    ) {}
 
     async loginUser(loginOrEmail: string, password: string, browserName: string, clientIp: string): Promise<Result<TokensPair | null>> {
 
         const userCredentialsResult = await this.checkUserCredentials(loginOrEmail, password);
-
-        if (userCredentialsResult.status !== ResultStatus.Success_200 || !userCredentialsResult.data) {
+        if (userCredentialsResult.status !== ResultStatus.Success || !userCredentialsResult.data) {
             return {
                 status: ResultStatus.Unauthorized_401,
                 data: null,
@@ -65,25 +64,23 @@ export class AuthService {
         const refreshToken = createSessionResult.data.refreshToken;
 
         return {
-            status: ResultStatus.Success_200,
+            status: ResultStatus.Success,
             data: { accessToken, refreshToken },
             extensions: [],
         };
     }
 
-    async checkUserCredentials(loginOrEmail: string, password: string,): Promise<Result<WithId<IUserDB> | null>> {
-        const user = await this.usersService.findByLoginOrEmail(loginOrEmail);
-
+    async checkUserCredentials(loginOrEmail: string, password: string,): Promise<Result<HydratedDocument<IUserDB> | null>> {
+        const user = await this.userRepository.findByLoginOrEmail(loginOrEmail);
         if (!user)
             return {
-                status: ResultStatus.NotFound_404,
+                status: ResultStatus.Unauthorized_401,
                 data: null,
-                errorMessage: "Not Found",
-                extensions: [{ field: loginOrEmail, message: "Not Found" }]
+                errorMessage: "Unauthorized",
+                extensions: [{ field: 'loginOrEmail', message: "Wrong credentials" }]
             };
 
         const isPassCorrect = await this.bcryptService.checkPassword(password, user.passwordHash);
-
         if (!isPassCorrect)
             return {
                 status: ResultStatus.Unauthorized_401,
@@ -93,7 +90,7 @@ export class AuthService {
             };
 
         return {
-            status: ResultStatus.Success_200,
+            status: ResultStatus.Success,
             data: user,
             extensions: [],
         };
@@ -101,38 +98,27 @@ export class AuthService {
 
     async registerUser(login: string, password: string, email: string): Promise<Result<string | null>> {
 
-        const userByLogin = await this.usersService.findByLoginOrEmail(login);
-        const userByEmail = await this.usersService.findByLoginOrEmail(email);
-        if (userByLogin || userByEmail) {
+        const createdUserId = await this.userService.create({ login, password, email })
+        if (createdUserId.status !== ResultStatus.Success || !createdUserId.data) {
+            return {
+                status: createdUserId.status,
+                errorMessage: createdUserId.errorMessage,
+                data: null,
+                extensions: createdUserId.extensions,
+            };
+        }
+
+        const newUser = await this.userRepository.findById(createdUserId.data)
+        if (!newUser) {
             return {
                 status: ResultStatus.BadRequest_400,
                 errorMessage: 'Bad Request',
                 data: null,
-                extensions: [{ field: userByLogin ? 'login' : 'email', message: 'Already Registered' }],
-            }
+                extensions: [{ field: 'User', message: 'User registration failed' }],
+            };
         }
 
-        const passwordHash = await this.bcryptService.generateHash(password);
-
-        const newUser: IUserDB = {
-            login: login,
-            passwordHash: passwordHash,
-            email: email,
-            createdAt: new Date().toISOString(),
-            emailConfirmation: {
-                confirmationCode: randomUUID(),
-                expirationDate: new Date(Date.now() + 60 * 60 * 1000).toISOString(),
-                isConfirmed: false,
-            },
-            passwordRecovery: {
-                recoveryCode: null,
-                expirationDate: null,
-            }
-        }
-
-        const createdId = await this.usersRepository.create(newUser);
-
-        this.nodemailerService //todo
+        this.nodemailerService
             .sendEmail(
                 newUser.email,
                 newUser.emailConfirmation.confirmationCode,
@@ -141,16 +127,15 @@ export class AuthService {
             .catch(er => console.error('error in send email:', er));
 
         return {
-            status: ResultStatus.NoContent_204,
-            data: createdId,
+            status: ResultStatus.Success,
+            data: createdUserId.data,
             extensions: [],
         };
     }
 
     async resendEmailConfirmationCode(email: string): Promise<Result<string | null>> {
 
-        const userByEmail = await this.usersService.findByLoginOrEmail(email)
-
+        const userByEmail = await this.userRepository.findByLoginOrEmail(email)
         if (!userByEmail) {
             return {
                 status: ResultStatus.BadRequest_400,
@@ -172,7 +157,7 @@ export class AuthService {
         const confirmationCode = randomUUID();
         const expirationDate = new Date(Date.now() + 60 * 60 * 1000).toISOString();
 
-        await this.usersRepository.updateEmailConfirmationCode(email, confirmationCode, expirationDate);
+        await this.userRepository.updateEmailConfirmationCode(email, confirmationCode, expirationDate);
 
         this.nodemailerService.sendEmail(
             email,
@@ -183,7 +168,7 @@ export class AuthService {
 
 
         return {
-            status: ResultStatus.NoContent_204,
+            status: ResultStatus.Success,
             data: null,
             extensions: [],
         };
@@ -191,10 +176,10 @@ export class AuthService {
 
     async sendPasswordRecoveryCode(email: string): Promise<Result<string | null>> {
 
-        const userByEmail = await this.usersService.findByLoginOrEmail(email)
+        const userByEmail = await this.userRepository.findByLoginOrEmail(email)
         if (!userByEmail) {
             return {
-                status: ResultStatus.NoContent_204,
+                status: ResultStatus.Success,
                 data: null,
                 extensions: [],
             }
@@ -203,9 +188,17 @@ export class AuthService {
         const recoveryCode = randomUUID();
         const expirationDate = new Date(Date.now() + 60 * 60 * 1000).toISOString();
 
-        await this.usersRepository.updatePasswordRecoveryCode(email, recoveryCode, expirationDate);
+        const isUpdateRecoveryCode = await this.userRepository.updatePasswordRecoveryCode(email, recoveryCode, expirationDate);
+        if (!isUpdateRecoveryCode) {
+            return {
+                status: ResultStatus.BadRequest_400,
+                errorMessage: 'BadRequest',
+                data: null,
+                extensions: [{ field: 'Email', message: 'Invalid email' }],
+            };
+        }
 
-        try {
+        try { //todo
             await this.nodemailerService.sendEmail(
                 email,
                 recoveryCode,
@@ -216,18 +209,17 @@ export class AuthService {
         }
 
         return {
-            status: ResultStatus.NoContent_204,
+            status: ResultStatus.Success,
             data: null,
             extensions: [],
         };
     }
 
     async updatePassword(newPassword: string, recoveryCode: string): Promise<Result<boolean | null>> {
-        const userResult = await this.usersService.findByRecoveryCode(recoveryCode);
-        if (
-            !userResult.data ||
-            !userResult.data.passwordRecovery.recoveryCode ||
-            !userResult.data.passwordRecovery.expirationDate
+        const userResult = await this.userRepository.findByRecoveryCode(recoveryCode);
+        if (!userResult ||
+            !userResult.passwordRecovery.recoveryCode ||
+            !userResult.passwordRecovery.expirationDate
         ) {
             return {
                 status: ResultStatus.BadRequest_400,
@@ -239,52 +231,46 @@ export class AuthService {
 
         const newPasswordHash = await this.bcryptService.generateHash(newPassword);
 
-        const isUpdatedResult = await this.usersService.updatePasswordAndClearRecovery(
-            userResult.data._id.toString(),
+        const isUpdatedResult = await this.userRepository.updatePasswordAndClearRecovery(
+            userResult._id.toString(),
             newPasswordHash
         );
-
-        if (!isUpdatedResult.data) {
+        if (!isUpdatedResult) {
             return {
                 status: ResultStatus.BadRequest_400,
                 errorMessage: 'Bad Request',
                 data: null,
-                extensions: isUpdatedResult.extensions,
+                extensions: [{ field: 'recoveryCode', message: 'Failed to update password.' }],
             };
         }
 
         return {
-            status: ResultStatus.Success_200,
-            data: isUpdatedResult.data,
+            status: ResultStatus.Success,
+            data: isUpdatedResult,
             extensions: []
         };
     }
 
     async confirmEmail(code: string): Promise<Result> {
 
-        const result = await this.usersService.updateEmailConfirmationStatus(code);
-
-        if (!result) {
+        const isUpdate = await this.userService.updateEmailConfirmationStatus(code);
+        if (isUpdate.status !== ResultStatus.Success) {
             return {
-                status: ResultStatus.BadRequest_400,
-                errorMessage: 'Bad Request',
+                status: isUpdate.status,
+                errorMessage: isUpdate.errorMessage,
                 data: null,
-                extensions: [{ field: 'code', message: 'Incorrect code' }],
+                extensions: isUpdate.extensions,
             };
         }
 
         return {
-            status: ResultStatus.NoContent_204,
+            status: ResultStatus.Success,
             data: null,
             extensions: [],
-
         };
     }
 
-    async refreshSession(userId: string, deviceId: string): Promise<Result<{
-        accessToken: string;
-        refreshToken: string
-    } | null>> {
+    async refreshSession(userId: string, deviceId: string): Promise<Result<TokensPair | null>> {
 
         const tokensPairResult = await this._createTokensPair(userId, deviceId);
         if (!tokensPairResult.data) {
@@ -308,7 +294,6 @@ export class AuthService {
 
         const iatDate = new Date(refreshTokenPayload.iat * 1000);
         const updateIatResult = await this.authRepository.updateIat(deviceId, iatDate);
-
         if (!updateIatResult) {
             return {
                 status: ResultStatus.Unauthorized_401,
@@ -318,11 +303,16 @@ export class AuthService {
             };
         }
 
-        return tokensPairResult;
+        return {
+            status: ResultStatus.Success,
+            data: tokensPairResult.data,
+            extensions: [],
+        };
     }
 
     async deleteSession(deviceId: string): Promise<Result> {
-        const isDeletedSession = await this.authRepository.deleteSession(deviceId);
+
+        const isDeletedSession = await this.authRepository.delete(deviceId);
         if (!isDeletedSession) {
             return {
                 status: ResultStatus.Unauthorized_401,
@@ -333,7 +323,7 @@ export class AuthService {
         }
 
         return {
-            status: ResultStatus.NoContent_204,
+            status: ResultStatus.Success,
             data: null,
             extensions: []
         };
@@ -352,7 +342,7 @@ export class AuthService {
         }
 
         return {
-            status: ResultStatus.Success_200,
+            status: ResultStatus.Success,
             data: result,
             extensions: [],
         };
@@ -389,21 +379,21 @@ export class AuthService {
         }
 
         const iatDate = new Date(refreshTokenPayload.iat * 1000);
-        const expDate = new Date(refreshTokenPayload.exp * 1000);
+        const expireDate = new Date(refreshTokenPayload.exp * 1000);
 
-        const session: Session = {
+        const newSession = new SessionModel({
             user_id: sessionDto.userId,
             device_id: deviceId,
             iat: iatDate,
             browserName: sessionDto.browserName,
             ip: sessionDto.clientIp,
-            exp: expDate,
-        }
+            exp: expireDate,
+        });
 
-        await this.authRepository.saveSession(session);
+        await this.authRepository.save(newSession);
 
         return {
-            status: ResultStatus.Success_200,
+            status: ResultStatus.Success,
             data: { accessToken, refreshToken },
             extensions: [],
         };
@@ -435,7 +425,7 @@ export class AuthService {
         }
 
         return {
-            status: ResultStatus.Success_200,
+            status: ResultStatus.Success,
             data: { accessToken, refreshToken },
             extensions: []
         };

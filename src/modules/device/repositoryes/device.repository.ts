@@ -1,23 +1,23 @@
-import { sessionCollection } from "../../../db/mongo.db";
+import { SessionModel } from "../../../db/mongo.db";
 import { Session } from "../../auth/types/session";
-import { WithId } from "mongodb";
 import { injectable } from "inversify";
+import { HydratedDocument } from "mongoose";
 
 @injectable()
 export class DeviceRepository {
 
-    async findSessionById(deviceId: string): Promise<WithId<Session> | null> {
-        return await sessionCollection.findOne({ device_id: deviceId });
+    async findSessionById(deviceId: string): Promise<HydratedDocument<Session> | null> {
+        return await SessionModel.findOne({ device_id: deviceId });
     }
 
     async deleteSessionById(deviceId: string): Promise<boolean> {
-        const result = await sessionCollection.deleteOne({ device_id: deviceId });
+        const result = await SessionModel.deleteOne({ device_id: deviceId });
 
         return result.deletedCount > 0;
     }
 
     async deleteOtherSessions(userId: string, deviceId: string): Promise<boolean> {
-        const result = await sessionCollection.deleteMany({
+        const result = await SessionModel.deleteMany({
             user_id: userId,
             device_id: { $ne: deviceId }
         });

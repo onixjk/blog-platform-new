@@ -9,7 +9,6 @@ import { resultCodeToHttpException } from "../../../core/result/resultCodeToHttp
 import { NewPasswordRecoveryInput } from "../types/input/new-password-recovery.input";
 import { PasswordRecoveryInput } from "../types/input/password-recovery.input";
 import { UserInputDto } from "../../user/types/input/user.input-dto";
-import { errorsHandler } from "../../../core/errors/errors.handler";
 import { RegistrationConfirmationCodeInput } from "../types/input/registration-confirmation-code.input";
 import { RegistrationEmailResendingInput } from "../types/input/registration-email-resending.input";
 
@@ -23,11 +22,11 @@ export class AuthController {
 
     async getMe(req: Request, res: Response) {
 
-        const userId = req.user?.id as string;
-
+        const userId = req.user.id;
         if (!userId) return res.sendStatus(HttpStatuses.Unauthorized_401);
 
         const me = await this.userQueryRepository.findMeById(userId);
+        if (!me) return res.sendStatus(HttpStatuses.Unauthorized_401);
 
         return res.status(HttpStatuses.Ok_200).send(me);
     }
@@ -45,27 +44,27 @@ export class AuthController {
         const cookie_name = 'refreshToken';
 
         const result = await this.authService.loginUser(loginOrEmail, password, browserName, clientIp);
-
-        if (result.status !== ResultStatus.Success_200) {
+        if (result.status !== ResultStatus.Success || !result.data) {
             res.clearCookie(cookie_name);
-            return res.status(resultCodeToHttpException(result.status)).send(result.extensions);
+            return res
+                .status(resultCodeToHttpException(result.status))
+                .send({ errorsMessages: result.extensions });
         }
 
-        res.cookie(cookie_name, result.data!.refreshToken, { httpOnly: true, secure: true })
-        return res.status(HttpStatuses.Ok_200).send({ accessToken: result.data!.accessToken });
+        res.cookie(cookie_name, result.data.refreshToken, { httpOnly: true, secure: true })
+        return res.status(HttpStatuses.Ok_200).send({ accessToken: result.data.accessToken });
     }
 
     async logout(req: Request, res: Response) {
 
         const deviceId = req.deviceId;
-        if (!deviceId) {
-            return res.sendStatus(HttpStatuses.Unauthorized_401);
-        }
+        if (!deviceId) return res.sendStatus(HttpStatuses.Unauthorized_401);
 
         const result = await this.authService.deleteSession(deviceId);
-
-        if (result.status !== ResultStatus.NoContent_204) {
-            return res.sendStatus(HttpStatuses.Unauthorized_401);
+        if (result.status !== ResultStatus.Success) {
+            return res
+                .status(resultCodeToHttpException(result.status))
+                .send(result.extensions);
         }
 
         res.clearCookie('refreshToken', { httpOnly: true, secure: true });
@@ -74,26 +73,28 @@ export class AuthController {
 
     async newPassword(req: Request<{}, {}, NewPasswordRecoveryInput>, res: Response) {
         const { newPassword, recoveryCode } = req.body;
+        if (!newPassword || !recoveryCode) return res.sendStatus(HttpStatuses.BadRequest_400);
 
         const result = await this.authService.updatePassword(newPassword, recoveryCode);
-
-        if (result.status !== ResultStatus.Success_200)
+        if (result.status !== ResultStatus.Success) {
             return res
                 .status(resultCodeToHttpException(result.status))
                 .send({ errorsMessages: result.extensions });
+        }
 
         return res.sendStatus(HttpStatuses.NoContent_204);
     }
 
     async passwordRecovery(req: Request<{}, {}, PasswordRecoveryInput>, res: Response) {
         const { email } = req.body;
+        if (!email) return res.sendStatus(HttpStatuses.BadRequest_400);
 
         const result = await this.authService.sendPasswordRecoveryCode(email);
-
-        if (result.status !== ResultStatus.NoContent_204)
+        if (result.status !== ResultStatus.Success) {
             return res
                 .status(resultCodeToHttpException(result.status))
                 .send({ errorsMessages: result.extensions });
+        }
 
         return res.sendStatus(HttpStatuses.NoContent_204);
     }
@@ -102,13 +103,10 @@ export class AuthController {
         const cookie_name = 'refreshToken'
         const userId = req.user.id;
         const deviceId = req.deviceId;
-        if (!userId || !deviceId) {
-            return res.sendStatus(HttpStatuses.Unauthorized_401);
-        }
+        if (!userId || !deviceId) return res.sendStatus(HttpStatuses.Unauthorized_401);
 
         const result = await this.authService.refreshSession(userId, deviceId);
-
-        if (result.status !== ResultStatus.Success_200 || !result.data) {
+        if (result.status !== ResultStatus.Success || !result.data) {
             return res
                 .status(resultCodeToHttpException(result.status))
                 .send({ errorsMessages: result.extensions });
@@ -119,25 +117,20 @@ export class AuthController {
     }
 
     async registration(req: Request<{}, {}, UserInputDto>, res: Response) {
-        try {
-            const { login, password, email } = req.body;
+        const { login, password, email } = req.body;
 
-            const result = await this.authService.registerUser(login, password, email);
-
-            if (result.status !== ResultStatus.NoContent_204)
-                return res
-                    .status(resultCodeToHttpException(result.status))
-                    .send({ errorsMessages: result.extensions });
-
-            return res.status(HttpStatuses.NoContent_204).send(result.data);
-        } catch (e: unknown) {
-            errorsHandler(e, res);
+        const result = await this.authService.registerUser(login, password, email);
+        if (result.status !== ResultStatus.Success) {
+            return res
+                .status(resultCodeToHttpException(result.status))
+                .send({ errorsMessages: result.extensions });
         }
+
+        return res.sendStatus(HttpStatuses.NoContent_204);
     }
 
     async registrationConfirmation(req: Request<{}, {}, RegistrationConfirmationCodeInput>, res: Response) {
         const { code } = req.body
-
         if (!code) {
             return res
                 .status(HttpStatuses.BadRequest_400)
@@ -146,24 +139,29 @@ export class AuthController {
 
         const result = await this.authService.confirmEmail(code);
 
-        if (result.status !== ResultStatus.NoContent_204)
+        if (result.status !== ResultStatus.Success)
             return res
                 .status(resultCodeToHttpException(result.status))
                 .send({ errorsMessages: result.extensions });
 
-        return res.status(HttpStatuses.NoContent_204).send(result.data);
+        return res.sendStatus(HttpStatuses.NoContent_204);
     }
 
     async registrationEmailResending(req: Request<{}, {}, RegistrationEmailResendingInput>, res: Response) {
         const { email } = req.body;
+        if (!email) {
+            return res
+                .status(HttpStatuses.BadRequest_400)
+                .send({ errorsMessages: [{ field: 'email', message: 'Email is required' }] });
+        }
 
         const result = await this.authService.resendEmailConfirmationCode(email)
-
-        if (result.status !== ResultStatus.NoContent_204)
+        if (result.status !== ResultStatus.Success) {
             return res
                 .status(resultCodeToHttpException(result.status))
                 .send({ errorsMessages: result.extensions });
+        }
 
-        return res.status(HttpStatuses.NoContent_204).send(result.data);
+        return res.sendStatus(HttpStatuses.NoContent_204);
     }
 }

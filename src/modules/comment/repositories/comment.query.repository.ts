@@ -1,62 +1,44 @@
-import { commentCollection } from "../../../db/mongo.db";
-import { ObjectId } from "mongodb";
 import { mapToCommentListPaginatedOutput } from "../routes/mapers/map-to-comment-list-paginated-output.util";
 import { CommentQueryInput } from "../types/input/comment-query.input";
 import { CommentListPaginatedOutput } from "../types/output/comment-list-paginated.output";
 import { CommentOutput } from "../types/output/comment-output";
 import { mapToCommentOutput } from "../routes/mapers/map-to-comment-output.util";
-import { ResultStatus } from "../../../core/result/resultCode";
-import { Result } from "../../../core/result/result.type";
 import { injectable } from "inversify";
+import { CommentModel } from "../../../db/mongo.db";
 
 @injectable()
 export class CommentQueryRepository {
 
-    async findById(id: string): Promise<Result<CommentOutput | null>> {
-        const comment = await commentCollection.findOne({ _id: new ObjectId(id) });
+    async findById(id: string): Promise<CommentOutput | null> {
 
-        if (!comment) {
-            return {
-                status: ResultStatus.NotFound_404,
-                data: null,
-                errorMessage: 'Not Found',
-                extensions: [{ field: null, message: 'Comment doesn\'t exist' }],
-            }
-        }
+        const comment = await CommentModel.findById(id).lean();
 
-        return {
-            status: ResultStatus.Success_200,
-            data: mapToCommentOutput(comment),
-            extensions: [],
-        }
+        return comment ? mapToCommentOutput(comment) : null;
     }
 
     async findCommentByPost(
         queryDto: CommentQueryInput,
         postId: string,
-    ): Promise<Result<CommentListPaginatedOutput>> {
+    ): Promise<CommentListPaginatedOutput> {
         const { pageNumber, pageSize, sortBy, sortDirection } = queryDto;
         const skip = (pageNumber - 1) * pageSize;
         const filter = { 'postId': postId };
 
-        const items = await commentCollection
-            .find(filter)
-            .sort({ [sortBy]: sortDirection })
-            .skip(skip)
-            .limit(pageSize)
-            .toArray();
+        const [items, totalCount] = await Promise.all([
+            CommentModel
+                .find(filter)
+                .sort({ [sortBy]: sortDirection })
+                .skip(skip)
+                .limit(pageSize)
+                .lean(),
+            CommentModel
+                .countDocuments(filter)
+        ]);
 
-        const totalCount = await commentCollection.countDocuments(filter)
-        const paginatedData = mapToCommentListPaginatedOutput(items, {
-            pageNumber: queryDto.pageNumber,
-            pageSize: queryDto.pageSize,
+        return mapToCommentListPaginatedOutput(items, {
+            pageNumber,
+            pageSize,
             totalCount,
         });
-
-        return {
-            status: ResultStatus.Success_200,
-            data: paginatedData,
-            extensions: []
-        };
     }
 }

@@ -1,68 +1,150 @@
-import { WithId } from "mongodb";
 import { PostInputDto } from "../types/input/post.input-dto";
 import { Post } from "../types/post";
 import { Result } from "../../../core/result/result.type";
 import { inject, injectable } from "inversify";
 import { PostRepository } from "../repositories/post.repository";
-import { BlogService } from "../../blog/application/blog.service";
 import { CommentRepository } from "../../comment/repositories/comment.repository";
+import { ResultStatus } from "../../../core/result/resultCode";
+import { PostModel } from "../../../db/mongo.db";
+import { HydratedDocument } from "mongoose";
+import { Blog } from "../../blog/types/blog";
+import { BlogRepository } from "../../blog/repositories/blogRepository";
 
 @injectable()
 export class PostService {
 
     constructor(
         @inject(PostRepository) private postRepository: PostRepository,
-        @inject(BlogService) private blogService: BlogService,
         @inject(CommentRepository) private commentRepository: CommentRepository,
-    ) {
+        @inject(BlogRepository) private blogRepository: BlogRepository,
+    ) {}
+
+    async findById(id: string): Promise<Result<HydratedDocument<Post> | null>> {
+
+        const post = await this.postRepository.findById(id);
+        if (!post) {
+            return {
+                status: ResultStatus.NotFound_404,
+                errorMessage: 'NotFound',
+                data: null,
+                extensions: [{ field: 'Post', message: 'Post not exist' }]
+            };
+        }
+
+        return {
+            status: ResultStatus.Success,
+            data: post,
+            extensions: []
+        };
     }
 
-    async findById(id: string): Promise<Result<WithId<Post> | null>> {
-        return this.postRepository.findById(id);
-    }
+    async create(dto: PostInputDto): Promise<Result<string | null>> {
 
-    async findByIdOrFail(id: string): Promise<WithId<Post>> {
-        return this.postRepository.findByIdOrFail(id);
-    }
+        const blog = await this.blogRepository.findById(dto.blogId);
+        if (!blog) {
+            return {
+                status: ResultStatus.BadRequest_400,
+                errorMessage: 'Bad Request',
+                data: null,
+                extensions: [{ field: 'Blog', message: 'Blog not exist' }]
+            };
+        }
 
-    async create(dto: PostInputDto): Promise<string> {
-        const blog = await this.blogService.findByIdOrFail(dto.blogId);
-
-        const newPost: Post = {
+        const newPost = new PostModel({
             title: dto.title,
             shortDescription: dto.shortDescription,
             content: dto.content,
             blogId: dto.blogId,
             blogName: blog.name,
             createdAt: new Date().toISOString(),
+        })
+
+        const savedPostId = await this.postRepository.save(newPost);
+
+        return {
+            status: ResultStatus.Success,
+            data: savedPostId,
+            extensions: []
+        };
+    }
+
+    async update(id: string, dto: PostInputDto): Promise<Result<string | null>> {
+
+        const blog = await this.blogRepository.findById(dto.blogId);
+        if (!blog) {
+            return {
+                status: ResultStatus.BadRequest_400,
+                errorMessage: 'Bad Request',
+                data: null,
+                extensions: [{ field: 'blogId', message: 'Blog not exist' }]
+            };
         }
 
-        return this.postRepository.create(newPost);
+        const post = await this.postRepository.findById(id);
+        if (!post) {
+            return {
+                status: ResultStatus.NotFound_404,
+                errorMessage: 'NotFound',
+                data: null,
+                extensions: [{ field: 'Post', message: 'Post not exist' }]
+            };
+        }
+
+        post.title = dto.title;
+        post.shortDescription = dto.shortDescription;
+        post.content = dto.content;
+        post.blogId = dto.blogId;
+        post.blogName = blog.name;
+
+        const savedPostId = await this.postRepository.save(post);
+
+        return {
+            status: ResultStatus.Success,
+            data: savedPostId,
+            extensions: []
+        };
     }
 
-    async update(id: string, dto: PostInputDto): Promise<void> {
-        const blog = await this.blogService.findByIdOrFail(dto.blogId);
+    // async updateAllBlogNames(blogId: string, blogName: string): Promise<Result<boolean | null>> {
+    //
+    //     const areAllUpdated = await this.postRepository.updateAllBlogNames(blogId, blogName);
+    //
+    //     return {
+    //         status: ResultStatus.Success,
+    //         data: areAllUpdated,
+    //         extensions: []
+    //     };
+    // }
 
-        await this.postRepository.update(id, dto, blog.name);
-        return;
-    }
+    async delete(id: string): Promise<Result<boolean | null>> {
 
-    async updateBlogName(blogId: string, blogName: string): Promise<void> {
-        await this.postRepository.updateAllBlogNames(blogId, blogName);
+        const isDeleted = await this.postRepository.delete(id);
+        if (!isDeleted) {
+            return {
+                status: ResultStatus.NotFound_404,
+                errorMessage: 'Not Found',
+                data: null,
+                extensions: [{ field: 'Post', message: 'Post not exist' }]
+            };
+        }
 
-        return;
-    }
-
-    async delete(id: string): Promise<void> {
         await this.commentRepository.deleteAllByPostId(id)
-        await this.postRepository.delete(id);
-        return;
+
+        return {
+            status: ResultStatus.Success,
+            data: isDeleted,
+            extensions: []
+        };
     }
 
-    async deleteAllByBlogId(blogId: string): Promise<void> {
-        await this.postRepository.deleteAllByBlogId(blogId);
-        return;
-    }
+    // async deleteAllByBlogId(blogId: string): Promise<Result<boolean | null>> {
+    //
+    //     const isAllDeleted = await this.postRepository.deleteAllByBlogId(blogId);
+    //
+    //     return {
+    //         status: ResultStatus.Success,
+    //         data: isAllDeleted,
+    //         extensions: []
+    //     };
+    // }
 }
-
-export default PostService

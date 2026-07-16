@@ -1,5 +1,5 @@
 export enum ResultStatus {
-    Success_200 = 'Success',
+    Success = 'Success',
     Created_201 = 'Created',
     NoContent_204 = 'NoContent',
 
@@ -7,4 +7,8 @@ export enum ResultStatus {
     Unauthorized_401 = 'Unauthorized',
     Forbidden_403 = 'Forbidden',
     NotFound_404 = 'NotFound',
+    Conflict_409 = 'Conflict',
+    TooManyRequests_429 = 'TooManyRequests_429',
+
+    InternalServerError_500 = 'InternalServerError_500',
 }

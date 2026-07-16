@@ -9,7 +9,7 @@ export class DeviceService {
     constructor(@inject(DeviceRepository) private deviceRepository: DeviceRepository) {
     }
 
-    async deleteSessionById(userId: string, deviceId: string): Promise<Result> {
+    async deleteSessionById(userId: string, deviceId: string): Promise<Result<boolean | null>> {
         const session = await this.deviceRepository.findSessionById(deviceId);
         if (!session) {
             return {
@@ -30,37 +30,21 @@ export class DeviceService {
         }
 
         const isDeleted = await this.deviceRepository.deleteSessionById(deviceId);
-        if (!isDeleted) {
-            return {
-                status: ResultStatus.NotFound_404,
-                data: null,
-                errorMessage: 'Not Found',
-                extensions: [{ field: 'Session', message: 'Session could not be deleted' }]
-            };
-        }
 
         return {
-            status: ResultStatus.NoContent_204,
-            data: null,
+            status: ResultStatus.Success,
+            data: isDeleted,
             extensions: []
         };
     }
 
-    async deleteOtherSessions(userId: string, deviceId: string): Promise<Result> {
-        const isCompleted = await this.deviceRepository.deleteOtherSessions(userId, deviceId);
+    async deleteOtherSessions(userId: string, deviceId: string): Promise<Result<boolean | null>> {
 
-        if (!isCompleted) {
-            return {
-                status: ResultStatus.BadRequest_400,
-                errorMessage: 'Bad Request',
-                data: null,
-                extensions: [{ field: 'Session', message: 'Could not complete operation' }]
-            };
-        }
+        const isAllDeleted = await this.deviceRepository.deleteOtherSessions(userId, deviceId);
 
         return {
-            status: ResultStatus.NoContent_204,
-            data: null,
+            status: ResultStatus.Success,
+            data: isAllDeleted,
             extensions: []
         };
     }

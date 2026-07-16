@@ -1,100 +1,39 @@
-import { ObjectId, WithId } from "mongodb";
-import { postCollection } from "../../../db/mongo.db";
-import { RepositoryNotFoundError } from "../../../core/errors/repository-not-found.error";
 import { Post } from "../types/post";
-import { PostInputDto } from "../types/input/post.input-dto";
-import { Result } from "../../../core/result/result.type";
-import { ResultStatus } from "../../../core/result/resultCode";
 import { injectable } from "inversify";
+import { PostModel } from "../../../db/mongo.db";
+import { HydratedDocument } from "mongoose";
 
 @injectable()
 export class PostRepository {
 
-    async findById(id: string): Promise<Result<WithId<Post> | null>> {
-        const post = await postCollection.findOne({ _id: new ObjectId(id) });
-
-        if (!post) {
-            return {
-                status: ResultStatus.NotFound_404,
-                data: null,
-                errorMessage: 'Not Found',
-                extensions: [{ field: null, message: 'Post not exist' }],
-            }
-        }
-
-        return {
-            status: ResultStatus.Success_200,
-            data: post,
-            extensions: [],
-        };
+    async findById(id: string): Promise<HydratedDocument<Post> | null> {
+        return PostModel.findById(id);
     }
 
-    async findByIdOrFail(id: string): Promise<WithId<Post>> {
-        const res = await postCollection.findOne({ _id: new ObjectId(id) });
+    async save(document: HydratedDocument<Post>): Promise<string> {
+        const savedPost = await document.save();
 
-        if (!res) {
-            throw new RepositoryNotFoundError('Post not exist');
-        }
-
-        return res;
+        return savedPost.id;
     }
 
-    async create(newPost: Post): Promise<string> {
-        const insertResult = await postCollection.insertOne(newPost);
-
-        return insertResult.insertedId.toString()
-    }
-
-    async update(id: string, dto: PostInputDto, blogName: string): Promise<void> {
-        const updateResult = await postCollection.updateOne(
-            {
-                _id: new ObjectId(id)
-            },
-            {
-                $set: {
-                    title: dto.title,
-                    shortDescription: dto.shortDescription,
-                    content: dto.content,
-                    blogId: dto.blogId,
-                    blogName: blogName,
-                }
-            }
+    async updateAllBlogNames(blogId: string, blogName: string): Promise<boolean> {
+        const updateAllResult = await PostModel.updateMany(
+            { blogId: blogId },
+            { blogName: blogName }
         );
 
-        if (updateResult.matchedCount < 1) {
-            throw new RepositoryNotFoundError("Post doesn't exist");
-        }
-        return;
+        return updateAllResult.acknowledged;
     }
 
-    async updateAllBlogNames(blogId: string, blogName: string): Promise<void> {
-        await postCollection.updateMany(
-            {
-                blogId: blogId
-            },
-            {
-                $set: {
-                    blogName: blogName,
-                }
-            }
-        );
+    async delete(id: string): Promise<boolean> {
+        const deleteResult = await PostModel.deleteOne({ _id: id });
 
-        return;
+        return deleteResult.deletedCount > 0;
     }
 
-    async delete(id: string): Promise<void> {
-        const deleteResult = await postCollection.deleteOne({ _id: new ObjectId(id) });
+    async deleteAllByBlogId(blogId: string): Promise<boolean> {
+        const deleteResult = await PostModel.deleteMany({ blogId: blogId });
 
-        if (deleteResult.deletedCount < 1) {
-            throw new RepositoryNotFoundError("Post not exist");
-        }
-
-        return;
-    }
-
-    async deleteAllByBlogId(blogId: string): Promise<void> {
-        await postCollection.deleteMany({ blogId: blogId });
-
-        return;
+        return deleteResult.acknowledged;
     }
 }

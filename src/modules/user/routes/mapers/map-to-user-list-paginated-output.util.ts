@@ -1,10 +1,9 @@
-import {WithId} from 'mongodb';
-import {UserOutput} from "../../types/output/user-output";
-import {User} from "../../types/user";
-import {UserListPaginatedOutput} from "../../types/output/user-list-paginated.output.ts";
+import { UserOutput } from "../../types/output/user-output";
+import { User } from "../../types/user";
+import { UserListPaginatedOutput } from "../../types/output/user-list-paginated.output";
 
 export function mapToUserListPaginatedOutput(
-    users: WithId<User>[],
+    users: (User & { _id: any })[],
     meta: { pageNumber: number; pageSize: number; totalCount: number },
 ): UserListPaginatedOutput {
     return {

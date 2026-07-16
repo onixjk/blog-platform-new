@@ -1,4 +1,3 @@
-import { WithId } from "mongodb";
 import { CommentCreateDto } from "../types/input/comment-create.dto";
 import { Comment } from "../types/comment";
 import { CommentRepository } from "../repositories/comment.repository";
@@ -6,38 +5,61 @@ import { CommentUpdateDto } from "../types/input/comment-update.dto";
 import { Result } from "../../../core/result/result.type";
 import { ResultStatus } from "../../../core/result/resultCode";
 import { inject, injectable } from "inversify";
-import { UserService } from "../../user/application/user.service";
 import { PostRepository } from "../../post/repositories/post.repository";
+import { CommentModel } from "../../../db/mongo.db";
+import { HydratedDocument } from "mongoose";
+import { UserRepository } from "../../user/repositories/user.repository";
 
 @injectable()
 export class CommentService {
 
     constructor(
         @inject(CommentRepository) private commentRepository: CommentRepository,
-        @inject(UserService) private userService: UserService,
+        @inject(UserRepository) private userRepository: UserRepository,
         @inject(PostRepository) private postRepository: PostRepository,
-    ) {
-    }
+    ) {}
 
-    async findById(id: string): Promise<Result<WithId<Comment> | null>> {
-        return this.commentRepository.findById(id);
+    async findById(id: string): Promise<Result<HydratedDocument<Comment> | null>> {
+        const comment = await this.commentRepository.findById(id);
+        if (!comment) {
+            return {
+                status: ResultStatus.NotFound_404,
+                errorMessage: 'NotFound',
+                data: null,
+                extensions: [{ field: 'Comment', message: 'Comment not exist' }]
+            };
+        }
+
+        return {
+            status: ResultStatus.Success,
+            data: comment,
+            extensions: []
+        };
     }
 
     async create(dto: CommentCreateDto): Promise<Result<string | null>> {
-        const postResult = await this.postRepository.findById(dto.postId);
 
-        if (postResult.status === ResultStatus.NotFound_404 || !postResult.data) {
+        const post = await this.postRepository.findById(dto.postId);
+        if (!post) {
             return {
                 status: ResultStatus.NotFound_404,
-                data: null,
                 errorMessage: 'NotFound',
-                extensions: [{ field: null, message: 'Comment not exist' }],
+                data: null,
+                extensions: [{ field: 'Post', message: 'Post not exist' }],
             }
         }
 
-        const user = await this.userService.findByIdOrFail(dto.userId);
+        const user = await this.userRepository.findById(dto.userId);
+        if (!user) {
+            return {
+                status: ResultStatus.NotFound_404,
+                errorMessage: 'NotFound',
+                data: null,
+                extensions: [{ field: 'User', message: 'User not exist' }],
+            }
+        }
 
-        const newComment: Comment = {
+        const newComment = new CommentModel({
             postId: dto.postId,
             content: dto.content,
             commentatorInfo: {
@@ -45,40 +67,53 @@ export class CommentService {
                 userLogin: user.login
             },
             createdAt: new Date().toISOString(),
-        }
+        });
 
-        return this.commentRepository.create(newComment);
+        const savedCommentId = await this.commentRepository.save(newComment);
+
+        return {
+            status: ResultStatus.Success,
+            data: savedCommentId,
+            extensions: []
+        };
     }
 
-    async update(dto: CommentUpdateDto): Promise<Result> {
+    async update(dto: CommentUpdateDto): Promise<Result<string | null>> {
 
-        const result = await this.findById(dto.commentId);
-
-        if (result.status === ResultStatus.NotFound_404 || !result.data) {
+        const comment = await this.commentRepository.findById(dto.commentId);
+        if (!comment) {
             return {
                 status: ResultStatus.NotFound_404,
-                data: null,
                 errorMessage: 'NotFound',
-                extensions: [{ field: null, message: 'Comment not exist' }],
+                data: null,
+                extensions: [{ field: 'Comment', message: 'Comment not exist' }],
             }
         }
 
-        if (result.data.commentatorInfo.userId !== dto.userId) {
+        if (comment.commentatorInfo.userId !== dto.userId) {
             return {
                 status: ResultStatus.Forbidden_403,
-                data: null,
                 errorMessage: 'Forbidden',
-                extensions: [{ field: null, message: 'You try to update someone else\'s comment' }],
+                data: null,
+                extensions: [{ field: 'Comment', message: 'You try to update someone else\'s comment' }],
             }
         }
 
-        return await this.commentRepository.update(dto);
+        comment.content = dto.content;
+
+        const savedCommentId = await this.commentRepository.save(comment);
+
+        return {
+            status: ResultStatus.Success,
+            data: savedCommentId,
+            extensions: []
+        };
     }
 
-    async delete(id: string, userId: string): Promise<Result<WithId<Comment> | null>> {
-        const commentResult = await this.findById(id);
+    async delete(id: string, userId: string): Promise<Result<boolean | null>> {
 
-        if (commentResult.status === ResultStatus.NotFound_404 || !commentResult.data) {
+        const comment = await this.commentRepository.findById(id);
+        if (!comment) {
             return {
                 status: ResultStatus.NotFound_404,
                 data: null,
@@ -87,7 +122,7 @@ export class CommentService {
             };
         }
 
-        if (commentResult.data.commentatorInfo.userId !== userId) {
+        if (comment.commentatorInfo.userId !== userId) {
             return {
                 status: ResultStatus.Forbidden_403,
                 data: null,
@@ -96,10 +131,23 @@ export class CommentService {
             }
         }
 
-        return await this.commentRepository.delete(id);
+        const isDeleted = await this.commentRepository.delete(id);
+
+        return {
+            status: ResultStatus.Success,
+            data: isDeleted,
+            extensions: []
+        };
     }
 
-    async deleteAllByPostId(postId: string): Promise<Result> {
-        return await this.commentRepository.deleteAllByPostId(postId);
-    }
+    // async deleteAllByPostId(postId: string): Promise<Result<boolean | null>> {
+    //
+    //     const isAllDeleted = await this.commentRepository.deleteAllByPostId(postId);
+    //
+    //     return {
+    //         status: ResultStatus.Success,
+    //         data: isAllDeleted,
+    //         extensions: []
+    //     };
+    // }
 }

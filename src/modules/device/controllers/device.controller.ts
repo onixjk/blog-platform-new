@@ -15,10 +15,8 @@ export class DeviceController {
     ) {}
 
     async getDeviceList(req: Request, res: Response) {
-        const userId = req.user?.id;
-        if (!userId) {
-            return res.sendStatus(HttpStatuses.Unauthorized_401);
-        }
+        const userId = req.user.id;
+        if (!userId) return res.sendStatus(HttpStatuses.Unauthorized_401);
 
         const devices = await this.deviceQueryRepository.findMany(userId);
 
@@ -26,16 +24,12 @@ export class DeviceController {
     }
 
     async deleteDevice(req: Request<{ deviceId: string }, {}, {}, {}>, res: Response) {
-        const userId = req.user?.id;
+        const userId = req.user.id;
         const deviceId = req.params.deviceId;
-
-        if (!userId || !deviceId) {
-            return res.sendStatus(HttpStatuses.Unauthorized_401);
-        }
+        if (!userId || !deviceId) return res.sendStatus(HttpStatuses.Unauthorized_401);
 
         const result = await this.deviceService.deleteSessionById(userId, deviceId);
-
-        if (result.status !== ResultStatus.NoContent_204) {
+        if (result.status !== ResultStatus.Success) {
             return res
                 .status(resultCodeToHttpException(result.status))
                 .send({ errorsMessages: result.extensions });
@@ -45,20 +39,12 @@ export class DeviceController {
     }
 
     async deleteDeviceList(req: Request, res: Response) {
-        const userId = req.user?.id;
+        const userId = req.user.id;
         const currentDeviceId = req.deviceId;
-
-        if (!userId || !currentDeviceId) {
-            return res.sendStatus(HttpStatuses.Unauthorized_401);
-        }
+        if (!userId || !currentDeviceId) return res.sendStatus(HttpStatuses.Unauthorized_401);
 
         const result = await this.deviceService.deleteOtherSessions(userId, currentDeviceId);
-
-        if (result.status !== ResultStatus.NoContent_204) {
-            return res
-                .status(resultCodeToHttpException(result.status))
-                .send({ errorsMessages: result.extensions });
-        }
+        if (!result) return res.sendStatus(HttpStatuses.BadRequest_400);
 
         return res.sendStatus(HttpStatuses.NoContent_204);
     }
