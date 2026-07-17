@@ -83,6 +83,33 @@ export class UserService {
             // };
         }
 
+        // // 1. Ищем отдельно по логину и отдельно по email
+        // const userByLogin = await this.userRepository.findByLoginOrEmail(dto.login);
+        // const userByEmail = await this.userRepository.findByLoginOrEmail(dto.email);
+        //
+        // // 2. Если нашли совпадение хотя бы в одном месте
+        // if (userByLogin || userByEmail) {
+        //     const extensions: Array<{ field: string; message: string }> = [];
+        //
+        //     // Проверяем конкретно: если нашелся юзер с таким логином
+        //     if (userByLogin) {
+        //         extensions.push({ field: 'login', message: 'Login already exists' });
+        //     }
+        //     // Проверяем конкретно: если нашелся юзер с таким email
+        //     if (userByEmail) {
+        //         extensions.push({ field: 'email', message: 'Email already exists' });
+        //     }
+        //
+        //     return {
+        //         status: ResultStatus.BadRequest_400,
+        //         errorMessage: 'BadRequest',
+        //         data: null,
+        //         extensions: extensions,
+        //     };
+        // }
+        //
+
+
         const passwordHash = await this.bcryptService.generateHash(dto.password);
 
         const newUser = new UserModel({
@@ -122,10 +149,10 @@ export class UserService {
         const isUpdated = await this.userRepository.updateEmailConfirmationStatus(code);
         if (!isUpdated) {
             return {
-                status: ResultStatus.NotFound_404,
-                errorMessage: 'NotFound',
+                status: ResultStatus.BadRequest_400,
+                errorMessage: 'Bad Request',
                 data: null,
-                extensions: [{ field: 'User', message: 'User not exist' }],
+                extensions: [{ field: 'code', message: 'Confirmation code is invalid, expired or already confirmed' }],
             };
         }
 
