@@ -100,12 +100,20 @@ export class AuthService {
 
         const createdUserId = await this.userService.create({ login, password, email })
         if (createdUserId.status !== ResultStatus.Success || !createdUserId.data) {
+
             return {
-                status: createdUserId.status,
-                errorMessage: createdUserId.errorMessage,
+                status: ResultStatus.BadRequest_400,
+                errorMessage: 'Conflict',
                 data: null,
-                extensions: createdUserId.extensions,
+                extensions: [{ message: 'Email already exists', field: 'email' }],
             };
+
+            // return {
+            //     status: createdUserId.status,
+            //     errorMessage: createdUserId.errorMessage,
+            //     data: null,
+            //     extensions: createdUserId.extensions,
+            // };
         }
 
         const newUser = await this.userRepository.findById(createdUserId.data)
