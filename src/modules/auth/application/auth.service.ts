@@ -118,23 +118,23 @@ export class AuthService {
             };
         }
 
-        // try {
-        //     await this.nodemailerService.sendEmail(
-        //         newUser.email,
-        //         newUser.emailConfirmation.confirmationCode,
-        //         this.emailExamples.registrationEmail
-        //     );
-        // } catch (e) {
-        //     console.error('error in send email:', e);
-        // }
-
-        await this.nodemailerService //todo
-            .sendEmail(
+        try {
+            await this.nodemailerService.sendEmail(
                 newUser.email,
                 newUser.emailConfirmation.confirmationCode,
                 this.emailExamples.registrationEmail
-            )
-            .catch(er => console.error('error in send email:', er));
+            );
+        } catch (e) {
+            console.error('error in send email:', e);
+        }
+
+        // await this.nodemailerService //todo
+        //     .sendEmail(
+        //         newUser.email,
+        //         newUser.emailConfirmation.confirmationCode,
+        //         this.emailExamples.registrationEmail
+        //     )
+        //     .catch(er => console.error('error in send email:', er));
 
         return {
             status: ResultStatus.Success,
