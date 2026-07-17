@@ -90,13 +90,23 @@ export class PostService {
             };
         }
 
-        post.title = dto.title;
-        post.shortDescription = dto.shortDescription;
-        post.content = dto.content;
-        post.blogId = dto.blogId;
-        post.blogName = blog.name;
+        post.set({
+            title: dto.title,
+            shortDescription: dto.shortDescription,
+            content: dto.content,
+            blogId: dto.blogId,
+            blogName: blog.name,
+        })
 
         const savedPostId = await this.postRepository.save(post);
+        if (!savedPostId) {
+            return {
+                status: ResultStatus.BadRequest_400,
+                errorMessage: 'BadRequest',
+                data: null,
+                extensions: [{ field: 'Post', message: 'Post update failed' }]
+            };
+        }
 
         return {
             status: ResultStatus.Success,
