@@ -82,13 +82,11 @@ import { ApiRequestsModel } from "../../../db/mongo.db";
 
 export const rateLimitGuard = async (req: Request, res: Response, next: NextFunction) => {
     try {
-        // ✅ ИСПРАВЛЕНО: Безопасное извлечение первого IP из списка прокси
         let clientIp = (req.headers['x-forwarded-for'] as string) || req.ip || 'unknown';
         if (clientIp && clientIp.includes(',')) {
-            clientIp = clientIp.split(',')[0].trim(); // Берем [0] элемент, затем вызываем .trim()
+            clientIp = clientIp.split(',')[0].trim();
         }
 
-        // ✅ Нормализуем URL
         let currentUrl = req.originalUrl || req.url;
         if (currentUrl && currentUrl.length > 1 && currentUrl.endsWith('/')) {
             currentUrl = currentUrl.slice(0, -1);
@@ -120,7 +118,6 @@ export const rateLimitGuard = async (req: Request, res: Response, next: NextFunc
 
     } catch (error) {
         console.error("Error in rateLimitGuard:", error);
-        // В случае непредвиденной ошибки не вешаем сервер, а пропускаем запрос или отдаем 500
         return res.sendStatus(500);
     }
 };
