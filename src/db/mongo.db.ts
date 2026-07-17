@@ -70,7 +70,7 @@
 // }
 
 import mongoose, { Schema } from 'mongoose';
-import { SETTINGS } from '../core/settings/settings'; // Проверьте путь до settings
+import { SETTINGS } from '../core/settings/settings';
 import { Blog } from "../modules/blog/types/blog";
 import { Post } from "../modules/post/types/post";
 import { IUserDB } from "../modules/user/types/user.db.interface";
