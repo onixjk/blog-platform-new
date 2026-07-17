@@ -169,12 +169,24 @@ export class AuthService {
 
         await this.userRepository.updateEmailConfirmationCode(email, confirmationCode, expirationDate);
 
-        this.nodemailerService.sendEmail(
-            email,
-            confirmationCode,
-            this.emailExamples.registrationEmail
-        )
-            .catch(e => console.error('error in send email:', e));
+        try {
+            await this.nodemailerService.sendEmail(
+                email,
+                confirmationCode,
+                this.emailExamples.registrationEmail
+            );
+        } catch (e) {
+            console.error('error in send email:', e);
+            // Не валим выполнение, но даем тестам дождаться завершения операции
+        }
+
+            //todo
+        // this.nodemailerService.sendEmail(
+        //     email,
+        //     confirmationCode,
+        //     this.emailExamples.registrationEmail
+        // )
+        //     .catch(e => console.error('error in send email:', e));
 
 
         return {
