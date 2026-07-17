@@ -118,23 +118,23 @@ export class AuthService {
             };
         }
 
-        try {
-            await this.nodemailerService.sendEmail(
-                newUser.email,
-                newUser.emailConfirmation.confirmationCode,
-                this.emailExamples.registrationEmail
-            );
-        } catch (e) {
-            console.error('error in send email:', e);
-        }
-
-        // await this.nodemailerService //todo
-        //     .sendEmail(
+        // try {
+        //     await this.nodemailerService.sendEmail(
         //         newUser.email,
         //         newUser.emailConfirmation.confirmationCode,
         //         this.emailExamples.registrationEmail
-        //     )
-        //     .catch(er => console.error('error in send email:', er));
+        //     );
+        // } catch (e) {
+        //     console.error('error in send email:', e);
+        // }
+
+        await this.nodemailerService //todo
+            .sendEmail(
+                newUser.email,
+                newUser.emailConfirmation.confirmationCode,
+                this.emailExamples.registrationEmail
+            )
+            .catch(er => console.error('error in send email:', er));
 
         return {
             status: ResultStatus.Success,
@@ -169,24 +169,24 @@ export class AuthService {
 
         await this.userRepository.updateEmailConfirmationCode(email, confirmationCode, expirationDate);
 
-        try {
-            await this.nodemailerService.sendEmail(
-                email,
-                confirmationCode,
-                this.emailExamples.registrationEmail
-            );
-        } catch (e) {
-            console.error('error in send email:', e);
-            // Не валим выполнение, но даем тестам дождаться завершения операции
-        }
+        // try {
+        //     await this.nodemailerService.sendEmail(
+        //         email,
+        //         confirmationCode,
+        //         this.emailExamples.registrationEmail
+        //     );
+        // } catch (e) {
+        //     console.error('error in send email:', e);
+        //     // Не валим выполнение, но даем тестам дождаться завершения операции
+        // }
 
             //todo
-        // this.nodemailerService.sendEmail(
-        //     email,
-        //     confirmationCode,
-        //     this.emailExamples.registrationEmail
-        // )
-        //     .catch(e => console.error('error in send email:', e));
+        this.nodemailerService.sendEmail(
+            email,
+            confirmationCode,
+            this.emailExamples.registrationEmail
+        )
+            .catch(e => console.error('error in send email:', e));
 
 
         return {
