@@ -99,14 +99,6 @@ export class PostService {
         })
 
         const savedPostId = await this.postRepository.save(post);
-        if (!savedPostId) {
-            return {
-                status: ResultStatus.BadRequest_400,
-                errorMessage: 'BadRequest',
-                data: null,
-                extensions: [{ field: 'Post', message: 'Post update failed' }]
-            };
-        }
 
         return {
             status: ResultStatus.Success,

@@ -99,7 +99,9 @@ export class CommentService {
             }
         }
 
-        comment.content = dto.content;
+        comment.set({
+            content: dto.content,
+        });
 
         const savedCommentId = await this.commentRepository.save(comment);
 
