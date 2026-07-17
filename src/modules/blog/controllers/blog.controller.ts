@@ -24,59 +24,6 @@ export class BlogController {
         @inject(PostQueryRepository) private postQueryRepository: PostQueryRepository,
     ) {}
 
-    async createBlog(req: Request<{}, {}, BlogInputDto>, res: Response) {
-
-        const createdBlogId = await this.blogService.create(req.body);
-        if (createdBlogId.status !== ResultStatus.Success || !createdBlogId.data) {
-            return res
-                .status(resultCodeToHttpException(createdBlogId.status))
-                .send({ errorsMessages: createdBlogId.extensions });
-        }
-
-        const blogOutput = await this.blogQueryRepository.findById(createdBlogId.data);
-        if (!blogOutput) return res.sendStatus(HttpStatuses.BadRequest_400);
-
-        res.status(HttpStatuses.Created_201).send(blogOutput);
-    }
-
-    async createBlogPost(req: Request<{ blogId: string }, {}, BlogPostInputDto>, res: Response) {
-
-        const { blogId } = req.params;
-        if (!blogId) return res.sendStatus(HttpStatuses.NotFound_404);
-
-        const blog = await this.blogQueryRepository.findById(blogId);
-        if (!blog) return res.sendStatus(HttpStatuses.NotFound_404);
-
-        const postData = { ...req.body, blogId };
-
-        const createdPostId = await this.postService.create(postData);
-        if (createdPostId.status !== ResultStatus.Success || !createdPostId.data) {
-            return res
-                .status(resultCodeToHttpException(createdPostId.status))
-                .send({ errorsMessages: createdPostId.extensions });
-        }
-
-        const postOutput = await this.postQueryRepository.findById(createdPostId.data);
-        if (!postOutput) return res.sendStatus(HttpStatuses.BadRequest_400);
-
-        res.status(HttpStatuses.Created_201).send(postOutput);
-    }
-
-    async deleteBlog(req: Request<{ id: string }>, res: Response) {
-
-        const id = req.params.id;
-        if (!id) return res.sendStatus(HttpStatuses.NotFound_404);
-
-        const result = await this.blogService.delete(id);
-        if (result.status !== ResultStatus.Success || !result.data) {
-            return res
-                .status(resultCodeToHttpException(result.status))
-                .send({ errorsMessages: result.extensions });
-        }
-
-        res.sendStatus(HttpStatuses.NoContent_204);
-    }
-
     async getBlog(req: Request<{ id: string }>, res: Response) {
 
         const id = req.params.id;
@@ -123,6 +70,44 @@ export class BlogController {
         res.status(HttpStatuses.Ok_200).send(postListOutput);
     }
 
+    async createBlog(req: Request<{}, {}, BlogInputDto>, res: Response) {
+
+        const createdBlogId = await this.blogService.create(req.body);
+        if (createdBlogId.status !== ResultStatus.Success || !createdBlogId.data) {
+            return res
+                .status(resultCodeToHttpException(createdBlogId.status))
+                .send({ errorsMessages: createdBlogId.extensions });
+        }
+
+        const blogOutput = await this.blogQueryRepository.findById(createdBlogId.data);
+        if (!blogOutput) return res.sendStatus(HttpStatuses.BadRequest_400);
+
+        res.status(HttpStatuses.Created_201).send(blogOutput);
+    }
+
+    async createBlogPost(req: Request<{ blogId: string }, {}, BlogPostInputDto>, res: Response) {
+
+        const { blogId } = req.params;
+        if (!blogId) return res.sendStatus(HttpStatuses.NotFound_404);
+
+        const blog = await this.blogQueryRepository.findById(blogId);
+        if (!blog) return res.sendStatus(HttpStatuses.NotFound_404);
+
+        const postData = { ...req.body, blogId };
+
+        const createdPostId = await this.postService.create(postData);
+        if (createdPostId.status !== ResultStatus.Success || !createdPostId.data) {
+            return res
+                .status(resultCodeToHttpException(createdPostId.status))
+                .send({ errorsMessages: createdPostId.extensions });
+        }
+
+        const postOutput = await this.postQueryRepository.findById(createdPostId.data);
+        if (!postOutput) return res.sendStatus(HttpStatuses.BadRequest_400);
+
+        res.status(HttpStatuses.Created_201).send(postOutput);
+    }
+
     async updateBlog(req: Request<{ id: string }, {}, BlogInputDto>, res: Response) {
 
         const id = req.params.id;
@@ -136,5 +121,20 @@ export class BlogController {
         }
 
         res.sendStatus(HttpStatuses.NoContent_204)
+    }
+
+    async deleteBlog(req: Request<{ id: string }>, res: Response) {
+
+        const id = req.params.id;
+        if (!id) return res.sendStatus(HttpStatuses.NotFound_404);
+
+        const result = await this.blogService.delete(id);
+        if (result.status !== ResultStatus.Success || !result.data) {
+            return res
+                .status(resultCodeToHttpException(result.status))
+                .send({ errorsMessages: result.extensions });
+        }
+
+        res.sendStatus(HttpStatuses.NoContent_204);
     }
 }

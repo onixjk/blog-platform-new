@@ -74,9 +74,11 @@ export class BlogService {
             };
         }
 
-        blog.name = dto.name;
-        blog.description = dto.description;
-        blog.websiteUrl = dto.websiteUrl;
+        blog.set({
+            name: dto.name,
+            description: dto.description,
+            websiteUrl: dto.websiteUrl
+        });
 
         const savedBlogId = await this.blogRepository.save(blog);
         if (!savedBlogId) {
