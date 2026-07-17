@@ -69,11 +69,18 @@ export class UserService {
             }
 
             return {
-                status: ResultStatus.Conflict_409,
-                errorMessage: 'Conflict',
+                status: ResultStatus.BadRequest_400,
+                errorMessage: 'BadRequest',
                 data: null,
                 extensions: extensions,
             };
+
+            // return {
+            //     status: ResultStatus.Conflict_409,
+            //     errorMessage: 'Conflict',
+            //     data: null,
+            //     extensions: extensions,
+            // };
         }
 
         const passwordHash = await this.bcryptService.generateHash(dto.password);

@@ -3,9 +3,7 @@ import {FieldValidationError, ValidationError, validationResult} from "express-v
 import {NextFunction, Request, Response} from "express";
 import {HttpStatuses} from "../../types/http-statuses";
 
-export const createErrorMessages = (
-    errors: ValidationErrorType[],
-) => {
+export const createErrorMessages = (errors: ValidationErrorType[]) => {
     return {
         errorsMessages: errors.map((error) => ({
             message: error.detail,
