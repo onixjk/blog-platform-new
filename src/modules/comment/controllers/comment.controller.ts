@@ -49,14 +49,14 @@ export class CommentController {
         return res.sendStatus(HttpStatuses.NoContent_204)
     }
 
-    async updateLikeStatus(req: Request<{ commentId: string }, {}, LikeStatus>, res: Response) {
+    async updateLikeStatus(req: Request<{ commentId: string }, {}, { likeStatus: LikeStatus }>, res: Response) {
 
         const commentId = req.params.commentId;
         if (!commentId) return res.sendStatus(HttpStatuses.NotFound_404);
 
         const userId = req.user.id!;
 
-        const likeStatus = req.body
+        const likeStatus = req.body.likeStatus;
         if (!likeStatus) return res.sendStatus(HttpStatuses.BadRequest_400);
 
         const commentData = { commentId, userId, likeStatus }
