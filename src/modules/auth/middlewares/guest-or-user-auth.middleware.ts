@@ -6,9 +6,18 @@ const jwtService = container.get(JwtService);
 
 export const guestOrUserAuthMiddleware = async (req: Request, res: Response, next: NextFunction) => {
 
-    req.user = { id: null };
+    // req.user = { id: null };
+    //
+    // if (!req.headers.authorization) return next();
 
-    if (!req.headers.authorization) return next();
+    if (!req.user) {
+        req.user = { id: null };
+    }
+
+    if (!req.headers.authorization) {
+        req.user.id = null;
+        return next();
+    }
 
     const [authType, token] = req.headers.authorization.split(' ');
 
