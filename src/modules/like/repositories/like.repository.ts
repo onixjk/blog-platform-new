@@ -16,7 +16,7 @@ export class LikeRepository {
 
     async save(dto: Like): Promise<string> {
 
-        const savedComment = await LikeModel.findOneAndUpdate(
+        const savedLike = await LikeModel.findOneAndUpdate(
             {
                 commentId: dto.commentId,
                 userId: dto.userId
@@ -27,11 +27,12 @@ export class LikeRepository {
             },
             {
                 upsert: true,
-                returnDocument: 'after'
+                returnDocument: 'after',
+                new: true,
             }
         );
 
-        return savedComment.id;
+        return savedLike.id;
     }
 
     async delete(commentId: string): Promise<boolean> {

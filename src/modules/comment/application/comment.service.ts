@@ -156,8 +156,8 @@ export class CommentService {
         if (newStatus === LikeStatus.Like) likesModifier++;
         if (newStatus === LikeStatus.Dislike) dislikesModifier++;
 
-        comment.likesInfo.likesCount = comment.likesInfo.likesCount + likesModifier;
-        comment.likesInfo.dislikesCount = comment.likesInfo.dislikesCount + dislikesModifier;
+        comment.likesInfo.likesCount = Math.max(0, comment.likesInfo.likesCount + likesModifier);
+        comment.likesInfo.dislikesCount = Math.max(0, comment.likesInfo.dislikesCount + dislikesModifier);
 
         await this.likeService.update({
             commentId: dto.commentId,
