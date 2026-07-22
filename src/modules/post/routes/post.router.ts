@@ -1,5 +1,4 @@
 import { Router } from 'express';
-import { superAdminGuardMiddleware } from "../../auth/middlewares/super-admin.guard-middleware";
 import { idValidation, postIdValidation } from "../../../core/middlewares/validation/params-id.validation-middleware";
 import {
     paginationAndSortingValidation
@@ -14,6 +13,8 @@ import { accessTokenGuard } from "../../auth/middlewares/access-token.guard";
 import { commentInputValidation } from "../../comment/middlewares/comment.input-dto.validation-middlewares";
 import { container } from "../../../composition-root";
 import { PostController } from "../controllers/post.controller";
+import { superAdminGuardMiddleware } from "../../auth/middlewares/super-admin.guard";
+import { guestOrUserAuthMiddleware } from "../../auth/middlewares/guest-or-user-auth.middleware";
 
 export const postRouter = Router({});
 
@@ -24,6 +25,7 @@ postRouter
     .get('',
         paginationAndSortingValidation(PostSortField),
         inputValidationResultMiddleware,
+        guestOrUserAuthMiddleware,
         postController.getPostList.bind(postController)
     )
 

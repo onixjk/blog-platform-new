@@ -3,9 +3,9 @@ import { deviceIdValidation } from "../../../core/middlewares/validation/params-
 import {
     inputValidationResultMiddleware
 } from "../../../core/middlewares/validation/input-validation-result.middleware";
-import { refreshTokenGuard } from "../../auth/middlewares/refreshTokenGuard";
 import { container } from "../../../composition-root";
 import { DeviceController } from "../controllers/device.controller";
+import { refreshTokenGuard } from "../../auth/middlewares/refresh-token.guard";
 
 export const deviceRouter = Router({});
 

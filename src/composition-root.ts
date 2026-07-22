@@ -27,6 +27,8 @@ import { CommentController } from "./modules/comment/controllers/comment.control
 import { DeviceController } from "./modules/device/controllers/device.controller";
 import { PostController } from "./modules/post/controllers/post.controller";
 import { UserController } from "./modules/user/controllers/user.controller";
+import { LikeService } from "./modules/like/application/like.service";
+import { LikeRepository } from "./modules/like/repositories/like.repository";
 
 
 export const container = new Container();
@@ -51,6 +53,9 @@ container.bind(DeviceService).toSelf().inSingletonScope;
 container.bind(CommentQueryRepository).toSelf().inSingletonScope;
 container.bind(CommentRepository).toSelf().inSingletonScope;
 container.bind(CommentService).toSelf().inSingletonScope;
+
+container.bind(LikeService).toSelf().inSingletonScope;
+container.bind(LikeRepository).toSelf().inSingletonScope;
 
 container.bind(BlogQueryRepository).toSelf().inSingletonScope;
 container.bind(BlogRepository).toSelf().inSingletonScope;

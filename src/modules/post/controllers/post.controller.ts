@@ -49,9 +49,12 @@ export class PostController {
         });
         const queryInput = setDefaultSortAndPaginationIfNotExist(sanitizedQuery);
 
+        const userId = req.user?.id;
+
         const commentListOutput = await this.commentQueryRepository.findCommentByPost(
             queryInput,
             postId,
+            userId,
         );
 
         res.status(HttpStatuses.Ok_200).send(commentListOutput);

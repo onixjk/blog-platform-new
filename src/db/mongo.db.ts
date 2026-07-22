@@ -77,6 +77,7 @@ import { IUserDB } from "../modules/user/types/user.db.interface";
 import { Comment } from "../modules/comment/types/comment";
 import { Session } from "../modules/auth/types/session";
 import { ApiRequestLog } from "../modules/auth/types/api-request-log";
+import { Like } from "../modules/like/types/like";
 
 const ApiRequestSchema = new Schema<ApiRequestLog>({
     date: { type: Date, required: true, expires: 10 }
@@ -90,11 +91,13 @@ const BlogSchema = new Schema<Blog>({}, { strict: false });
 const PostSchema = new Schema<Post>({}, { strict: false });
 const UserSchema = new Schema<IUserDB>({}, { strict: false });
 const CommentSchema = new Schema<Comment>({}, { strict: false });
+const LikesSchema = new Schema<Like>({}, { strict: false });
 
 export let BlogModel = mongoose.model<Blog>('blogs', BlogSchema);
 export let PostModel = mongoose.model<Post>('posts', PostSchema);
 export let UserModel = mongoose.model<IUserDB>('users', UserSchema);
 export let CommentModel = mongoose.model<Comment>('comments', CommentSchema);
+export let LikeModel = mongoose.model<Like>('likes', LikesSchema);
 export let SessionModel = mongoose.model<Session>('sessions', SessionSchema);
 export let ApiRequestsModel = mongoose.model<ApiRequestLog>('apiRequests', ApiRequestSchema);
 

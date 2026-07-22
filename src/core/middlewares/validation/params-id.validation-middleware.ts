@@ -29,5 +29,13 @@ export const deviceIdValidation = param('deviceId')
     .withMessage('ID is required')
     .isString()
     .withMessage('ID must be a string')
-    // .isUUID()
-    // .withMessage('Invalid format ObjectId');
+    .isMongoId()
+    .withMessage('Invalid format ObjectId');
+
+export const commentIdValidation = param('commentId')
+    .exists()
+    .withMessage('ID is required')
+    .isString()
+    .withMessage('ID must be a string')
+    .isMongoId()
+    .withMessage('Invalid format ObjectId');

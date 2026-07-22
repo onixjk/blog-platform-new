@@ -1,3 +1,5 @@
+import { LikesInfo } from "../../../like/types/likes-info";
+
 export type CommentOutput = {
     id: string,
     content: string,
@@ -6,4 +8,5 @@ export type CommentOutput = {
         userLogin: string,
     }
     createdAt: string,
+    likesInfo: LikesInfo,
 }

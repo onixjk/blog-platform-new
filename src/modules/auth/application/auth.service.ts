@@ -118,16 +118,6 @@ export class AuthService {
             };
         }
 
-        // try {
-        //     await this.nodemailerService.sendEmail(
-        //         newUser.email,
-        //         newUser.emailConfirmation.confirmationCode,
-        //         this.emailExamples.registrationEmail
-        //     );
-        // } catch (e) {
-        //     console.error('error in send email:', e);
-        // }
-
         await this.nodemailerService //todo
             .sendEmail(
                 newUser.email,
@@ -168,17 +158,6 @@ export class AuthService {
         const expirationDate = new Date(Date.now() + 60 * 60 * 1000).toISOString();
 
         await this.userRepository.updateEmailConfirmationCode(email, confirmationCode, expirationDate);
-
-        // try {
-        //     await this.nodemailerService.sendEmail(
-        //         email,
-        //         confirmationCode,
-        //         this.emailExamples.registrationEmail
-        //     );
-        // } catch (e) {
-        //     console.error('error in send email:', e);
-        //     // Не валим выполнение, но даем тестам дождаться завершения операции
-        // }
 
             //todo
         this.nodemailerService.sendEmail(

@@ -1,6 +1,5 @@
 import { Router } from 'express';
 import { blogIdValidation, idValidation, } from "../../../core/middlewares/validation/params-id.validation-middleware";
-import { superAdminGuardMiddleware } from "../../auth/middlewares/super-admin.guard-middleware";
 import {
     paginationAndSortingValidation
 } from "../../../core/middlewares/validation/query-pagination-sorting.validation-middleware";
@@ -13,6 +12,7 @@ import {
 } from "../../../core/middlewares/validation/input-validation-result.middleware";
 import { container } from "../../../composition-root";
 import { BlogController } from "../controllers/blog.controller";
+import { superAdminGuardMiddleware } from "../../auth/middlewares/super-admin.guard";
 
 export const blogRouter = Router({});
 

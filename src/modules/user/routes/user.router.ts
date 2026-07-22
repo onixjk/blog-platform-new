@@ -1,5 +1,4 @@
 import { Router } from 'express';
-import { superAdminGuardMiddleware } from "../../auth/middlewares/super-admin.guard-middleware";
 import {
     paginationAndSortingValidation
 } from "../../../core/middlewares/validation/query-pagination-sorting.validation-middleware";
@@ -11,6 +10,7 @@ import { userInputValidation } from "../middlewares/user.input-dto.validation-mi
 import { idValidation } from "../../../core/middlewares/validation/params-id.validation-middleware";
 import { container } from "../../../composition-root";
 import { UserController } from "../controllers/user.controller";
+import { superAdminGuardMiddleware } from "../../auth/middlewares/super-admin.guard";
 
 export const userRouter = Router({});
 

@@ -9,6 +9,10 @@ import { PostRepository } from "../../post/repositories/post.repository";
 import { CommentModel } from "../../../db/mongo.db";
 import { HydratedDocument } from "mongoose";
 import { UserRepository } from "../../user/repositories/user.repository";
+import { LikeStatus } from "../../like/types/like-status";
+import { LikeStatusInputDto } from "../../like/types/input/like-status-input.dto";
+import { LikeService } from "../../like/application/like.service";
+import { LikeRepository } from "../../like/repositories/like.repository";
 
 @injectable()
 export class CommentService {
@@ -17,6 +21,8 @@ export class CommentService {
         @inject(CommentRepository) private commentRepository: CommentRepository,
         @inject(UserRepository) private userRepository: UserRepository,
         @inject(PostRepository) private postRepository: PostRepository,
+        @inject(LikeRepository) private likeRepository: LikeRepository,
+        @inject(LikeService) private likeService: LikeService,
     ) {}
 
     async findById(id: string): Promise<Result<HydratedDocument<Comment> | null>> {
@@ -67,6 +73,11 @@ export class CommentService {
                 userLogin: user.login
             },
             createdAt: new Date().toISOString(),
+            likesInfo: {
+                likesCount: 0,
+                dislikesCount: 0,
+                myStatus: LikeStatus.None,
+            }
         });
 
         const savedCommentId = await this.commentRepository.save(newComment);
@@ -112,6 +123,57 @@ export class CommentService {
         };
     }
 
+    async updateLikeCountAndStatus(dto: LikeStatusInputDto): Promise<Result<string | null>> {
+
+        const comment = await this.commentRepository.findById(dto.commentId);
+        if (!comment) {
+            return {
+                status: ResultStatus.NotFound_404,
+                errorMessage: 'NotFound',
+                data: null,
+                extensions: [{ field: 'Comment', message: 'Comment not exist' }],
+            }
+        }
+
+        const like = await this.likeRepository.findByCommentIdAndUserId(dto.commentId, dto.userId);
+        const oldStatus = like ? like.status : LikeStatus.None;
+        const newStatus = dto.likeStatus;
+
+        if (oldStatus === newStatus) {
+            return {
+                status: ResultStatus.Success,
+                data: comment.id,
+                extensions: []
+            };
+        }
+
+        let likesModifier = 0;
+        let dislikesModifier = 0;
+
+        if (oldStatus === LikeStatus.Like) likesModifier--;
+        if (oldStatus === LikeStatus.Dislike) dislikesModifier--;
+
+        if (newStatus === LikeStatus.Like) likesModifier++;
+        if (newStatus === LikeStatus.Dislike) dislikesModifier++;
+
+        comment.likesInfo.likesCount = comment.likesInfo.likesCount + likesModifier;
+        comment.likesInfo.dislikesCount = comment.likesInfo.dislikesCount + dislikesModifier;
+
+        await this.likeService.update({
+            commentId: dto.commentId,
+            userId: dto.userId,
+            status: newStatus
+        });
+
+        const savedCommentId = await this.commentRepository.save(comment);
+
+        return {
+            status: ResultStatus.Success,
+            data: savedCommentId,
+            extensions: []
+        };
+    }
+
     async delete(id: string, userId: string): Promise<Result<boolean | null>> {
 
         const comment = await this.commentRepository.findById(id);
@@ -141,15 +203,4 @@ export class CommentService {
             extensions: []
         };
     }
-
-    // async deleteAllByPostId(postId: string): Promise<Result<boolean | null>> {
-    //
-    //     const isAllDeleted = await this.commentRepository.deleteAllByPostId(postId);
-    //
-    //     return {
-    //         status: ResultStatus.Success,
-    //         data: isAllDeleted,
-    //         extensions: []
-    //     };
-    // }
 }

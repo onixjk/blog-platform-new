@@ -9,13 +9,13 @@ import {
     userInputValidation,
 } from "../../user/middlewares/user.input-dto.validation-middlewares";
 import { accessTokenGuard } from "../middlewares/access-token.guard";
-import { confirmationCodeInputValidation } from "../middlewares/confirmation-code.input-dto.validation-middleware";
-import { emailInputValidation } from "../middlewares/email-resending.input-dto.validation-middleware";
-import { refreshTokenGuard } from "../middlewares/refreshTokenGuard";
 import useragent from "express-useragent";
 import { rateLimitGuard } from "../middlewares/rate-limit.guard";
 import { container } from "../../../composition-root";
 import { AuthController } from "../controllers/auth.controller";
+import { confirmationCodeInputValidation } from "../middlewares/confirmation-code.input-dto.validation";
+import { emailInputValidation } from "../middlewares/email-resending.input-dto.validation";
+import { refreshTokenGuard } from "../middlewares/refresh-token.guard";
 
 export const authRouter = Router({});
 

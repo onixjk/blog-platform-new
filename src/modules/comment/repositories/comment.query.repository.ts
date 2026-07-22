@@ -4,21 +4,33 @@ import { CommentListPaginatedOutput } from "../types/output/comment-list-paginat
 import { CommentOutput } from "../types/output/comment-output";
 import { mapToCommentOutput } from "../routes/mapers/map-to-comment-output.util";
 import { injectable } from "inversify";
-import { CommentModel } from "../../../db/mongo.db";
+import { CommentModel, LikeModel } from "../../../db/mongo.db";
+import { LikeStatus } from "../../like/types/like-status";
 
 @injectable()
 export class CommentQueryRepository {
 
-    async findById(id: string): Promise<CommentOutput | null> {
+    async findById(id: string, userId?: string | null): Promise<CommentOutput | null> {
 
         const comment = await CommentModel.findById(id).lean();
 
-        return comment ? mapToCommentOutput(comment) : null;
+        let myStatus = LikeStatus.None;
+
+        if (userId) {
+            const likeDoc = await LikeModel.findOne({ commentId: id, userId }).lean();
+
+            if (likeDoc) {
+                myStatus = likeDoc.status;
+            }
+        }
+
+        return comment ? mapToCommentOutput(comment, myStatus) : null;
     }
 
     async findCommentByPost(
         queryDto: CommentQueryInput,
         postId: string,
+        userId?: string | null,
     ): Promise<CommentListPaginatedOutput> {
         const { pageNumber, pageSize, sortBy, sortDirection } = queryDto;
         const skip = (pageNumber - 1) * pageSize;
@@ -35,7 +47,17 @@ export class CommentQueryRepository {
                 .countDocuments(filter)
         ]);
 
-        return mapToCommentListPaginatedOutput(items, {
+        const itemsWithCorrectStatus = await Promise.all(items.map(async (item) => {
+            let myStatus = LikeStatus.None;
+            if (userId) {
+                const likeDoc = await LikeModel.findOne({ commentId: item._id.toString(), userId }).lean();
+                if (likeDoc) myStatus = likeDoc.status;
+            }
+
+            return mapToCommentOutput(item, myStatus);
+        }));
+
+        return mapToCommentListPaginatedOutput(itemsWithCorrectStatus, {
             pageNumber,
             pageSize,
             totalCount,

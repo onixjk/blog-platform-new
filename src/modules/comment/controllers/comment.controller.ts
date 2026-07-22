@@ -6,6 +6,7 @@ import { CommentService } from "../application/comment.service";
 import { CommentQueryRepository } from "../repositories/comment.query.repository";
 import { CommentInputDto } from "../types/input/comment-input.dto";
 import { HttpStatuses } from "../../../core/types/http-statuses";
+import { LikeStatus } from "../../like/types/like-status";
 
 @injectable()
 export class CommentController {
@@ -20,7 +21,9 @@ export class CommentController {
         const id = req.params.id;
         if (!id) return res.sendStatus(HttpStatuses.NotFound_404);
 
-        const commentOutput = await this.commentQueryRepository.findById(id)
+        const userId = req.user?.id;
+
+        const commentOutput = await this.commentQueryRepository.findById(id, userId);
         if (!commentOutput) return res.sendStatus(HttpStatuses.NotFound_404);
 
         res.status(HttpStatuses.Ok_200).send(commentOutput);
@@ -36,6 +39,29 @@ export class CommentController {
         const commentData = { commentId, userId, ...req.body }
 
         const result = await this.commentService.update(commentData);
+
+        if (result.status !== ResultStatus.Success) {
+            return res
+                .status(resultCodeToHttpException(result.status))
+                .send({ errorsMessages: result.extensions });
+        }
+
+        return res.sendStatus(HttpStatuses.NoContent_204)
+    }
+
+    async updateLikeStatus(req: Request<{ id: string }, {}, LikeStatus>, res: Response) {
+
+        const commentId = req.params.id;
+        if (!commentId) return res.sendStatus(HttpStatuses.NotFound_404);
+
+        const userId = req.user.id!;
+
+        const likeStatus = req.body
+        if (!likeStatus) return res.sendStatus(HttpStatuses.BadRequest_400);
+
+        const commentData = { commentId, userId, likeStatus }
+
+        const result = await this.commentService.updateLikeCountAndStatus(commentData);
 
         if (result.status !== ResultStatus.Success) {
             return res
