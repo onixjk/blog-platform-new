@@ -16,9 +16,9 @@ export class CommentController {
         @inject(CommentService) private commentService: CommentService,
     ) {}
 
-    async getComment(req: Request<{ id: string }>, res: Response) {
+    async getComment(req: Request<{ commentId: string }>, res: Response) {
 
-        const id = req.params.id;
+        const id = req.params.commentId;
         if (!id) return res.sendStatus(HttpStatuses.NotFound_404);
 
         const userId = req.user?.id;
@@ -49,9 +49,9 @@ export class CommentController {
         return res.sendStatus(HttpStatuses.NoContent_204)
     }
 
-    async updateLikeStatus(req: Request<{ id: string }, {}, LikeStatus>, res: Response) {
+    async updateLikeStatus(req: Request<{ commentId: string }, {}, LikeStatus>, res: Response) {
 
-        const commentId = req.params.id;
+        const commentId = req.params.commentId;
         if (!commentId) return res.sendStatus(HttpStatuses.NotFound_404);
 
         const userId = req.user.id!;
