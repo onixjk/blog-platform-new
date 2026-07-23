@@ -157,9 +157,6 @@ export class CommentService {
         if (newStatus === LikeStatus.Like) likesModifier++;
         if (newStatus === LikeStatus.Dislike) dislikesModifier++;
 
-        // comment.likesInfo.likesCount = Math.max(0, comment.likesInfo.likesCount + likesModifier);
-        // comment.likesInfo.dislikesCount = Math.max(0, comment.likesInfo.dislikesCount + dislikesModifier);
-
         await this.likeService.update({
             commentId: dto.commentId,
             userId: dto.userId,
@@ -168,9 +165,6 @@ export class CommentService {
         });
 
         await this.commentRepository.updateLikesCount(dto.commentId, likesModifier, dislikesModifier);
-
-        // comment.markModified('likesInfo');
-        // const savedCommentId = await this.commentRepository.save(comment);
 
         return {
             status: ResultStatus.Success,
