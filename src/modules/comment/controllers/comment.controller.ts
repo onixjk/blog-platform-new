@@ -29,9 +29,9 @@ export class CommentController {
         res.status(HttpStatuses.Ok_200).send(commentOutput);
     }
 
-    async updateComment(req: Request<{ id: string }, {}, CommentInputDto>, res: Response) {
+    async updateComment(req: Request<{ commentId: string }, {}, CommentInputDto>, res: Response) {
 
-        const commentId = req.params.id;
+        const commentId = req.params.commentId;
         if (!commentId) return res.sendStatus(HttpStatuses.NotFound_404);
 
         const userId = req.user.id!;
@@ -72,9 +72,9 @@ export class CommentController {
         return res.sendStatus(HttpStatuses.NoContent_204)
     }
 
-    async deleteComment(req: Request<{ id: string }>, res: Response) {
+    async deleteComment(req: Request<{ commentId: string }>, res: Response) {
 
-        const commentId = req.params.id;
+        const commentId = req.params.commentId;
         if (!commentId) return res.sendStatus(HttpStatuses.NotFound_404);
 
         const userId = req.user.id!;
