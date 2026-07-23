@@ -16,6 +16,20 @@ export class CommentRepository {
         return savedComment.id;
     }
 
+    async updateLikesCount(commentId: string, likesModifier: number, dislikesModifier: number): Promise<boolean> {
+        const result = await CommentModel.updateOne(
+            { _id: commentId },
+            {
+                $inc: {
+                    "likesInfo.likesCount": likesModifier,
+                    "likesInfo.dislikesCount": dislikesModifier
+                }
+            }
+        );
+
+        return result.modifiedCount > 0;
+    }
+
     async delete(commentId: string): Promise<boolean> {
 
         const deleteResult = await CommentModel.deleteOne({ _id: commentId });

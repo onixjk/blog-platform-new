@@ -58,7 +58,6 @@ export class CommentQueryRepository {
 
         const commentIds = items.map(item => item._id.toString());
 
-        // Запрашиваем ВСЕ лайки юзера для этих комментариев ОДНИМ запросом
         let userLikes: any[] = [];
 
         if (userId) {
@@ -68,11 +67,10 @@ export class CommentQueryRepository {
             }).lean();
         }
 
-        // Создаем Map для моментального поиска со сложностью O(1) вместо циклов
         const likesMap = new Map(userLikes.map(like => [like.commentId, like.status]));
 
         const itemsWithCorrectStatus = items.map((item) => {
-            const myStatus = (likesMap.get(item._id.toString())) || LikeStatus.None;
+            const myStatus = (likesMap.get(item._id.toString()) as LikeStatus) || LikeStatus.None;
             return mapToCommentOutput(item, myStatus);
         });
 

@@ -123,7 +123,7 @@ export class CommentService {
         };
     }
 
-    async updateLikeCountAndStatus(dto: LikeStatusInputDto): Promise<Result<string | null>> {
+    async updateLikeCountAndStatus(dto: LikeStatusInputDto): Promise<Result> {
 
         const comment = await this.commentRepository.findById(dto.commentId);
         if (!comment) {
@@ -136,13 +136,14 @@ export class CommentService {
         }
 
         const like = await this.likeRepository.findByCommentIdAndUserId(dto.commentId, dto.userId);
+
         const oldStatus = like ? like.status : LikeStatus.None;
         const newStatus = dto.likeStatus;
 
         if (oldStatus === newStatus) {
             return {
                 status: ResultStatus.Success,
-                data: comment.id,
+                data: null,
                 extensions: []
             };
         }
@@ -156,8 +157,8 @@ export class CommentService {
         if (newStatus === LikeStatus.Like) likesModifier++;
         if (newStatus === LikeStatus.Dislike) dislikesModifier++;
 
-        comment.likesInfo.likesCount = Math.max(0, comment.likesInfo.likesCount + likesModifier);
-        comment.likesInfo.dislikesCount = Math.max(0, comment.likesInfo.dislikesCount + dislikesModifier);
+        // comment.likesInfo.likesCount = Math.max(0, comment.likesInfo.likesCount + likesModifier);
+        // comment.likesInfo.dislikesCount = Math.max(0, comment.likesInfo.dislikesCount + dislikesModifier);
 
         await this.likeService.update({
             commentId: dto.commentId,
@@ -166,12 +167,14 @@ export class CommentService {
             createdAt: new Date().toISOString(),
         });
 
-        comment.markModified('likesInfo');
-        const savedCommentId = await this.commentRepository.save(comment);
+        await this.commentRepository.updateLikesCount(dto.commentId, likesModifier, dislikesModifier);
+
+        // comment.markModified('likesInfo');
+        // const savedCommentId = await this.commentRepository.save(comment);
 
         return {
             status: ResultStatus.Success,
-            data: savedCommentId,
+            data: null,
             extensions: []
         };
     }
