@@ -32,8 +32,8 @@ export class PostQueryRepository {
         ]);
 
         return mapToPostListPaginatedOutput(items, {
-            pageNumber: queryDto.pageNumber,
-            pageSize: queryDto.pageSize,
+            pageNumber,
+            pageSize,
             totalCount,
         });
     }
@@ -55,8 +55,8 @@ export class PostQueryRepository {
         ]);
 
         return mapToPostListPaginatedOutput(items, {
-            pageNumber: queryDto.pageNumber,
-            pageSize: queryDto.pageSize,
+            pageNumber,
+            pageSize,
             totalCount,
         });
     }

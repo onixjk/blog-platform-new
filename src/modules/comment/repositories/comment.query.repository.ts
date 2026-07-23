@@ -17,12 +17,6 @@ export class CommentQueryRepository {
         let myStatus = LikeStatus.None;
 
         if (userId) {
-            // const likeDoc = await LikeModel.findOne({ commentId: id, userId }).lean();
-            //
-            // if (likeDoc) {
-            //     myStatus = likeDoc.status;
-            // }
-
             const likeDoc = await LikeModel.findOne({
                 commentId: id.toString(),
                 userId: userId.toString()
@@ -70,7 +64,7 @@ export class CommentQueryRepository {
         const likesMap = new Map(userLikes.map(like => [like.commentId, like.status]));
 
         const itemsWithCorrectStatus = items.map((item) => {
-            const myStatus = (likesMap.get(item._id.toString()) as LikeStatus) || LikeStatus.None;
+            const myStatus = (likesMap.get(item._id.toString()) as LikeStatus) ?? LikeStatus.None;
             return mapToCommentOutput(item, myStatus);
         });
 
