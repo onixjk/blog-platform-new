@@ -30,7 +30,10 @@ export const guestOrUserAuthMiddleware = async (req: Request, res: Response, nex
 
     const payload = await jwtService.verifyAccessToken(token);
 
-    if (!payload) return next();
+    if (!payload) {
+        next();
+        return;
+    }
 
     req.user = { id: payload.userId };
 
