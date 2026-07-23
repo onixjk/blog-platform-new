@@ -57,23 +57,26 @@ export class CommentQueryRepository {
         ]);
 
         const itemsWithCorrectStatus = await Promise.all(items.map(async (item) => {
+
             let myStatus = LikeStatus.None;
-            // if (userId) {
-            //     const likeDoc = await LikeModel.findOne({ commentId: item._id.toString(), userId }).lean();
-            //     if (likeDoc) myStatus = likeDoc.status;
-            // }
 
             if (userId) {
-                // Приводим _id комментария к строке .toString() перед поиском лайка!
                 const likeDoc = await LikeModel.findOne({
                     commentId: item._id.toString(),
-                    userId: userId.toString()
+                    userId
                 }).lean();
 
-                if (likeDoc) {
-                    myStatus = likeDoc.status as LikeStatus;
-                }
+                if (likeDoc) myStatus = likeDoc.status;
             }
+
+            // if (userId) {
+            //     const likeDoc = await LikeModel.findOne({
+            //         commentId: item._id.toString(),
+            //         userId: userId.toString()
+            //     }).lean();
+            //
+            //     if (likeDoc) myStatus = likeDoc.status as LikeStatus;
+            // }
 
             return mapToCommentOutput(item, myStatus);
         }));

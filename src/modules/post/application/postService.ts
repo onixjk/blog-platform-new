@@ -107,17 +107,6 @@ export class PostService {
         };
     }
 
-    // async updateAllBlogNames(blogId: string, blogName: string): Promise<Result<boolean | null>> {
-    //
-    //     const areAllUpdated = await this.postRepository.updateAllBlogNames(blogId, blogName);
-    //
-    //     return {
-    //         status: ResultStatus.Success,
-    //         data: areAllUpdated,
-    //         extensions: []
-    //     };
-    // }
-
     async delete(id: string): Promise<Result<boolean | null>> {
 
         const isDeleted = await this.postRepository.delete(id);
@@ -138,15 +127,4 @@ export class PostService {
             extensions: []
         };
     }
-
-    // async deleteAllByBlogId(blogId: string): Promise<Result<boolean | null>> {
-    //
-    //     const isAllDeleted = await this.postRepository.deleteAllByBlogId(blogId);
-    //
-    //     return {
-    //         status: ResultStatus.Success,
-    //         data: isAllDeleted,
-    //         extensions: []
-    //     };
-    // }
 }
