@@ -4,4 +4,5 @@ export type Like = {
     commentId: string,
     userId: string,
     status: LikeStatus,
+    createdAt: string;
 }

@@ -91,7 +91,13 @@ const BlogSchema = new Schema<Blog>({}, { strict: false });
 const PostSchema = new Schema<Post>({}, { strict: false });
 const UserSchema = new Schema<IUserDB>({}, { strict: false });
 const CommentSchema = new Schema<Comment>({}, { strict: false });
-const LikesSchema = new Schema<Like>({}, { strict: false });
+// const LikesSchema = new Schema<Like>({}, { strict: false });
+export const LikesSchema = new Schema<Like>({
+    commentId: { type: String, required: true },
+    userId: { type: String, required: true },
+    status: { type: String, required: true },
+    createdAt: { type: String, required: true }
+});
 
 export let BlogModel = mongoose.model<Blog>('blogs', BlogSchema);
 export let PostModel = mongoose.model<Post>('posts', PostSchema);

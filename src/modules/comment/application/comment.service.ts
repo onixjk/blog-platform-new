@@ -162,9 +162,10 @@ export class CommentService {
         await this.likeService.update({
             commentId: dto.commentId,
             userId: dto.userId,
-            status: newStatus
+            status: newStatus,
+            createdAt: new Date().toISOString(),
         });
-        
+
         comment.markModified('likesInfo');
         const savedCommentId = await this.commentRepository.save(comment);
 

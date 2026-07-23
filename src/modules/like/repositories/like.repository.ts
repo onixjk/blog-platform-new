@@ -23,7 +23,7 @@ export class LikeRepository {
             },
             {
                 status: dto.status,
-                createdAt: new Date().toISOString()
+                createdAt: dto.createdAt
             },
             {
                 upsert: true,
