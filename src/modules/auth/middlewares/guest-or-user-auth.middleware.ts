@@ -16,12 +16,17 @@ export const guestOrUserAuthMiddleware = async (req: Request, res: Response, nex
 
     if (!req.headers.authorization) {
         req.user.id = null;
-        return next();
+
+        next();
+        return;
     }
 
     const [authType, token] = req.headers.authorization.split(' ');
 
-    if (authType !== 'Bearer' || !token) return next();
+    if (authType !== 'Bearer' || !token) {
+        next();
+        return;
+    }
 
     const payload = await jwtService.verifyAccessToken(token);
 
