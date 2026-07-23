@@ -24,6 +24,8 @@ export const guestOrUserAuthMiddleware = async (req: Request, res: Response, nex
     const [authType, token] = req.headers.authorization.split(' ');
 
     if (authType !== 'Bearer' || !token) {
+        req.user.id = null;
+
         next();
         return;
     }
@@ -31,6 +33,8 @@ export const guestOrUserAuthMiddleware = async (req: Request, res: Response, nex
     const payload = await jwtService.verifyAccessToken(token);
 
     if (!payload) {
+        req.user.id = null;
+
         next();
         return;
     }
