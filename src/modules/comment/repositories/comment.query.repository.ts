@@ -17,10 +17,19 @@ export class CommentQueryRepository {
         let myStatus = LikeStatus.None;
 
         if (userId) {
-            const likeDoc = await LikeModel.findOne({ commentId: id, userId }).lean();
+            // const likeDoc = await LikeModel.findOne({ commentId: id, userId }).lean();
+            //
+            // if (likeDoc) {
+            //     myStatus = likeDoc.status;
+            // }
+
+            const likeDoc = await LikeModel.findOne({
+                commentId: id.toString(),
+                userId: userId.toString()
+            }).lean();
 
             if (likeDoc) {
-                myStatus = likeDoc.status;
+                myStatus = likeDoc.status as LikeStatus;
             }
         }
 
@@ -49,9 +58,21 @@ export class CommentQueryRepository {
 
         const itemsWithCorrectStatus = await Promise.all(items.map(async (item) => {
             let myStatus = LikeStatus.None;
+            // if (userId) {
+            //     const likeDoc = await LikeModel.findOne({ commentId: item._id.toString(), userId }).lean();
+            //     if (likeDoc) myStatus = likeDoc.status;
+            // }
+
             if (userId) {
-                const likeDoc = await LikeModel.findOne({ commentId: item._id.toString(), userId }).lean();
-                if (likeDoc) myStatus = likeDoc.status;
+                // Приводим _id комментария к строке .toString() перед поиском лайка!
+                const likeDoc = await LikeModel.findOne({
+                    commentId: item._id.toString(),
+                    userId: userId.toString()
+                }).lean();
+
+                if (likeDoc) {
+                    myStatus = likeDoc.status as LikeStatus;
+                }
             }
 
             return mapToCommentOutput(item, myStatus);
