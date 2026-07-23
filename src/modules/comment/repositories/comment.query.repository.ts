@@ -56,30 +56,54 @@ export class CommentQueryRepository {
                 .countDocuments(filter)
         ]);
 
-        const itemsWithCorrectStatus = await Promise.all(items.map(async (item) => {
 
-            let myStatus = LikeStatus.None;
 
-            if (userId) {
-                const likeDoc = await LikeModel.findOne({
-                    commentId: item._id.toString(),
-                    userId
-                }).lean();
+        const commentIds = items.map(item => item._id.toString());
 
-                if (likeDoc) myStatus = likeDoc.status;
-            }
+        // Запрашиваем ВСЕ лайки юзера для этих комментариев ОДНИМ запросом
+        let userLikes: any[] = [];
+        if (userId) {
+            userLikes = await LikeModel.find({
+                commentId: { $in: commentIds },
+                userId: userId.toString()
+            }).lean();
+        }
 
-            // if (userId) {
-            //     const likeDoc = await LikeModel.findOne({
-            //         commentId: item._id.toString(),
-            //         userId: userId.toString()
-            //     }).lean();
-            //
-            //     if (likeDoc) myStatus = likeDoc.status as LikeStatus;
-            // }
+        // Создаем Map для моментального поиска со сложностью O(1) вместо циклов
+        const likesMap = new Map(userLikes.map(like => [like.commentId, like.status]));
 
+        const itemsWithCorrectStatus = items.map((item) => {
+            const myStatus = (likesMap.get(item._id.toString()) as LikeStatus) || LikeStatus.None;
             return mapToCommentOutput(item, myStatus);
-        }));
+        });
+
+
+
+        //
+        // const itemsWithCorrectStatus = await Promise.all(items.map(async (item) => {
+        //
+        //     let myStatus = LikeStatus.None;
+        //
+        //     if (userId) {
+        //         const likeDoc = await LikeModel.findOne({
+        //             commentId: item._id.toString(),
+        //             userId
+        //         }).lean();
+        //
+        //         if (likeDoc) myStatus = likeDoc.status;
+        //     }
+        //
+        //     // if (userId) {
+        //     //     const likeDoc = await LikeModel.findOne({
+        //     //         commentId: item._id.toString(),
+        //     //         userId: userId.toString()
+        //     //     }).lean();
+        //     //
+        //     //     if (likeDoc) myStatus = likeDoc.status as LikeStatus;
+        //     // }
+        //
+        //     return mapToCommentOutput(item, myStatus);
+        // }));
 
         return mapToCommentListPaginatedOutput(itemsWithCorrectStatus, {
             pageNumber,
