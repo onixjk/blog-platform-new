@@ -164,7 +164,8 @@ export class CommentService {
             userId: dto.userId,
             status: newStatus
         });
-
+        
+        comment.markModified('likesInfo');
         const savedCommentId = await this.commentRepository.save(comment);
 
         return {
