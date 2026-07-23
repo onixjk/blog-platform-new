@@ -39,6 +39,7 @@ postRouter
         postIdValidation,
         paginationAndSortingValidation(CommentSortField),
         inputValidationResultMiddleware,
+        guestOrUserAuthMiddleware,
         postController.getPostCommentList.bind(postController)
     )
 
