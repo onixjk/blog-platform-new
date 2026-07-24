@@ -41,12 +41,12 @@ export const PostSchema = new Schema<Post>({
 });
 
 const UserSchema = new Schema<IUserDB>({
-    login: { type: String, required: true },
-    email: { type: String, required: true },
+    login: { type: String, required: true, unique: true },
+    email: { type: String, required: true, unique: true },
     passwordHash: { type: String, required: true },
     createdAt: { type: String, required: true },
     emailConfirmation: {
-        confirmationCode: { type: String, required: true },
+        confirmationCode: { type: String },
         expirationDate: { type: Date },
         isConfirmed: { type: Boolean, default: false }
     },
