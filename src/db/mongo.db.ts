@@ -9,24 +9,73 @@ import { ApiRequestLog } from "../modules/auth/types/api-request-log";
 import { Like } from "../modules/like/types/like";
 
 const ApiRequestSchema = new Schema<ApiRequestLog>({
+    ip: {type: String, required: true},
+    url: {type: String, required: true},
     date: { type: Date, required: true, expires: 10 }
-}, { strict: false });
+});
 
 const SessionSchema = new Schema<Session>({
-    exp: { type: Date, required: true, expires: 0 }
-}, { strict: false });
+        user_id: { type: String, required: true },
+        device_id: { type: String, required: true },
+        iat: { type: Date, required: true },
+        browserName: { type: String, required: true },
+        ip: { type: String, required: true },
+        exp: { type: Date, required: true, expires: 0 }
+    });
 
-const BlogSchema = new Schema<Blog>({}, { strict: false });
-const PostSchema = new Schema<Post>({}, { strict: false });
-const UserSchema = new Schema<IUserDB>({}, { strict: false });
-const CommentSchema = new Schema<Comment>({}, { strict: false });
-const LikesSchema = new Schema<Like>({}, { strict: false });
-// export const LikesSchema = new Schema<Like>({
-//     commentId: { type: String, required: true },
-//     userId: { type: String, required: true },
-//     status: { type: String, required: true },
-//     createdAt: { type: String, required: true }
-// });
+const BlogSchema = new Schema<Blog>({
+    name: { type: String, required: true, minLength: 1 },
+    description: { type: String, required: true, minLength: 1 },
+    websiteUrl: { type: String, required: true, minLength: 7 },
+    createdAt: { type: String, required: true },
+    isMembership: { type: Boolean, required: true, default: false },
+});
+
+export const PostSchema = new Schema<Post>({
+    title: { type: String, required: true, minLength: 1 },
+    shortDescription: { type: String, required: true, minLength: 1 },
+    content: { type: String, required: true, minLength: 1 },
+    blogId: { type: String, required: true },
+    blogName: { type: String, required: true, minLength: 1 },
+    createdAt: { type: String, required: true }
+});
+
+const UserSchema = new Schema<IUserDB>({
+    login: { type: String, required: true },
+    email: { type: String, required: true },
+    passwordHash: { type: String, required: true },
+    createdAt: { type: String, required: true },
+    emailConfirmation: {
+        confirmationCode: { type: String, required: true },
+        expirationDate: { type: Date },
+        isConfirmed: { type: Boolean, default: false }
+    },
+    passwordRecovery: {
+        recoveryCode: { type: String },
+        expirationDate: { type: Date },
+    },
+});
+
+export const CommentSchema = new Schema<Comment>({
+    postId: { type: String, required: true },
+    content: { type: String, required: true, minLength: 1, },
+    commentatorInfo: {
+        userId: { type: String, required: true },
+        userLogin: { type: String, required: true, minLength: 1, },
+    },
+    createdAt: { type: String, required: true },
+    likesInfo: {
+        likesCount: { type: Number, required: true, default: 0 },
+        dislikesCount: { type: Number, required: true, default: 0 }
+    }
+});
+
+export const LikesSchema = new Schema<Like>({
+    commentId: { type: String, required: true },
+    userId: { type: String, required: true },
+    status: { type: String, required: true },
+    createdAt: { type: String, required: true }
+});
 
 export let BlogModel = mongoose.model<Blog>('blogs', BlogSchema);
 export let PostModel = mongoose.model<Post>('posts', PostSchema);
