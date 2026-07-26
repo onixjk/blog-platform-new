@@ -28,7 +28,7 @@ export class LikeRepository {
             {
                 upsert: true,
                 returnDocument: 'after',
-                new: true,
+                // new: true,
             }
         );
 
