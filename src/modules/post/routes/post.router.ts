@@ -20,7 +20,6 @@ export const postRouter = Router({});
 
 const postController = container.get(PostController);
 
-
 postRouter
     .get('',
         paginationAndSortingValidation(PostSortField),
