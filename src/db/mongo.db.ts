@@ -29,7 +29,7 @@ export const BlogSchema = new Schema<Blog>({
     description: { type: String, required: true, minLength: 1 },
     websiteUrl: { type: String, required: true, minLength: 7 },
     createdAt: { type: String, required: true },
-    isMembership: { type: Boolean, required: true, default: false },
+    isMembership: { type: Boolean, default: false },
 });
 
 export const PostSchema = new Schema<Post>({
