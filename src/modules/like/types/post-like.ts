@@ -1,6 +1,6 @@
 import { LikeStatus } from "./like-status";
 
-export type LikePosts = {
+export type PostLike = {
     postId: string;
     userId: string;
     login: string;

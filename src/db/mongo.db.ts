@@ -6,7 +6,8 @@ import { IUserDB } from "../modules/user/types/user.db.interface";
 import { Comment } from "../modules/comment/types/comment";
 import { Session } from "../modules/auth/types/session";
 import { ApiRequestLog } from "../modules/auth/types/api-request-log";
-import { LikeComments } from "../modules/like/types/like-comments";
+import { PostLike } from "../modules/like/types/post-like";
+import { CommentLike } from "../modules/like/types/comment-like";
 
 const ApiRequestSchema = new Schema<ApiRequestLog>({
     ip: { type: String, required: true },
@@ -74,26 +75,27 @@ export const UserSchema = new Schema<IUserDB>({
     },
 });
 
-export const CommentLikeSchema = new Schema<LikeComments>({
+export const CommentLikeSchema = new Schema<CommentLike>({
     commentId: { type: String, required: true },
     userId: { type: String, required: true },
     status: { type: String, required: true },
     createdAt: { type: String, required: true }
 });
 
-export const PostLikeSchema = new Schema<LikeComments>({
-    commentId: { type: String, required: true },
+export const PostLikeSchema = new Schema<PostLike>({
+    postId: { type: String, required: true },
     userId: { type: String, required: true },
+    login: { type: String, required: true },
     status: { type: String, required: true },
-    createdAt: { type: String, required: true }
+    createdAt: { type: Date, required: true, default: Date.now }
 });
 
 export let BlogModel = mongoose.model<Blog>('blogs', BlogSchema);
 export let PostModel = mongoose.model<Post>('posts', PostSchema);
 export let UserModel = mongoose.model<IUserDB>('users', UserSchema);
 export let CommentModel = mongoose.model<Comment>('comments', CommentSchema);
-export let CommentLikeModel = mongoose.model<LikeComments>('commentLike', CommentLikeSchema);
-export let PostLikeModel = mongoose.model<LikeComments>('postLike', PostLikeSchema);
+export let CommentLikeModel = mongoose.model<CommentLike>('commentLike', CommentLikeSchema);
+export let PostLikeModel = mongoose.model<PostLike>('postLike', PostLikeSchema);
 export let SessionModel = mongoose.model<Session>('sessions', SessionSchema);
 export let ApiRequestsModel = mongoose.model<ApiRequestLog>('apiRequests', ApiRequestSchema);
 
