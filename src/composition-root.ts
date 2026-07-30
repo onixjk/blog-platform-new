@@ -29,43 +29,48 @@ import { PostController } from "./modules/post/controllers/post.controller";
 import { UserController } from "./modules/user/controllers/user.controller";
 import { CommentLikeRepository } from "./modules/like/repositories/comment-like.repository";
 import { CommentLikeService } from "./modules/like/application/comment-like.service";
+import { PostLikeRepository } from "./modules/like/repositories/post-like.repository";
+import { PostLikeService } from "./modules/like/application/post-like.service";
 
 
 export const container = new Container();
 
-container.bind(EmailExamples).toSelf().inSingletonScope;
-container.bind(NodemailerService).toSelf().inSingletonScope;
-container.bind(JwtService).toSelf().inSingletonScope;
-container.bind(BcryptService).toSelf().inSingletonScope;
+container.bind(EmailExamples).toSelf().inSingletonScope();
+container.bind(NodemailerService).toSelf().inSingletonScope();
+container.bind(JwtService).toSelf().inSingletonScope();
+container.bind(BcryptService).toSelf().inSingletonScope();
 
-container.bind(AuthRepository).toSelf().inSingletonScope;
-container.bind(AuthService).toSelf().inSingletonScope;
+container.bind(AuthRepository).toSelf().inSingletonScope();
+container.bind(AuthService).toSelf().inSingletonScope();
 container.bind(AuthController).toSelf().inSingletonScope();
 
-container.bind(DeviceQueryRepository).toSelf().inSingletonScope;
-container.bind(DeviceRepository).toSelf().inSingletonScope;
-container.bind(DeviceService).toSelf().inSingletonScope;
+container.bind(DeviceQueryRepository).toSelf().inSingletonScope();
+container.bind(DeviceRepository).toSelf().inSingletonScope();
+container.bind(DeviceService).toSelf().inSingletonScope();
 container.bind(DeviceController).toSelf().inSingletonScope();
 
-container.bind(UserQueryRepository).toSelf().inSingletonScope;
-container.bind(UserRepository).toSelf().inSingletonScope;
-container.bind(UserService).toSelf().inSingletonScope;
+container.bind(UserQueryRepository).toSelf().inSingletonScope();
+container.bind(UserRepository).toSelf().inSingletonScope();
+container.bind(UserService).toSelf().inSingletonScope();
 container.bind(UserController).toSelf().inSingletonScope();
 
-container.bind(BlogQueryRepository).toSelf().inSingletonScope;
-container.bind(BlogRepository).toSelf().inSingletonScope;
-container.bind(BlogService).toSelf().inSingletonScope;
+container.bind(BlogQueryRepository).toSelf().inSingletonScope();
+container.bind(BlogRepository).toSelf().inSingletonScope();
+container.bind(BlogService).toSelf().inSingletonScope();
 container.bind(BlogController).toSelf().inSingletonScope();
 
-container.bind(PostQueryRepository).toSelf().inSingletonScope;
-container.bind(PostRepository).toSelf().inSingletonScope;
-container.bind(PostService).toSelf().inSingletonScope;
+container.bind(PostQueryRepository).toSelf().inSingletonScope();
+container.bind(PostRepository).toSelf().inSingletonScope();
+container.bind(PostService).toSelf().inSingletonScope();
 container.bind(PostController).toSelf().inSingletonScope();
 
-container.bind(CommentQueryRepository).toSelf().inSingletonScope;
-container.bind(CommentRepository).toSelf().inSingletonScope;
-container.bind(CommentService).toSelf().inSingletonScope;
+container.bind(CommentQueryRepository).toSelf().inSingletonScope();
+container.bind(CommentRepository).toSelf().inSingletonScope();
+container.bind(CommentService).toSelf().inSingletonScope();
 container.bind(CommentController).toSelf().inSingletonScope();
 
-container.bind(CommentLikeService).toSelf().inSingletonScope;
-container.bind(CommentLikeRepository).toSelf().inSingletonScope;
+container.bind(CommentLikeService).toSelf().inSingletonScope();
+container.bind(CommentLikeRepository).toSelf().inSingletonScope();
+
+container.bind(PostLikeService).toSelf().inSingletonScope();
+container.bind(PostLikeRepository).toSelf().inSingletonScope();
