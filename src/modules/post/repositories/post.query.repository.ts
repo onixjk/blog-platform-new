@@ -4,7 +4,7 @@ import { mapToPostListPaginatedOutput } from "../routes/mapers/map-to-post-list-
 import { PostOutput } from "../types/output/post-output";
 import { mapToPostOutput } from "../routes/mapers/map-to-post-output.util";
 import { injectable } from "inversify";
-import { LikeCommentsModel, LikePostsModel, PostModel } from "../../../db/mongo.db";
+import { LikePostsModel, PostModel } from "../../../db/mongo.db";
 import { LikeStatus } from "../../like/types/like-status";
 
 @injectable()
@@ -12,12 +12,13 @@ export class PostQueryRepository {
 
     async findById(id: string, userId?: string | null): Promise<PostOutput | null> {
         const post = await PostModel.findById(id).lean();
+        if (!post) return null;
 
         let myStatus = LikeStatus.None;
 
         if (userId) {
-            const likeDoc = await LikeCommentsModel.findOne({
-                commentId: id.toString(),
+            const likeDoc = await LikePostsModel.findOne({
+                postId: id.toString(),
                 userId: userId.toString()
             }).lean();
 
@@ -26,7 +27,12 @@ export class PostQueryRepository {
             }
         }
 
-        return post ? mapToPostOutput(post, myStatus) : null;
+        const newestLikes = await LikePostsModel.find({ postId: id, status: LikeStatus.Like })
+            .sort({ createdAt: -1 })
+            .limit(3)
+            .lean();
+
+        return mapToPostOutput(post, myStatus, newestLikes);
     }
 
     // async findMany(queryDto: PostQueryInput): Promise<PostListPaginatedOutput> {
@@ -90,34 +96,14 @@ export class PostQueryRepository {
             const myStatus = myStatusesMap.get(postIdStr) ?? LikeStatus.None;
             const newestLikes = newestLikesMap.get(postIdStr) ?? [];
 
-            return {
-                id: postIdStr,
-                title: post.title,
-                shortDescription: post.shortDescription,
-                content: post.content,
-                blogId: post.blogId,
-                blogName: post.blogName,
-                createdAt: post.createdAt,
-                extendedLikesInfo: {
-                    likesCount: post.extendedLikesInfo?.likesCount ?? 0,
-                    dislikesCount: post.extendedLikesInfo?.dislikesCount ?? 0,
-                    myStatus,
-                    newestLikes: newestLikes.map(l => ({
-                        addedAt: l.addedAt.toISOString(),
-                        userId: l.userId,
-                        login: l.login
-                    }))
-                }
-            };
+            return mapToPostOutput(post, myStatus, newestLikes);
         });
 
-        return {
-            pagesCount: Math.ceil(totalCount / pageSize),
-            page: pageNumber,
+        return mapToPostListPaginatedOutput(mappedItems, {
+            pageNumber,
             pageSize,
-            totalCount,
-            items: mappedItems
-        };
+            totalCount
+        });
     }
 
     async findPostsByBlog(queryDto: PostQueryInput, blogId: string, userId?: string | null): Promise<PostListPaginatedOutput> {
@@ -141,19 +127,36 @@ export class PostQueryRepository {
         let userLikes: any[] = [];
 
         if (userId) {
-            userLikes = await LikeCommentsModel.find({
-                commentId: { $in: postIds },
-                userId: userId.toString()
+            userLikes = await LikePostsModel.find({
+                postId: { $in: postIds },
+                userId
             }).lean();
         }
 
-        const likesMap = new Map<string, LikeStatus>(
+        const myStatusesMap = new Map<string, LikeStatus>(
             userLikes.map(like => [like.postId, like.status as LikeStatus])
         );
 
+        const newestLikesDocs = await LikePostsModel.aggregate([
+            { $match: { postId: { $in: postIds }, status: LikeStatus.Like } },
+            { $sort: { createdAt: -1 } },
+            {
+                $group: {
+                    _id: "$postId",
+                    latestLikes: { $push: { addedAt: "$createdAt", userId: "$userId", login: "$login" } }
+                }
+            },
+            { $project: { latestLikes: { $slice: ["$latestLikes", 3] } } }
+        ]);
+
+        const newestLikesMap = new Map<string, any[]>(newestLikesDocs.map(d => [d._id.toString(), d.latestLikes]));
+
         const itemsWithCorrectStatus = items.map((item) => {
-            const myStatus = likesMap.get(item._id.toString()) ?? LikeStatus.None;
-            return mapToPostOutput(item, myStatus);
+            const postIdStr = item._id.toString();
+            const myStatus = myStatusesMap.get(postIdStr) ?? LikeStatus.None;
+            const newestLikes = newestLikesMap.get(postIdStr) ?? [];
+
+            return mapToPostOutput(item, myStatus, newestLikes);
         });
 
         return mapToPostListPaginatedOutput(itemsWithCorrectStatus, {
@@ -162,4 +165,5 @@ export class PostQueryRepository {
             totalCount,
         });
     }
+
 }

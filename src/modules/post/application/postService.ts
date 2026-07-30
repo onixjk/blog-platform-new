@@ -158,13 +158,6 @@ export class PostService {
             { upsert: true }
         );
 
-        // await this.postLikeService.update({
-        //     postId: dto.postId,
-        //     userId: dto.userId,
-        //     status: newStatus,
-        //     createdAt: new Date(),
-        // });
-
         await this.commentRepository.updateLikesCount(dto.postId, likesModifier, dislikesModifier);
 
         return {

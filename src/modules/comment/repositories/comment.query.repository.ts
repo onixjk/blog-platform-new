@@ -57,12 +57,12 @@ export class CommentQueryRepository {
             }).lean();
         }
 
-        const likesMap = new Map<string, LikeStatus>(
+        const myStatusesMap = new Map<string, LikeStatus>(
             userLikes.map(like => [like.commentId, like.status as LikeStatus])
         );
 
         const itemsWithCorrectStatus = items.map((item) => {
-            const myStatus = likesMap.get(item._id.toString()) ?? LikeStatus.None;
+            const myStatus = myStatusesMap.get(item._id.toString()) ?? LikeStatus.None;
             return mapToCommentOutput(item, myStatus);
         });
 

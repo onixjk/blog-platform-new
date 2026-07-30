@@ -2,7 +2,7 @@ import { PostOutput } from "../../types/output/post-output";
 import { Post } from "../../types/post";
 import { LikeStatus } from "../../../like/types/like-status";
 
-export function mapToPostOutput(post: Post & { _id: any }, myStatus: LikeStatus): PostOutput {
+export function mapToPostOutput(post: Post & { _id: any }, myStatus: LikeStatus, newestLikes: any[] = []): PostOutput {
     return {
         id: post._id.toString(),
         title: post.title,
@@ -12,14 +12,14 @@ export function mapToPostOutput(post: Post & { _id: any }, myStatus: LikeStatus)
         blogName: post.blogName,
         createdAt: post.createdAt,
         extendedLikesInfo: {
-            likesCount: post.extendedLikesInfo.likesCount,
-            dislikesCount: post.extendedLikesInfo.dislikesCount,
+            likesCount: post.extendedLikesInfo?.likesCount ?? 0,
+            dislikesCount: post.extendedLikesInfo?.dislikesCount ?? 0,
             myStatus: myStatus,
-            newestLikes: [{
-                addedAt: post.extendedLikesInfo.newestLikes[0].addedAt,
-                userId: post.extendedLikesInfo.newestLikes[0].userId,
-                login: post.extendedLikesInfo.newestLikes[0].login,
-            }]
+            newestLikes: newestLikes.map(like => ({
+                addedAt: like.addedAt instanceof Date ? like.addedAt.toISOString() : new Date(like.addedAt).toISOString(),
+                userId: like.userId,
+                login: like.login,
+            }))
         },
 
     }
