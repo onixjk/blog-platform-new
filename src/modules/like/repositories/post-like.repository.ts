@@ -4,7 +4,7 @@ import { LikePostsModel } from "../../../db/mongo.db";
 import { LikePosts } from "../types/like-posts";
 
 @injectable()
-export class LikePostsRepository {
+export class PostLikeRepository {
 
     async findById(id: string): Promise<HydratedDocument<LikePosts> | null> {
         return LikePostsModel.findById(id);

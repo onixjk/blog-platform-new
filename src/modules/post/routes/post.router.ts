@@ -24,26 +24,23 @@ const postController = container.get(PostController);
 postRouter
     .get('',
         paginationAndSortingValidation(PostSortField),
-        likeStatusValidation,
-        inputValidationResultMiddleware,
         guestOrUserAuthMiddleware,
+        inputValidationResultMiddleware,
         postController.getPostList.bind(postController)
     )
 
     .get('/:id',
         idValidation,
-        likeStatusValidation,
-        inputValidationResultMiddleware,
         guestOrUserAuthMiddleware,
+        inputValidationResultMiddleware,
         postController.getPost.bind(postController)
     )
 
     .get('/:postId/comments',
         postIdValidation,
         paginationAndSortingValidation(CommentSortField),
-        likeStatusValidation,
-        inputValidationResultMiddleware,
         guestOrUserAuthMiddleware,
+        inputValidationResultMiddleware,
         postController.getPostCommentList.bind(postController)
     )
 
@@ -59,6 +56,14 @@ postRouter
         commentInputValidation,
         inputValidationResultMiddleware,
         postController.createPostComment.bind(postController)
+    )
+
+    .put('/:postId/like-status',
+        postIdValidation,
+        accessTokenGuard,
+        likeStatusValidation,
+        inputValidationResultMiddleware,
+        postController.updateLikeStatus.bind(postController)
     )
 
     .put('/:id',

@@ -11,8 +11,8 @@ import { HydratedDocument } from "mongoose";
 import { UserRepository } from "../../user/repositories/user.repository";
 import { LikeStatus } from "../../like/types/like-status";
 import { CommentLikeStatusInputDto } from "../../like/types/input/comment-like-status-input.dto";
-import { LikeCommentsService } from "../../like/application/like-comments.service";
-import { LikeCommentsRepository } from "../../like/repositories/like-comments.repository";
+import { CommentLikeRepository } from "../../like/repositories/comment-like.repository";
+import { CommentLikeService } from "../../like/application/comment-like.service";
 
 @injectable()
 export class CommentService {
@@ -21,8 +21,8 @@ export class CommentService {
         @inject(CommentRepository) private commentRepository: CommentRepository,
         @inject(UserRepository) private userRepository: UserRepository,
         @inject(PostRepository) private postRepository: PostRepository,
-        @inject(LikeCommentsRepository) private commentLikeRepository: LikeCommentsRepository,
-        @inject(LikeCommentsService) private commentLikeService: LikeCommentsService,
+        @inject(CommentLikeRepository) private commentLikeRepository: CommentLikeRepository,
+        @inject(CommentLikeService) private commentLikeService: CommentLikeService,
     ) {}
 
     async findById(id: string): Promise<Result<HydratedDocument<Comment> | null>> {

@@ -2,13 +2,13 @@ import { Result } from "../../../core/result/result.type";
 import { ResultStatus } from "../../../core/result/resultCode";
 import { inject, injectable } from "inversify";
 import { LikePosts } from "../types/like-posts";
-import { LikePostsRepository } from "../repositories/like-posts.repository";
+import { PostLikeRepository } from "../repositories/post-like.repository";
 
 @injectable()
-export class LikePostsService {
+export class PostLikeService {
 
     constructor(
-        @inject(LikePostsRepository) private postLikeRepository: LikePostsRepository,
+        @inject(PostLikeRepository) private postLikeRepository: PostLikeRepository,
     ) {}
 
     async update(dto: LikePosts): Promise<Result<string | null>> {

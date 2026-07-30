@@ -11,7 +11,7 @@ import { Blog } from "../../blog/types/blog";
 import { BlogRepository } from "../../blog/repositories/blogRepository";
 import { LikeStatus } from "../../like/types/like-status";
 import { PostLikeStatusInputDto } from "../../like/types/input/post-like-status-input.dto";
-import { LikePostsRepository } from "../../like/repositories/like-posts.repository";
+import { PostLikeRepository } from "../../like/repositories/post-like.repository";
 import { UserRepository } from "../../user/repositories/user.repository";
 
 @injectable()
@@ -20,7 +20,7 @@ export class PostService {
     constructor(
         @inject(PostRepository) private postRepository: PostRepository,
         @inject(CommentRepository) private commentRepository: CommentRepository,
-        @inject(LikePostsRepository) private likePostsRepository: LikePostsRepository,
+        @inject(PostLikeRepository) private postLikeRepository: PostLikeRepository,
         @inject(UserRepository) private userRepository: UserRepository,
         @inject(BlogRepository) private blogRepository: BlogRepository,
     ) {}
@@ -115,7 +115,7 @@ export class PostService {
 
     async updateLikeCountAndStatus(dto: PostLikeStatusInputDto): Promise<Result> {
 
-        const post = await this.commentRepository.findById(dto.postId);
+        const post = await this.postRepository.findById(dto.postId);
         if (!post) return {
             status: ResultStatus.NotFound_404,
             errorMessage: 'NotFound',
@@ -130,7 +130,7 @@ export class PostService {
             extensions: []
         };
 
-        const like = await this.likePostsRepository.findByPostIdAndUserId(dto.postId, dto.userId);
+        const like = await this.postLikeRepository.findByPostIdAndUserId(dto.postId, dto.userId);
 
         const oldStatus = like ? like.status : LikeStatus.None;
         const newStatus = dto.likeStatus;
@@ -158,7 +158,7 @@ export class PostService {
             { upsert: true }
         );
 
-        await this.commentRepository.updateLikesCount(dto.postId, likesModifier, dislikesModifier);
+        await this.postRepository.updateLikesCount(dto.postId, likesModifier, dislikesModifier);
 
         return {
             status: ResultStatus.Success,
