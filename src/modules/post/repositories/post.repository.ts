@@ -16,6 +16,19 @@ export class PostRepository {
         return savedPost.id;
     }
 
+    async updateLikesCount(postId: string, likesModifier: number, dislikesModifier: number): Promise<boolean> {
+        const result = await PostModel.updateOne(
+            { _id: postId },
+            {
+                $inc: {
+                    "extendedLikesInfo.likesCount": likesModifier,
+                    "extendedLikesInfo.dislikesCount": dislikesModifier
+                }
+            }
+        );
+        return result.matchedCount > 0;
+    }
+
     async updateAllBlogNames(blogId: string, blogName: string): Promise<boolean> {
         const updateAllResult = await PostModel.updateMany(
             { blogId: blogId },

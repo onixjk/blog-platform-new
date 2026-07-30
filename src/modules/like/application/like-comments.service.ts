@@ -1,17 +1,17 @@
 import { Result } from "../../../core/result/result.type";
 import { ResultStatus } from "../../../core/result/resultCode";
 import { inject, injectable } from "inversify";
-import { LikeRepository } from "../repositories/like.repository";
-import { Like } from "../types/like";
+import { LikeCommentsRepository } from "../repositories/like-comments.repository";
+import { LikeComments } from "../types/comment-like";
 
 @injectable()
-export class LikeService {
+export class LikeCommentsService {
 
     constructor(
-        @inject(LikeRepository) private likeRepository: LikeRepository,
+        @inject(LikeCommentsRepository) private likeRepository: LikeCommentsRepository,
     ) {}
 
-    async update(dto: Like): Promise<Result<string | null>> {
+    async update(dto: LikeComments): Promise<Result<string | null>> {
 
         const savedLike = await this.likeRepository.save(dto);
 

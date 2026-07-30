@@ -1,6 +1,6 @@
 import { LikeStatus } from "./like-status";
 
-export type Like = {
+export type LikeComments = {
     commentId: string,
     userId: string,
     status: LikeStatus,

@@ -1,6 +1,6 @@
 import { LikeStatus } from "../like-status";
 
-export type LikeStatusInputDto = {
+export type CommentLikeStatusInputDto = {
     commentId: string,
     userId: string,
     likeStatus: LikeStatus,

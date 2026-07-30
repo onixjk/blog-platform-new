@@ -6,24 +6,24 @@ import { IUserDB } from "../modules/user/types/user.db.interface";
 import { Comment } from "../modules/comment/types/comment";
 import { Session } from "../modules/auth/types/session";
 import { ApiRequestLog } from "../modules/auth/types/api-request-log";
-import { Like } from "../modules/like/types/like";
+import { LikeComments } from "../modules/like/types/like-comments";
 
 const ApiRequestSchema = new Schema<ApiRequestLog>({
-    ip: {type: String, required: true},
-    url: {type: String, required: true},
+    ip: { type: String, required: true },
+    url: { type: String, required: true },
     date: { type: Date, required: true, expires: 10 }
 });
 
-const SessionSchema = new Schema<Session>({
-        user_id: { type: String, required: true },
-        device_id: { type: String, required: true },
-        iat: { type: Date, required: true },
-        browserName: { type: String, required: true },
-        ip: { type: String, required: true },
-        exp: { type: Date, required: true, expires: 0 }
-    });
+export const SessionSchema = new Schema<Session>({
+    user_id: { type: String, required: true },
+    device_id: { type: String, required: true },
+    iat: { type: Date, required: true },
+    browserName: { type: String, required: true },
+    ip: { type: String, required: true },
+    exp: { type: Date, required: true, expires: 0 }
+});
 
-const BlogSchema = new Schema<Blog>({
+export const BlogSchema = new Schema<Blog>({
     name: { type: String, required: true, minLength: 1 },
     description: { type: String, required: true, minLength: 1 },
     websiteUrl: { type: String, required: true, minLength: 7 },
@@ -37,23 +37,11 @@ export const PostSchema = new Schema<Post>({
     content: { type: String, required: true, minLength: 1 },
     blogId: { type: String, required: true },
     blogName: { type: String, required: true, minLength: 1 },
-    createdAt: { type: String, required: true }
-});
-
-const UserSchema = new Schema<IUserDB>({
-    login: { type: String, required: true, unique: true },
-    email: { type: String, required: true, unique: true },
-    passwordHash: { type: String, required: true },
     createdAt: { type: String, required: true },
-    emailConfirmation: {
-        confirmationCode: { type: String },
-        expirationDate: { type: Date },
-        isConfirmed: { type: Boolean, default: false }
-    },
-    passwordRecovery: {
-        recoveryCode: { type: String },
-        expirationDate: { type: Date },
-    },
+    extendedLikesInfo: {
+        likesCount: { type: Number, required: true, default: 0 },
+        dislikesCount: { type: Number, required: true, default: 0 }
+    }
 });
 
 export const CommentSchema = new Schema<Comment>({
@@ -70,7 +58,30 @@ export const CommentSchema = new Schema<Comment>({
     }
 });
 
-export const LikesSchema = new Schema<Like>({
+export const UserSchema = new Schema<IUserDB>({
+    login: { type: String, required: true, unique: true },
+    email: { type: String, required: true, unique: true },
+    passwordHash: { type: String, required: true },
+    createdAt: { type: String, required: true },
+    emailConfirmation: {
+        confirmationCode: { type: String },
+        expirationDate: { type: Date },
+        isConfirmed: { type: Boolean, default: false }
+    },
+    passwordRecovery: {
+        recoveryCode: { type: String },
+        expirationDate: { type: Date },
+    },
+});
+
+export const LikeCommentsSchema = new Schema<LikeComments>({
+    commentId: { type: String, required: true },
+    userId: { type: String, required: true },
+    status: { type: String, required: true },
+    createdAt: { type: String, required: true }
+});
+
+export const LikePostsSchema = new Schema<LikeComments>({
     commentId: { type: String, required: true },
     userId: { type: String, required: true },
     status: { type: String, required: true },
@@ -81,7 +92,8 @@ export let BlogModel = mongoose.model<Blog>('blogs', BlogSchema);
 export let PostModel = mongoose.model<Post>('posts', PostSchema);
 export let UserModel = mongoose.model<IUserDB>('users', UserSchema);
 export let CommentModel = mongoose.model<Comment>('comments', CommentSchema);
-export let LikeModel = mongoose.model<Like>('likes', LikesSchema);
+export let LikeCommentsModel = mongoose.model<LikeComments>('likeComments', LikeCommentsSchema);
+export let LikePostsModel = mongoose.model<LikeComments>('likePosts', LikePostsSchema);
 export let SessionModel = mongoose.model<Session>('sessions', SessionSchema);
 export let ApiRequestsModel = mongoose.model<ApiRequestLog>('apiRequests', ApiRequestSchema);
 

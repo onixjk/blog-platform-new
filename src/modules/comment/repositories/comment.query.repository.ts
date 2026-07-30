@@ -4,7 +4,7 @@ import { CommentListPaginatedOutput } from "../types/output/comment-list-paginat
 import { CommentOutput } from "../types/output/comment-output";
 import { mapToCommentOutput } from "../routes/mapers/map-to-comment-output.util";
 import { injectable } from "inversify";
-import { CommentModel, LikeModel } from "../../../db/mongo.db";
+import { CommentModel, LikeCommentsModel } from "../../../db/mongo.db";
 import { LikeStatus } from "../../like/types/like-status";
 
 @injectable()
@@ -17,7 +17,7 @@ export class CommentQueryRepository {
         let myStatus = LikeStatus.None;
 
         if (userId) {
-            const likeDoc = await LikeModel.findOne({
+            const likeDoc = await LikeCommentsModel.findOne({
                 commentId: id.toString(),
                 userId: userId.toString()
             }).lean();
@@ -30,11 +30,7 @@ export class CommentQueryRepository {
         return comment ? mapToCommentOutput(comment, myStatus) : null;
     }
 
-    async findCommentByPost(
-        queryDto: CommentQueryInput,
-        postId: string,
-        userId?: string | null,
-    ): Promise<CommentListPaginatedOutput> {
+    async findCommentByPost(queryDto: CommentQueryInput, postId: string, userId?: string | null): Promise<CommentListPaginatedOutput> {
         const { pageNumber, pageSize, sortBy, sortDirection } = queryDto;
         const skip = (pageNumber - 1) * pageSize;
         const filter = { 'postId': postId };
@@ -55,7 +51,7 @@ export class CommentQueryRepository {
         let userLikes: any[] = [];
 
         if (userId) {
-            userLikes = await LikeModel.find({
+            userLikes = await LikeCommentsModel.find({
                 commentId: { $in: commentIds },
                 userId: userId.toString()
             }).lean();

@@ -10,9 +10,9 @@ import { CommentModel } from "../../../db/mongo.db";
 import { HydratedDocument } from "mongoose";
 import { UserRepository } from "../../user/repositories/user.repository";
 import { LikeStatus } from "../../like/types/like-status";
-import { LikeStatusInputDto } from "../../like/types/input/like-status-input.dto";
-import { LikeService } from "../../like/application/like.service";
-import { LikeRepository } from "../../like/repositories/like.repository";
+import { CommentLikeStatusInputDto } from "../../like/types/input/comment-like-status-input.dto";
+import { LikeCommentsService } from "../../like/application/like-comments.service";
+import { LikeCommentsRepository } from "../../like/repositories/like-comments.repository";
 
 @injectable()
 export class CommentService {
@@ -21,8 +21,8 @@ export class CommentService {
         @inject(CommentRepository) private commentRepository: CommentRepository,
         @inject(UserRepository) private userRepository: UserRepository,
         @inject(PostRepository) private postRepository: PostRepository,
-        @inject(LikeRepository) private likeRepository: LikeRepository,
-        @inject(LikeService) private likeService: LikeService,
+        @inject(LikeCommentsRepository) private commentLikeRepository: LikeCommentsRepository,
+        @inject(LikeCommentsService) private commentLikeService: LikeCommentsService,
     ) {}
 
     async findById(id: string): Promise<Result<HydratedDocument<Comment> | null>> {
@@ -123,7 +123,7 @@ export class CommentService {
         };
     }
 
-    async updateLikeCountAndStatus(dto: LikeStatusInputDto): Promise<Result> {
+    async updateLikeCountAndStatus(dto: CommentLikeStatusInputDto): Promise<Result> {
 
         const comment = await this.commentRepository.findById(dto.commentId);
         if (!comment) {
@@ -135,7 +135,7 @@ export class CommentService {
             }
         }
 
-        const like = await this.likeRepository.findByCommentIdAndUserId(dto.commentId, dto.userId);
+        const like = await this.commentLikeRepository.findByCommentIdAndUserId(dto.commentId, dto.userId);
 
         const oldStatus = like ? like.status : LikeStatus.None;
         const newStatus = dto.likeStatus;
@@ -157,7 +157,7 @@ export class CommentService {
         if (newStatus === LikeStatus.Like) likesModifier++;
         if (newStatus === LikeStatus.Dislike) dislikesModifier++;
 
-        await this.likeService.update({
+        await this.commentLikeService.update({
             commentId: dto.commentId,
             userId: dto.userId,
             status: newStatus,

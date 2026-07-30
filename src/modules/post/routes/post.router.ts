@@ -15,6 +15,7 @@ import { container } from "../../../composition-root";
 import { PostController } from "../controllers/post.controller";
 import { superAdminGuardMiddleware } from "../../auth/middlewares/super-admin.guard";
 import { guestOrUserAuthMiddleware } from "../../auth/middlewares/guest-or-user-auth.middleware";
+import { likeStatusValidation } from "../../like/middlewares/comment-like-status.validation-middleware";
 
 export const postRouter = Router({});
 
@@ -23,6 +24,7 @@ const postController = container.get(PostController);
 postRouter
     .get('',
         paginationAndSortingValidation(PostSortField),
+        likeStatusValidation,
         inputValidationResultMiddleware,
         guestOrUserAuthMiddleware,
         postController.getPostList.bind(postController)
@@ -30,13 +32,16 @@ postRouter
 
     .get('/:id',
         idValidation,
+        likeStatusValidation,
         inputValidationResultMiddleware,
+        guestOrUserAuthMiddleware,
         postController.getPost.bind(postController)
     )
 
     .get('/:postId/comments',
         postIdValidation,
         paginationAndSortingValidation(CommentSortField),
+        likeStatusValidation,
         inputValidationResultMiddleware,
         guestOrUserAuthMiddleware,
         postController.getPostCommentList.bind(postController)

@@ -5,10 +5,14 @@ import { inject, injectable } from "inversify";
 import { PostRepository } from "../repositories/post.repository";
 import { CommentRepository } from "../../comment/repositories/comment.repository";
 import { ResultStatus } from "../../../core/result/resultCode";
-import { PostModel } from "../../../db/mongo.db";
+import { LikePostsModel, PostModel } from "../../../db/mongo.db";
 import { HydratedDocument } from "mongoose";
 import { Blog } from "../../blog/types/blog";
 import { BlogRepository } from "../../blog/repositories/blogRepository";
+import { LikeStatus } from "../../like/types/like-status";
+import { PostLikeStatusInputDto } from "../../like/types/input/post-like-status-input.dto";
+import { LikePostsRepository } from "../../like/repositories/like-posts.repository";
+import { UserRepository } from "../../user/repositories/user.repository";
 
 @injectable()
 export class PostService {
@@ -16,6 +20,8 @@ export class PostService {
     constructor(
         @inject(PostRepository) private postRepository: PostRepository,
         @inject(CommentRepository) private commentRepository: CommentRepository,
+        @inject(LikePostsRepository) private likePostsRepository: LikePostsRepository,
+        @inject(UserRepository) private userRepository: UserRepository,
         @inject(BlogRepository) private blogRepository: BlogRepository,
     ) {}
 
@@ -103,6 +109,67 @@ export class PostService {
         return {
             status: ResultStatus.Success,
             data: savedPostId,
+            extensions: []
+        };
+    }
+
+    async updateLikeCountAndStatus(dto: PostLikeStatusInputDto): Promise<Result> {
+
+        const post = await this.commentRepository.findById(dto.postId);
+        if (!post) return {
+            status: ResultStatus.NotFound_404,
+            errorMessage: 'NotFound',
+            data: null,
+            extensions: [{ field: 'Post', message: 'Post does not exist' }],
+        }
+
+        const user = await this.userRepository.findById(dto.userId);
+        if (!user) return {
+            status: ResultStatus.Unauthorized_401,
+            data: null,
+            extensions: []
+        };
+
+        const like = await this.likePostsRepository.findByPostIdAndUserId(dto.postId, dto.userId);
+
+        const oldStatus = like ? like.status : LikeStatus.None;
+        const newStatus = dto.likeStatus;
+
+        if (oldStatus === newStatus) {
+            return {
+                status: ResultStatus.Success,
+                data: null,
+                extensions: []
+            };
+        }
+
+        let likesModifier = 0;
+        let dislikesModifier = 0;
+
+        if (oldStatus === LikeStatus.Like) likesModifier--;
+        if (oldStatus === LikeStatus.Dislike) dislikesModifier--;
+
+        if (newStatus === LikeStatus.Like) likesModifier++;
+        if (newStatus === LikeStatus.Dislike) dislikesModifier++;
+
+        await LikePostsModel.findOneAndUpdate(
+            { postId: dto.postId, userId: dto.userId },
+            { status: newStatus, login: user.login, createdAt: new Date() },
+            { upsert: true }
+        );
+
+        // await this.postLikeService.update({
+        //     postId: dto.postId,
+        //     userId: dto.userId,
+        //     status: newStatus,
+        //     createdAt: new Date(),
+        // });
+
+        await this.commentRepository.updateLikesCount(dto.postId, likesModifier, dislikesModifier);
+
+        return {
+            status: ResultStatus.Success,
+            data: null,
             extensions: []
         };
     }
