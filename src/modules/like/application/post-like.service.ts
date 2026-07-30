@@ -1,8 +1,8 @@
 import { Result } from "../../../core/result/result.type";
 import { ResultStatus } from "../../../core/result/resultCode";
 import { inject, injectable } from "inversify";
-import { PostLike } from "../types/like-posts";
 import { PostLikeRepository } from "../repositories/post-like.repository";
+import { PostLike } from "../types/post-like";
 
 @injectable()
 export class PostLikeService {

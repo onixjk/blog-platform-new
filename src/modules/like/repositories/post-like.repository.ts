@@ -1,7 +1,7 @@
 import { injectable } from "inversify";
 import { HydratedDocument } from "mongoose";
 import { PostLikeModel } from "../../../db/mongo.db";
-import { PostLike } from "../types/like-posts";
+import { PostLike } from "../types/post-like";
 
 @injectable()
 export class PostLikeRepository {

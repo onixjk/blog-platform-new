@@ -1,20 +1,20 @@
 import { injectable } from "inversify";
 import { HydratedDocument } from "mongoose";
 import { CommentLikeModel } from "../../../db/mongo.db";
-import { LikeComments } from "../types/like-comments";
+import { CommentLike } from "../types/comment-like";
 
 @injectable()
 export class CommentLikeRepository {
 
-    async findById(id: string): Promise<HydratedDocument<LikeComments> | null> {
+    async findById(id: string): Promise<HydratedDocument<CommentLike> | null> {
         return CommentLikeModel.findById(id);
     }
 
-    async findByCommentIdAndUserId(commentId: string, userId: string): Promise<HydratedDocument<LikeComments> | null> {
+    async findByCommentIdAndUserId(commentId: string, userId: string): Promise<HydratedDocument<CommentLike> | null> {
         return CommentLikeModel.findOne({ commentId, userId });
     }
 
-    async save(dto: LikeComments): Promise<string> {
+    async save(dto: CommentLike): Promise<string> {
 
         const savedLike = await CommentLikeModel.findOneAndUpdate(
             {
