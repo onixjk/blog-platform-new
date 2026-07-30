@@ -15,6 +15,7 @@ import { container } from "../../../composition-root";
 import { PostController } from "../controllers/post.controller";
 import { superAdminGuardMiddleware } from "../../auth/middlewares/super-admin.guard";
 import { guestOrUserAuthMiddleware } from "../../auth/middlewares/guest-or-user-auth.middleware";
+import { likeStatusValidation } from "../../like/middlewares/like-status.validation-middleware";
 
 export const postRouter = Router({});
 
@@ -60,7 +61,7 @@ postRouter
     .put('/:postId/like-status',
         postIdValidation,
         accessTokenGuard,
-        // likeStatusValidation,
+        likeStatusValidation,
         inputValidationResultMiddleware,
         postController.updateLikeStatus.bind(postController)
     )
