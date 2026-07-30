@@ -41,29 +41,6 @@ export class PostQueryRepository {
         return mapToPostOutput(post, myStatus, formattedNewestLikes);
     }
 
-    // async findMany(queryDto: PostQueryInput): Promise<PostListPaginatedOutput> {
-    //     const { pageNumber, pageSize, sortBy, sortDirection } = queryDto;
-    //     const skip = (pageNumber - 1) * pageSize;
-    //     const filter: any = {};
-    //
-    //     const [items, totalCount] = await Promise.all([
-    //         PostModel
-    //             .find(filter)
-    //             .sort({ [sortBy]: sortDirection })
-    //             .skip(skip)
-    //             .limit(pageSize)
-    //             .lean(),
-    //         PostModel
-    //             .countDocuments(filter)
-    //     ]);
-    //
-    //     return mapToPostListPaginatedOutput(items, {
-    //         pageNumber,
-    //         pageSize,
-    //         totalCount,
-    //     });
-    // }
-
     async findMany(queryDto: PostQueryInput, userId?: string | null): Promise<PostListPaginatedOutput> {
         const { pageNumber, pageSize, sortBy, sortDirection } = queryDto;
         const skip = (pageNumber - 1) * pageSize;

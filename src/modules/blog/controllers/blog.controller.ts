@@ -56,6 +56,8 @@ export class BlogController {
         const blog = await this.blogQueryRepository.findById(blogId);
         if (!blog) return res.sendStatus(HttpStatuses.NotFound_404);
 
+        const userId = req.user?.id;
+
         const sanitizedQuery = matchedData<PostQueryInput>(req, {
             locations: ['query'],
             includeOptionals: true,
@@ -65,6 +67,7 @@ export class BlogController {
         const postListOutput = await this.postQueryRepository.findPostsByBlog(
             queryInput,
             blogId,
+            userId
         );
 
         res.status(HttpStatuses.Ok_200).send(postListOutput);

@@ -13,6 +13,7 @@ import {
 import { container } from "../../../composition-root";
 import { BlogController } from "../controllers/blog.controller";
 import { superAdminGuardMiddleware } from "../../auth/middlewares/super-admin.guard";
+import { guestOrUserAuthMiddleware } from "../../auth/middlewares/guest-or-user-auth.middleware";
 
 export const blogRouter = Router({});
 
@@ -34,6 +35,7 @@ blogRouter
     .get('/:blogId/posts',
         blogIdValidation,
         paginationAndSortingValidation(PostSortField),
+        guestOrUserAuthMiddleware,
         inputValidationResultMiddleware,
         blogController.getBlogPostList.bind(blogController),
     )
