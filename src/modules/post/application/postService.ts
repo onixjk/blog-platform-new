@@ -62,6 +62,10 @@ export class PostService {
             blogId: dto.blogId,
             blogName: blog.name,
             createdAt: new Date().toISOString(),
+            extendedLikesInfo: {
+                likesCount: 0,
+                dislikesCount: 0
+            }
         })
 
         const savedPostId = await this.postRepository.save(newPost);
