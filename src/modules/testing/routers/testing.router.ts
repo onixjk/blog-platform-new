@@ -4,7 +4,7 @@ import {
     ApiRequestsModel,
     BlogModel,
     CommentModel,
-    LikeCommentsModel, LikePostsModel,
+    CommentLikeModel, PostLikeModel,
     PostModel,
     SessionModel,
     UserModel
@@ -22,8 +22,8 @@ testingRouter.delete('/all-data', async (req: Request, res: Response) => {
             CommentModel.deleteMany({}),
             SessionModel.deleteMany({}),
             ApiRequestsModel.deleteMany({}),
-            LikeCommentsModel.deleteMany({}),
-            LikePostsModel.deleteMany({}),
+            CommentLikeModel.deleteMany({}),
+            PostLikeModel.deleteMany({}),
         ]);
 
         res.sendStatus(HttpStatuses.NoContent_204)

@@ -4,7 +4,7 @@ import { mapToPostListPaginatedOutput } from "../routes/mapers/map-to-post-list-
 import { PostOutput } from "../types/output/post-output";
 import { mapToPostOutput } from "../routes/mapers/map-to-post-output.util";
 import { injectable } from "inversify";
-import { LikePostsModel, PostModel } from "../../../db/mongo.db";
+import { PostLikeModel, PostModel } from "../../../db/mongo.db";
 import { LikeStatus } from "../../like/types/like-status";
 
 @injectable()
@@ -17,7 +17,7 @@ export class PostQueryRepository {
         let myStatus = LikeStatus.None;
 
         if (userId) {
-            const likeDoc = await LikePostsModel.findOne({
+            const likeDoc = await PostLikeModel.findOne({
                 postId: id.toString(),
                 userId: userId.toString()
             }).lean();
@@ -27,7 +27,7 @@ export class PostQueryRepository {
             }
         }
 
-        const newestLikes = await LikePostsModel.find({ postId: id, status: LikeStatus.Like })
+        const newestLikes = await PostLikeModel.find({ postId: id, status: LikeStatus.Like })
             .sort({ createdAt: -1 })
             .limit(3)
             .lean();
@@ -72,12 +72,12 @@ export class PostQueryRepository {
         let userLikes: any[] = [];
 
         if (userId) {
-            userLikes = await LikePostsModel.find({ postId: { $in: postIds }, userId }).lean();
+            userLikes = await PostLikeModel.find({ postId: { $in: postIds }, userId }).lean();
         }
 
         const myStatusesMap = new Map<string, LikeStatus>(userLikes.map(l => [l.postId, l.status as LikeStatus]));
 
-        const newestLikesDocs = await LikePostsModel.aggregate([
+        const newestLikesDocs = await PostLikeModel.aggregate([
             { $match: { postId: { $in: postIds }, status: LikeStatus.Like } },
             { $sort: { createdAt: -1 } },
             {
@@ -127,7 +127,7 @@ export class PostQueryRepository {
         let userLikes: any[] = [];
 
         if (userId) {
-            userLikes = await LikePostsModel.find({
+            userLikes = await PostLikeModel.find({
                 postId: { $in: postIds },
                 userId
             }).lean();
@@ -137,7 +137,7 @@ export class PostQueryRepository {
             userLikes.map(like => [like.postId, like.status as LikeStatus])
         );
 
-        const newestLikesDocs = await LikePostsModel.aggregate([
+        const newestLikesDocs = await PostLikeModel.aggregate([
             { $match: { postId: { $in: postIds }, status: LikeStatus.Like } },
             { $sort: { createdAt: -1 } },
             {

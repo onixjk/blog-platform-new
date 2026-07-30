@@ -74,14 +74,14 @@ export const UserSchema = new Schema<IUserDB>({
     },
 });
 
-export const LikeCommentsSchema = new Schema<LikeComments>({
+export const CommentLikeSchema = new Schema<LikeComments>({
     commentId: { type: String, required: true },
     userId: { type: String, required: true },
     status: { type: String, required: true },
     createdAt: { type: String, required: true }
 });
 
-export const LikePostsSchema = new Schema<LikeComments>({
+export const PostLikeSchema = new Schema<LikeComments>({
     commentId: { type: String, required: true },
     userId: { type: String, required: true },
     status: { type: String, required: true },
@@ -92,8 +92,8 @@ export let BlogModel = mongoose.model<Blog>('blogs', BlogSchema);
 export let PostModel = mongoose.model<Post>('posts', PostSchema);
 export let UserModel = mongoose.model<IUserDB>('users', UserSchema);
 export let CommentModel = mongoose.model<Comment>('comments', CommentSchema);
-export let LikeCommentsModel = mongoose.model<LikeComments>('likeComments', LikeCommentsSchema);
-export let LikePostsModel = mongoose.model<LikeComments>('likePosts', LikePostsSchema);
+export let CommentLikeModel = mongoose.model<LikeComments>('commentLike', CommentLikeSchema);
+export let PostLikeModel = mongoose.model<LikeComments>('postLike', PostLikeSchema);
 export let SessionModel = mongoose.model<Session>('sessions', SessionSchema);
 export let ApiRequestsModel = mongoose.model<ApiRequestLog>('apiRequests', ApiRequestSchema);
 

@@ -5,7 +5,7 @@ import { inject, injectable } from "inversify";
 import { PostRepository } from "../repositories/post.repository";
 import { CommentRepository } from "../../comment/repositories/comment.repository";
 import { ResultStatus } from "../../../core/result/resultCode";
-import { LikePostsModel, PostModel } from "../../../db/mongo.db";
+import { PostLikeModel, PostModel } from "../../../db/mongo.db";
 import { HydratedDocument } from "mongoose";
 import { BlogRepository } from "../../blog/repositories/blogRepository";
 import { LikeStatus } from "../../like/types/like-status";
@@ -151,7 +151,7 @@ export class PostService {
         if (newStatus === LikeStatus.Like) likesModifier++;
         if (newStatus === LikeStatus.Dislike) dislikesModifier++;
 
-        await LikePostsModel.findOneAndUpdate(
+        await PostLikeModel.findOneAndUpdate(
             { postId: dto.postId, userId: dto.userId },
             { status: newStatus, login: user.login, createdAt: new Date() },
             { upsert: true }
