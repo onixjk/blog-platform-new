@@ -18,7 +18,6 @@ const commentController = container.get(CommentController);
 commentRouter
     .get('/:commentId',
         commentIdValidation,
-        likeStatusValidation,
         inputValidationResultMiddleware,
         guestOrUserAuthMiddleware,
         commentController.getComment.bind(commentController)
