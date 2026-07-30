@@ -8,7 +8,6 @@ import { accessTokenGuard } from "../../auth/middlewares/access-token.guard";
 import { container } from "../../../composition-root";
 import { CommentController } from "../controllers/comment.controller";
 import { guestOrUserAuthMiddleware } from "../../auth/middlewares/guest-or-user-auth.middleware";
-import { likeStatusValidation } from "../../like/middlewares/comment-like-status.validation-middleware";
 
 export const commentRouter = Router({});
 
@@ -34,7 +33,7 @@ commentRouter
     .put('/:commentId/like-status',
         commentIdValidation,
         accessTokenGuard,
-        likeStatusValidation,
+        // likeStatusValidation,
         inputValidationResultMiddleware,
         commentController.updateLikeStatus.bind(commentController),
     )
