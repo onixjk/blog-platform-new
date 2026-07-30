@@ -38,7 +38,7 @@ export const PostSchema = new Schema<Post>({
     content: { type: String, required: true, minLength: 1 },
     blogId: { type: String, required: true },
     blogName: { type: String, required: true, minLength: 1 },
-    createdAt: { type: Date, required: true },
+    createdAt: { type: String, required: true },
     extendedLikesInfo: {
         likesCount: { type: Number, required: true, default: 0 },
         dislikesCount: { type: Number, required: true, default: 0 }

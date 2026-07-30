@@ -61,7 +61,7 @@ export class PostService {
             content: dto.content,
             blogId: dto.blogId,
             blogName: blog.name,
-            createdAt: new Date(),
+            createdAt: new Date().toISOString(),
             extendedLikesInfo: {
                 likesCount: 0,
                 dislikesCount: 0

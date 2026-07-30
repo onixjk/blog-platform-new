@@ -27,12 +27,18 @@ export class PostQueryRepository {
             }
         }
 
-        const newestLikes = await PostLikeModel.find({ postId: id, status: LikeStatus.Like })
+        const newestLikesDocs = await PostLikeModel.find({ postId: id, status: LikeStatus.Like })
             .sort({ createdAt: -1 })
             .limit(3)
             .lean();
 
-        return mapToPostOutput(post, myStatus, newestLikes);
+        const formattedNewestLikes = newestLikesDocs.map(like => ({
+            addedAt: like.createdAt,
+            userId: like.userId,
+            login: like.login
+        }));
+
+        return mapToPostOutput(post, myStatus, formattedNewestLikes);
     }
 
     // async findMany(queryDto: PostQueryInput): Promise<PostListPaginatedOutput> {

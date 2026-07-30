@@ -16,7 +16,7 @@ export function mapToPostOutput(post: Post & { _id: any }, myStatus: LikeStatus,
             dislikesCount: post.extendedLikesInfo?.dislikesCount ?? 0,
             myStatus: myStatus,
             newestLikes: newestLikes.map(like => ({
-                addedAt: like.addedAt instanceof Date ? like.addedAt.toISOString() : new Date(like.addedAt).toISOString(),
+                addedAt: like.addedAt ? new Date(like.addedAt).toISOString() : new Date().toISOString(),
                 userId: like.userId,
                 login: like.login,
             }))
