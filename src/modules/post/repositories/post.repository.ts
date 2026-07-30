@@ -49,4 +49,40 @@ export class PostRepository {
 
         return deleteResult.acknowledged;
     }
+
+    async pushNewestLike(postId: string, userId: string, login: string): Promise<boolean> {
+        const result = await PostModel.updateOne(
+            { _id: postId },
+            {
+                $push: {
+                    "extendedLikesInfo.newestLikes": {
+                        $each: [{ addedAt: new Date(), userId, login }],
+                        $sort: { addedAt: -1 },
+                        $slice: 3
+                    }
+                }
+            }
+        );
+        return result.matchedCount > 0;
+    }
+
+    async pullNewestLike(postId: string, userId: string): Promise<boolean> {
+        const result = await PostModel.updateOne(
+            { _id: postId },
+            {
+                $pull: {
+                    "extendedLikesInfo.newestLikes": { userId: userId }
+                }
+            }
+        );
+        return result.matchedCount > 0;
+    }
+
+    async setNewestLikes(postId: string, newestLikes: any[]): Promise<boolean> {
+        const result = await PostModel.updateOne(
+            { _id: postId },
+            { $set: { "extendedLikesInfo.newestLikes": newestLikes } }
+        );
+        return result.matchedCount > 0;
+    }
 }

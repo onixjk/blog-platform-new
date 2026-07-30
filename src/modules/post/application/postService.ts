@@ -5,7 +5,7 @@ import { inject, injectable } from "inversify";
 import { PostRepository } from "../repositories/post.repository";
 import { CommentRepository } from "../../comment/repositories/comment.repository";
 import { ResultStatus } from "../../../core/result/resultCode";
-import { PostLikeModel, PostModel } from "../../../db/mongo.db";
+import { PostModel } from "../../../db/mongo.db";
 import { HydratedDocument } from "mongoose";
 import { BlogRepository } from "../../blog/repositories/blogRepository";
 import { LikeStatus } from "../../like/types/like-status";
@@ -155,13 +155,30 @@ export class PostService {
         if (newStatus === LikeStatus.Like) likesModifier++;
         if (newStatus === LikeStatus.Dislike) dislikesModifier++;
 
-        await PostLikeModel.findOneAndUpdate(
-            { postId: dto.postId, userId: dto.userId },
-            { status: newStatus, login: user.login, createdAt: new Date() },
-            { upsert: true }
-        );
+        // 1. Обновляем статус самого лайка через репозиторий лайков
+        await this.postLikeRepository.updateLikeStatus(dto.postId, dto.userId, newStatus, user.login);
 
+        // 2. Обновляем счетчики лайков через репозиторий постов
         await this.postRepository.updateLikesCount(dto.postId, likesModifier, dislikesModifier);
+
+        // 3. Синхронизируем массив кэшированных топ-3 лайков в посте через репозитории
+        if (newStatus === LikeStatus.Like) {
+            await this.postRepository.pushNewestLike(dto.postId, dto.userId, user.login);
+        } else {
+            // Удаляем пользователя из кэша
+            await this.postRepository.pullNewestLike(dto.postId, dto.userId);
+
+            // Добираем из базы актуальный топ-3, если массив опустел
+            const activeTopLikes = await this.postLikeRepository.getLatestLikesForPost(dto.postId);
+
+            const formattedLikes = activeTopLikes.map(l => ({
+                addedAt: l.createdAt,
+                userId: l.userId,
+                login: l.login
+            }));
+
+            await this.postRepository.setNewestLikes(dto.postId, formattedLikes);
+        }
 
         return {
             status: ResultStatus.Success,
