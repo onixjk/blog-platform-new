@@ -7,7 +7,6 @@ import { CommentRepository } from "../../comment/repositories/comment.repository
 import { ResultStatus } from "../../../core/result/resultCode";
 import { LikePostsModel, PostModel } from "../../../db/mongo.db";
 import { HydratedDocument } from "mongoose";
-import { Blog } from "../../blog/types/blog";
 import { BlogRepository } from "../../blog/repositories/blogRepository";
 import { LikeStatus } from "../../like/types/like-status";
 import { PostLikeStatusInputDto } from "../../like/types/input/post-like-status-input.dto";
