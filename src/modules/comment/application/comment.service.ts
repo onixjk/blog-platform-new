@@ -126,27 +126,25 @@ export class CommentService {
     async updateLikeCountAndStatus(dto: CommentLikeStatusInputDto): Promise<Result> {
 
         const comment = await this.commentRepository.findById(dto.commentId);
-        if (!comment) {
-            return {
-                status: ResultStatus.NotFound_404,
-                errorMessage: 'NotFound',
-                data: null,
-                extensions: [{ field: 'Comment', message: 'Comment not exist' }],
-            }
+        if (!comment) return {
+            status: ResultStatus.NotFound_404,
+            errorMessage: 'NotFound',
+            data: null,
+            extensions: [{ field: 'Comment', message: 'Comment not exist' }],
         }
+
 
         const like = await this.commentLikeRepository.findByCommentIdAndUserId(dto.commentId, dto.userId);
 
         const oldStatus = like ? like.status : LikeStatus.None;
         const newStatus = dto.likeStatus;
 
-        if (oldStatus === newStatus) {
-            return {
-                status: ResultStatus.Success,
-                data: null,
-                extensions: []
-            };
-        }
+        if (oldStatus === newStatus) return {
+            status: ResultStatus.Success,
+            data: null,
+            extensions: []
+        };
+
 
         let likesModifier = 0;
         let dislikesModifier = 0;
