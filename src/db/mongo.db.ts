@@ -32,6 +32,11 @@ export const BlogSchema = new Schema<Blog>({
     isMembership: { type: Boolean, default: false },
 });
 
+const NewestLikeSchema = new Schema({
+    addedAt: { type: Date, required: true, default: Date.now },
+    userId: { type: String, required: true },
+    login: { type: String, required: true }
+}, { _id: false });
 export const PostSchema = new Schema<Post>({
     title: { type: String, required: true, minLength: 1 },
     shortDescription: { type: String, required: true, minLength: 1 },
@@ -41,7 +46,8 @@ export const PostSchema = new Schema<Post>({
     createdAt: { type: String, required: true },
     extendedLikesInfo: {
         likesCount: { type: Number, required: true, default: 0 },
-        dislikesCount: { type: Number, required: true, default: 0 }
+        dislikesCount: { type: Number, required: true, default: 0 },
+        newestLikes: { type: [NewestLikeSchema], default: [] }
     }
 });
 
