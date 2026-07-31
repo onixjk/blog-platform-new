@@ -155,22 +155,20 @@ export class PostService {
         if (newStatus === LikeStatus.Like) likesModifier++;
         if (newStatus === LikeStatus.Dislike) dislikesModifier++;
 
-        // 1. Обновляем статус самого лайка через репозиторий лайков
-        await this.postLikeRepository.updateLikeStatus(dto.postId, dto.userId, newStatus, user.login);
-
-        // 2. Обновляем счетчики лайков через репозиторий постов
-        await this.postRepository.updateLikesCount(dto.postId, likesModifier, dislikesModifier);
+        await Promise.all([
+            this.postLikeRepository.updateLikeStatus(dto.postId, dto.userId, newStatus, user.login),
+            this.postRepository.updateLikesCount(dto.postId, likesModifier, dislikesModifier)
+        ]);
 
         // 3. Синхронизируем массив кэшированных топ-3 лайков в посте через репозитории
         if (newStatus === LikeStatus.Like) {
+            // Юзер поставил лайк -> добавляем его в кэш
             await this.postRepository.pushNewestLike(dto.postId, dto.userId, user.login);
-        } else {
-            // Удаляем пользователя из кэша
+        } else if (oldStatus === LikeStatus.Like) {
+            // Юзер УБРАЛ лайк (поставил None или Dislike) -> удаляем и ищем замену
             await this.postRepository.pullNewestLike(dto.postId, dto.userId);
 
-            // Добираем из базы актуальный топ-3, если массив опустел
             const activeTopLikes = await this.postLikeRepository.getLatestLikesForPost(dto.postId);
-
             const formattedLikes = activeTopLikes.map(l => ({
                 addedAt: l.createdAt,
                 userId: l.userId,

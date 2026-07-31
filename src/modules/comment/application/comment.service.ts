@@ -157,14 +157,19 @@ export class CommentService {
         if (newStatus === LikeStatus.Like) likesModifier++;
         if (newStatus === LikeStatus.Dislike) dislikesModifier++;
 
-        await this.commentLikeService.update({
-            commentId: dto.commentId,
-            userId: dto.userId,
-            status: newStatus,
-            createdAt: new Date().toISOString(),
-        });
 
-        await this.commentRepository.updateLikesCount(dto.commentId, likesModifier, dislikesModifier);
+        await Promise.all([
+            await this.commentLikeService.update({
+                commentId: dto.commentId,
+                userId: dto.userId,
+                status: newStatus,
+                createdAt: new Date().toISOString(),
+            }),
+            await this.commentRepository.updateLikesCount(
+                dto.commentId,
+                likesModifier,
+                dislikesModifier
+            )]);
 
         return {
             status: ResultStatus.Success,
