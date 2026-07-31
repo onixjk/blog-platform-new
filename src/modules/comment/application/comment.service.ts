@@ -179,23 +179,21 @@ export class CommentService {
     async delete(id: string, userId: string): Promise<Result<boolean | null>> {
 
         const comment = await this.commentRepository.findById(id);
-        if (!comment) {
-            return {
-                status: ResultStatus.NotFound_404,
-                data: null,
-                errorMessage: 'Not Found',
-                extensions: [{ field: null, message: 'Comment doesn\'t exist' }],
-            };
+        if (!comment) return {
+            status: ResultStatus.NotFound_404,
+            data: null,
+            errorMessage: 'Not Found',
+            extensions: [{ field: null, message: 'Comment doesn\'t exist' }],
+        };
+
+
+        if (comment.commentatorInfo.userId !== userId) return {
+            status: ResultStatus.Forbidden_403,
+            data: null,
+            errorMessage: 'Forbidden',
+            extensions: [{ field: null, message: 'You try to delete someone else\'s comment' }],
         }
 
-        if (comment.commentatorInfo.userId !== userId) {
-            return {
-                status: ResultStatus.Forbidden_403,
-                data: null,
-                errorMessage: 'Forbidden',
-                extensions: [{ field: null, message: 'You try to delete someone else\'s comment' }],
-            }
-        }
 
         const isDeleted = await this.commentRepository.delete(id);
 
