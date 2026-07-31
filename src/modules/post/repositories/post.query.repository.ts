@@ -112,34 +112,6 @@ export class PostQueryRepository {
             this._getNewestLikesMap(postIds)
         ]);
 
-
-        // let userLikes: any[] = [];
-        //
-        // if (userId) {
-        //     userLikes = await PostLikeModel.find({
-        //         postId: { $in: postIds },
-        //         userId
-        //     }).lean();
-        // }
-
-        // const myStatusesMap = new Map<string, LikeStatus>(
-        //     userLikes.map(like => [like.postId, like.status as LikeStatus])
-        // );
-
-        // const newestLikesDocs = await PostLikeModel.aggregate([
-        //     { $match: { postId: { $in: postIds }, status: LikeStatus.Like } },
-        //     { $sort: { createdAt: -1 } },
-        //     {
-        //         $group: {
-        //             _id: "$postId",
-        //             latestLikes: { $push: { addedAt: "$createdAt", userId: "$userId", login: "$login" } }
-        //         }
-        //     },
-        //     { $project: { latestLikes: { $slice: ["$latestLikes", 3] } } }
-        // ]);
-
-        // const newestLikesMap = new Map<string, any[]>(newestLikesDocs.map(d => [d._id.toString(), d.latestLikes]));
-
         const itemsWithCorrectStatus = items.map((item) => {
             const postIdStr = item._id.toString();
             const myStatus = myStatusesMap.get(postIdStr) ?? LikeStatus.None;
