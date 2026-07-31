@@ -6,10 +6,6 @@ import { CommentLike } from "../types/comment-like";
 @injectable()
 export class CommentLikeRepository {
 
-    async findById(id: string): Promise<HydratedDocument<CommentLike> | null> {
-        return CommentLikeModel.findById(id);
-    }
-
     async findByCommentIdAndUserId(commentId: string, userId: string): Promise<HydratedDocument<CommentLike> | null> {
         return CommentLikeModel.findOne({ commentId, userId });
     }
@@ -32,12 +28,5 @@ export class CommentLikeRepository {
         );
 
         return savedLike.id;
-    }
-
-    async delete(commentId: string): Promise<boolean> {
-
-        const deleteResult = await CommentLikeModel.deleteOne({ _id: commentId });
-
-        return deleteResult.deletedCount > 0;
     }
 }

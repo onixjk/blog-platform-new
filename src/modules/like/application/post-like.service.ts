@@ -11,14 +11,14 @@ export class PostLikeService {
         @inject(PostLikeRepository) private postLikeRepository: PostLikeRepository,
     ) {}
 
-    async update(dto: PostLike): Promise<Result<string | null>> {
-
-        const savedLike = await this.postLikeRepository.save(dto);
-
-        return {
-            status: ResultStatus.Success,
-            data: savedLike,
-            extensions: []
-        };
-    }
+    // async update(dto: PostLike): Promise<Result<string | null>> {
+    //
+    //     const savedLike = await this.postLikeRepository.save(dto);
+    //
+    //     return {
+    //         status: ResultStatus.Success,
+    //         data: savedLike,
+    //         extensions: []
+    //     };
+    // }
 }
