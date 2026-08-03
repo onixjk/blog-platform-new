@@ -160,12 +160,9 @@ export class PostService {
             this.postRepository.updateLikesCount(dto.postId, likesModifier, dislikesModifier)
         ]);
 
-        // 3. Синхронизируем массив кэшированных топ-3 лайков в посте через репозитории
         if (newStatus === LikeStatus.Like) {
-            // Юзер поставил лайк -> добавляем его в кэш
             await this.postRepository.pushNewestLike(dto.postId, dto.userId, user.login);
         } else if (oldStatus === LikeStatus.Like) {
-            // Юзер УБРАЛ лайк (поставил None или Dislike) -> удаляем и ищем замену
             await this.postRepository.pullNewestLike(dto.postId, dto.userId);
 
             const activeTopLikes = await this.postLikeRepository.getLatestLikesForPost(dto.postId);

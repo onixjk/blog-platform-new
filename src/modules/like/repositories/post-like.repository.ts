@@ -11,26 +11,6 @@ export class PostLikeRepository {
         return PostLikeModel.findOne({ postId, userId });
     }
 
-    // async save(dto: PostLike): Promise<string> {
-    //
-    //     const savedLike = await PostLikeModel.findOneAndUpdate(
-    //         {
-    //             postId: dto.postId,
-    //             userId: dto.userId
-    //         },
-    //         {
-    //             status: dto.status,
-    //             createdAt: dto.createdAt
-    //         },
-    //         {
-    //             upsert: true,
-    //             returnDocument: 'after',
-    //         }
-    //     );
-    //
-    //     return savedLike.id;
-    // }
-
     async getLatestLikesForPost(postId: string): Promise<any[]> {
         return PostLikeModel.find({ postId: postId, status: LikeStatus.Like })
             .sort({ createdAt: -1 })

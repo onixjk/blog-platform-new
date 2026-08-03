@@ -1,5 +1,5 @@
 import { ResultStatus } from "../../../core/result/resultCode";
-import { IUserDB } from "../../user/types/user.db.interface";
+import { UserDB } from "../../user/types/user.db.interface";
 import { Result } from "../../../core/result/result.type";
 import { randomUUID } from "node:crypto";
 import { AuthRepository } from "../repositories/auth.repository";
@@ -17,7 +17,7 @@ import { SessionModel } from "../../../db/mongo.db";
 import { HydratedDocument } from "mongoose";
 
 @injectable()
-export class AuthService {
+class AuthService {
 
     constructor(
         @inject(JwtService) private jwtService: JwtService,
@@ -29,19 +29,27 @@ export class AuthService {
         @inject(EmailExamples) private emailExamples: EmailExamples,
     ) {}
 
+    //todo session
     async loginUser(loginOrEmail: string, password: string, browserName: string, clientIp: string): Promise<Result<TokensPair | null>> {
 
-        const userCredentialsResult = await this.checkUserCredentials(loginOrEmail, password);
-        if (userCredentialsResult.status !== ResultStatus.Success || !userCredentialsResult.data) {
-            return {
-                status: ResultStatus.Unauthorized_401,
-                data: null,
-                errorMessage: "Unauthorized",
-                extensions: [{ field: loginOrEmail, message: "Wrong credentials" }]
-            };
-        }
+        const user = await this.userRepository.findByLoginOrEmail(loginOrEmail);
+        if (!user) return {
+            status: ResultStatus.Unauthorized_401,
+            data: null,
+            errorMessage: "Unauthorized",
+            extensions: [{ field: 'loginOrEmail', message: "Wrong credentials" }]
+        };
 
-        const userId = userCredentialsResult.data._id.toString()
+        const isPassCorrect = await this.bcryptService.checkPassword(password, user.passwordHash);
+        if (!isPassCorrect) return {
+            status: ResultStatus.Unauthorized_401,
+            data: null,
+            errorMessage: 'Unauthorized',
+            extensions: [{ field: 'password', message: 'Wrong password' }],
+        };
+
+
+        const userId = user._id.toString();
 
         const sessionDto: SessionDto = {
             userId: userId,
@@ -51,14 +59,12 @@ export class AuthService {
 
         const createSessionResult = await this._createSession(sessionDto);
 
-        if (!createSessionResult.data) {
-            return {
-                status: ResultStatus.Unauthorized_401,
-                errorMessage: 'Unauthorized',
-                data: null,
-                extensions: [{ field: null, message: 'Failed to save refresh token' }],
-            };
-        }
+        if (!createSessionResult.data) return {
+            status: ResultStatus.Unauthorized_401,
+            errorMessage: 'Unauthorized',
+            data: null,
+            extensions: [{ field: null, message: 'Failed to save refresh token' }],
+        };
 
         const accessToken = createSessionResult.data.accessToken;
         const refreshToken = createSessionResult.data.refreshToken;
@@ -66,32 +72,6 @@ export class AuthService {
         return {
             status: ResultStatus.Success,
             data: { accessToken, refreshToken },
-            extensions: [],
-        };
-    }
-
-    async checkUserCredentials(loginOrEmail: string, password: string,): Promise<Result<HydratedDocument<IUserDB> | null>> {
-        const user = await this.userRepository.findByLoginOrEmail(loginOrEmail);
-        if (!user)
-            return {
-                status: ResultStatus.Unauthorized_401,
-                data: null,
-                errorMessage: "Unauthorized",
-                extensions: [{ field: 'loginOrEmail', message: "Wrong credentials" }]
-            };
-
-        const isPassCorrect = await this.bcryptService.checkPassword(password, user.passwordHash);
-        if (!isPassCorrect)
-            return {
-                status: ResultStatus.Unauthorized_401,
-                data: null,
-                errorMessage: 'Unauthorized',
-                extensions: [{ field: 'password', message: 'Wrong password' }],
-            };
-
-        return {
-            status: ResultStatus.Success,
-            data: user,
             extensions: [],
         };
     }
@@ -108,20 +88,18 @@ export class AuthService {
             };
         }
 
-        const newUser = await this.userRepository.findById(createdUserId.data)
-        if (!newUser) {
-            return {
-                status: ResultStatus.BadRequest_400,
-                errorMessage: 'Bad Request',
-                data: null,
-                extensions: [{ field: 'User', message: 'User registration failed' }],
-            };
-        }
+        const user = await this.userRepository.findById(createdUserId.data)
+        if (!user) return {
+            status: ResultStatus.BadRequest_400,
+            errorMessage: 'Bad Request',
+            data: null,
+            extensions: [{ field: 'User', message: 'User registration failed' }],
+        };
 
-        await this.nodemailerService //todo
+        await this.nodemailerService
             .sendEmail(
-                newUser.email,
-                newUser.emailConfirmation.confirmationCode,
+                user.email,
+                user.emailConfirmation.confirmationCode,
                 this.emailExamples.registrationEmail
             )
             .catch(er => console.error('error in send email:', er));
@@ -133,40 +111,47 @@ export class AuthService {
         };
     }
 
-    async resendEmailConfirmationCode(email: string): Promise<Result<string | null>> {
+    async resendConfirmationCode(email: string): Promise<Result<string | null>> {
 
-        const userByEmail = await this.userRepository.findByLoginOrEmail(email)
-        if (!userByEmail) {
-            return {
-                status: ResultStatus.BadRequest_400,
-                errorMessage: 'Bad Request',
-                data: null,
-                extensions: [{ field: 'email', message: 'Invalid email' }],
-            }
+        const user = await this.userRepository.findByLoginOrEmail(email)
+        if (!user) return {
+            status: ResultStatus.BadRequest_400,
+            errorMessage: 'Bad Request',
+            data: null,
+            extensions: [{ field: 'email', message: 'Invalid email' }],
         }
 
-        if (userByEmail.emailConfirmation.isConfirmed) {
-            return {
-                status: ResultStatus.BadRequest_400,
-                errorMessage: 'Bad Request',
-                data: null,
-                extensions: [{ field: 'email', message: 'Email confirmed' }],
-            }
+        if (user.emailConfirmation.isConfirmed) return {
+            status: ResultStatus.BadRequest_400,
+            errorMessage: 'Bad Request',
+            data: null,
+            extensions: [{ field: 'email', message: 'Email confirmed' }],
         }
 
         const confirmationCode = randomUUID();
-        const expirationDate = new Date(Date.now() + 60 * 60 * 1000).toISOString();
 
-        await this.userRepository.updateEmailConfirmationCode(email, confirmationCode, expirationDate);
+        const isUpdated = user.updateConfirmationCode(confirmationCode)
+        if (!isUpdated) return {
+            status: ResultStatus.BadRequest_400,
+            errorMessage: 'Bad Request',
+            data: null,
+            extensions: [{ field: 'email', message: 'Email already confirmed' }],
+        };
 
-            //todo
+        const isSaved = await this.userRepository.save(user);
+        if (!isSaved) return {
+            status: ResultStatus.BadRequest_400,
+            errorMessage: 'Database error',
+            data: null,
+            extensions: [{ field: 'user', message: 'Failed to update user in database' }],
+        };
+
         this.nodemailerService.sendEmail(
             email,
             confirmationCode,
             this.emailExamples.registrationEmail
         )
             .catch(e => console.error('error in send email:', e));
-
 
         return {
             status: ResultStatus.Success,
@@ -177,29 +162,26 @@ export class AuthService {
 
     async sendPasswordRecoveryCode(email: string): Promise<Result<string | null>> {
 
-        const userByEmail = await this.userRepository.findByLoginOrEmail(email)
-        if (!userByEmail) {
-            return {
-                status: ResultStatus.Success,
-                data: null,
-                extensions: [],
-            }
+        const user = await this.userRepository.findByLoginOrEmail(email)
+        if (!user) return {
+            status: ResultStatus.Success,
+            data: null,
+            extensions: [],
         }
 
         const recoveryCode = randomUUID();
-        const expirationDate = new Date(Date.now() + 60 * 60 * 1000).toISOString();
 
-        const isUpdateRecoveryCode = await this.userRepository.updatePasswordRecoveryCode(email, recoveryCode, expirationDate);
-        if (!isUpdateRecoveryCode) {
-            return {
-                status: ResultStatus.BadRequest_400,
-                errorMessage: 'BadRequest',
-                data: null,
-                extensions: [{ field: 'Email', message: 'Invalid email' }],
-            };
-        }
+        user.updateRecoveryCode(recoveryCode);
 
-        try { //todo
+        const isSavedUserId = await this.userRepository.save(user);
+        if (!isSavedUserId) return {
+            status: ResultStatus.BadRequest_400,
+            errorMessage: 'BadRequest',
+            data: null,
+            extensions: [{ field: 'Email', message: 'Failed to generate recovery code' }],
+        };
+
+        try {
             await this.nodemailerService.sendEmail(
                 email,
                 recoveryCode,
@@ -217,60 +199,69 @@ export class AuthService {
     }
 
     async updatePassword(newPassword: string, recoveryCode: string): Promise<Result<boolean | null>> {
-        const userResult = await this.userRepository.findByRecoveryCode(recoveryCode);
-        if (!userResult ||
-            !userResult.passwordRecovery.recoveryCode ||
-            !userResult.passwordRecovery.expirationDate
-        ) {
-            return {
-                status: ResultStatus.BadRequest_400,
-                errorMessage: 'Bad Request',
-                data: null,
-                extensions: [{ field: 'recoveryCode', message: 'Invalid or expired code' }],
-            };
-        }
+        const user = await this.userRepository.findByRecoveryCode(recoveryCode);
+        if (!user) return {
+            status: ResultStatus.BadRequest_400,
+            errorMessage: 'Bad Request',
+            data: null,
+            extensions: [{ field: 'recoveryCode', message: 'Invalid or expired code' }],
+        };
 
         const newPasswordHash = await this.bcryptService.generateHash(newPassword);
 
-        const isUpdatedResult = await this.userRepository.updatePasswordAndClearRecovery(
-            userResult._id.toString(),
-            newPasswordHash
-        );
-        if (!isUpdatedResult) {
-            return {
-                status: ResultStatus.BadRequest_400,
-                errorMessage: 'Bad Request',
-                data: null,
-                extensions: [{ field: 'recoveryCode', message: 'Failed to update password.' }],
-            };
-        }
+        const isUpdated = user.updatePasswordAndClearRecovery(newPasswordHash);
+        if (!isUpdated) return {
+            status: ResultStatus.BadRequest_400,
+            errorMessage: 'Bad Request',
+            data: null,
+            extensions: [{ field: 'recoveryCode', message: 'Failed to update password.' }],
+        };
+
+        const savedUserId = await this.userRepository.save(user);
+        if (!savedUserId) return {
+            status: ResultStatus.BadRequest_400,
+            errorMessage: 'Bad Request',
+            data: null,
+            extensions: [{ field: 'User', message: 'Failed to save new password to database.' }],
+        };
 
         return {
             status: ResultStatus.Success,
-            data: isUpdatedResult,
+            data: isUpdated,
             extensions: []
         };
     }
 
-    async confirmEmail(code: string): Promise<Result> {
+    async confirmEmail(code: string): Promise<Result<boolean>> {
 
-        const isUpdate = await this.userService.updateEmailConfirmationStatus(code);
-        if (isUpdate.status !== ResultStatus.Success) {
-            return {
-                status: isUpdate.status,
-                errorMessage: isUpdate.errorMessage,
-                data: null,
-                extensions: isUpdate.extensions,
-            };
-        }
+        const user = await this.userRepository.findByConfirmationCode(code);
+        if (!user) return {
+            status: ResultStatus.BadRequest_400,
+            errorMessage: 'User not found',
+            data: false,
+            extensions: [{ field: 'code', message: 'Confirmation code is invalid' }]
+        };
+
+        const isConfirmedSuccessfully = user.confirmEmail(code,);
+        if (!isConfirmedSuccessfully) return {
+            status: ResultStatus.BadRequest_400,
+            errorMessage: 'Verification failed',
+            data: false,
+            extensions: [{ field: 'code', message: 'Code is expired, invalid or already confirmed' }]
+        };
+
+        await this.userRepository.save(user);
 
         return {
             status: ResultStatus.Success,
-            data: null,
-            extensions: [],
+            data: true,
+            extensions: []
         };
     }
 
+
+
+    //todo переписать на DDD
     async refreshSession(userId: string, deviceId: string): Promise<Result<TokensPair | null>> {
 
         const tokensPairResult = await this._createTokensPair(userId, deviceId);
@@ -432,3 +423,5 @@ export class AuthService {
         };
     }
 }
+
+export default AuthService

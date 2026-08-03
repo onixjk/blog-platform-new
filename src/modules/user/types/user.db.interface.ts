@@ -1,15 +1,20 @@
-export interface IUserDB {
+export type EmailConfirmation = {
+    confirmationCode: string;
+    expirationDate: Date;
+    isConfirmed: boolean;
+}
+
+export type PasswordRecovery = {
+    recoveryCode: string | null;
+    expirationDate: string | null;
+}
+
+
+export type UserDB = {
     login: string;
     email: string;
     passwordHash: string;
     createdAt: string;
-    emailConfirmation: {
-        confirmationCode: string;
-        expirationDate: string;
-        isConfirmed: boolean;
-    }
-    passwordRecovery: {
-        recoveryCode: string | null;
-        expirationDate: string | null;
-    }
+    emailConfirmation: EmailConfirmation;
+    passwordRecovery: PasswordRecovery;
 }

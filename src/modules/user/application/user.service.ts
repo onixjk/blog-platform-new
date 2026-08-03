@@ -1,14 +1,11 @@
 import { User } from "../types/user";
 import { UserInputDto } from "../types/input/user.input-dto";
-import { IUserDB } from "../types/user.db.interface";
 import { BcryptService } from "../../auth/adapters/bcrypt.service";
-import { randomUUID } from "node:crypto";
 import { ResultStatus } from "../../../core/result/resultCode";
 import { Result } from "../../../core/result/result.type";
 import { inject, injectable } from "inversify";
 import { UserRepository } from "../repositories/user.repository";
-import { UserModel } from "../../../db/mongo.db";
-import { HydratedDocument } from "mongoose";
+import { UserDocument, UserModel } from "../domain/user.entity";
 
 @injectable()
 export class UserService {
@@ -18,40 +15,20 @@ export class UserService {
         @inject(BcryptService) private bcryptService: BcryptService,
     ) {}
 
-    async findById(id: string): Promise<Result<HydratedDocument<User> | null>> {
+    async findById(id: string): Promise<Result<UserDocument | null>> {
 
         const user = await this.userRepository.findById(id);
-        if (!user) {
-            return {
-                status: ResultStatus.NotFound_404,
-                errorMessage: 'NotFound',
-                data: null,
-                extensions: [{ field: 'User', message: 'User not exist' }],
-            };
-        }
+        if (!user) return {
+            status: ResultStatus.NotFound_404,
+            errorMessage: 'NotFound',
+            data: null,
+            extensions: [{ field: 'User', message: 'User not exist' }],
+        };
 
         return {
             status: ResultStatus.Success,
             data: user,
             extensions: []
-        };
-    }
-
-    async findByRecoveryCode(recoveryCode: string): Promise<Result<HydratedDocument<IUserDB> | null>> {
-        const user = await this.userRepository.findByRecoveryCode(recoveryCode);
-        if (!user) {
-            return {
-                status: ResultStatus.BadRequest_400,
-                errorMessage: 'Bad Request',
-                data: null,
-                extensions: [{ field: 'recoveryCode', message: 'Recovery code not found' }],
-            };
-        }
-
-        return {
-            status: ResultStatus.Success,
-            data: user,
-            extensions: [],
         };
     }
 
@@ -74,68 +51,18 @@ export class UserService {
                 data: null,
                 extensions: extensions,
             };
-
-            // return {
-            //     status: ResultStatus.Conflict_409,
-            //     errorMessage: 'Conflict',
-            //     data: null,
-            //     extensions: extensions,
-            // };
         }
-
-        // // 1. Ищем отдельно по логину и отдельно по email
-        // const userByLogin = await this.userRepository.findByLoginOrEmail(dto.login);
-        // const userByEmail = await this.userRepository.findByLoginOrEmail(dto.email);
-        //
-        // // 2. Если нашли совпадение хотя бы в одном месте
-        // if (userByLogin || userByEmail) {
-        //     const extensions: Array<{ field: string; message: string }> = [];
-        //
-        //     // Проверяем конкретно: если нашелся юзер с таким логином
-        //     if (userByLogin) {
-        //         extensions.push({ field: 'login', message: 'Login already exists' });
-        //     }
-        //     // Проверяем конкретно: если нашелся юзер с таким email
-        //     if (userByEmail) {
-        //         extensions.push({ field: 'email', message: 'Email already exists' });
-        //     }
-        //
-        //     return {
-        //         status: ResultStatus.BadRequest_400,
-        //         errorMessage: 'BadRequest',
-        //         data: null,
-        //         extensions: extensions,
-        //     };
-        // }
-        //
-
 
         const passwordHash = await this.bcryptService.generateHash(dto.password);
 
-        const newUser = new UserModel({
-            login: dto.login,
-            passwordHash: passwordHash,
-            email: dto.email,
-            createdAt: new Date().toISOString(),
-            emailConfirmation: {
-                confirmationCode: randomUUID(),
-                expirationDate: new Date().toISOString(),
-                isConfirmed: false,
-            },
-            passwordRecovery: {
-                recoveryCode: null,
-                expirationDate: null,
-            }
-        })
+        const newUser = UserModel.createUser(dto.login, dto.email, passwordHash);
 
         const savedUserId = await this.userRepository.save(newUser);
-        if (!savedUserId) {
-            return {
-                status: ResultStatus.BadRequest_400,
-                errorMessage: 'Bad Request',
-                data: null,
-                extensions: [{field: 'User', message: 'User registration failed' }],
-            };
+        if (!savedUserId) return {
+            status: ResultStatus.BadRequest_400,
+            errorMessage: 'Bad Request',
+            data: null,
+            extensions: [{ field: 'User', message: 'User registration failed' }],
         }
 
         return {
@@ -145,54 +72,23 @@ export class UserService {
         };
     }
 
-    async updateEmailConfirmationStatus(code: string): Promise<Result<boolean | null>> {
-        const isUpdated = await this.userRepository.updateEmailConfirmationStatus(code);
-        if (!isUpdated) {
-            return {
-                status: ResultStatus.BadRequest_400,
-                errorMessage: 'Bad Request',
-                data: null,
-                extensions: [{ field: 'code', message: 'Confirmation code is invalid, expired or already confirmed' }],
-            };
-        }
-
-        return {
-            status: ResultStatus.Success,
-            data: isUpdated,
-            extensions: [],
-        };
-    }
-
-    async updatePasswordAndClearRecovery(userId: string, passwordHash: string): Promise<Result<boolean | null>> {
-
-        const isUpdated = await this.userRepository.updatePasswordAndClearRecovery(userId, passwordHash);
-        if (!isUpdated) {
-            return {
-                status: ResultStatus.BadRequest_400,
-                errorMessage: 'Bad Request',
-                data: null,
-                extensions: [{ field: 'User id', message: 'Invalid user id' }],
-            };
-        }
-
-        return {
-            status: ResultStatus.Success,
-            data: isUpdated,
-            extensions: [],
-        };
-    }
-
     async delete(id: string): Promise<Result<boolean | null>> {
 
-        const isDeleted = await this.userRepository.delete(id);
-        if (!isDeleted) {
-            return {
-                status: ResultStatus.NotFound_404,
-                errorMessage: 'Not Found',
-                data: null,
-                extensions: [{ field: 'User', message: 'User not exist' }]
-            };
-        }
+        const user = await this.userRepository.findById(id);
+        if (!user) return {
+            status: ResultStatus.NotFound_404,
+            errorMessage: 'Not Found',
+            data: null,
+            extensions: [{ field: 'User', message: 'User not exist' }]
+        };
+
+        const isDeleted = await this.userRepository.delete(user);
+        if (!isDeleted) return {
+            status: ResultStatus.NotFound_404,
+            errorMessage: 'Not Found',
+            data: null,
+            extensions: [{ field: 'User', message: 'User not exist' }]
+        };
 
         return {
             status: ResultStatus.Success,

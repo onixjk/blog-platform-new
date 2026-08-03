@@ -16,7 +16,6 @@ export class UserController {
 
     constructor(
         @inject(UserQueryRepository) private userQueryRepository: UserQueryRepository,
-        @inject(UserRepository) private userRepository: UserRepository,
         @inject(UserService) private userService: UserService,
     ) {}
 

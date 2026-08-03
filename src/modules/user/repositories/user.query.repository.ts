@@ -7,7 +7,7 @@ import { mapToUserOutput } from "../routes/mapers/map-to-user-output.util";
 import { MeOutput } from "../../auth/types/output/me-output";
 import { mapToMeOutput } from "../../auth/mapers/map-to-me-output.util";
 import { injectable } from "inversify";
-import { UserModel } from "../../../db/mongo.db";
+import { UserModel } from "../domain/user.entity";
 
 @injectable()
 export class UserQueryRepository {
