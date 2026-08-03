@@ -29,8 +29,6 @@ interface UserMethods {
     updateRecoveryCode(recoveryCode: string): void;
 
     updatePasswordAndClearRecovery(newPasswordHash: string): boolean;
-
-    validatePassword(isPasswordCorrect: boolean): boolean
 }
 
 export class UserEntity {
@@ -44,9 +42,9 @@ export class UserEntity {
         private passwordRecovery: PasswordRecovery,
     ) {}
 
-    static createConfirmedUser(login: string, email: string, passwordHash: string) {
+    static createConfirmedUser(this: Model<UserDB>, login: string, email: string, passwordHash: string) {
 
-        return new UserModel({
+        return new this({
             login: login,
             passwordHash: passwordHash,
             email: email,
@@ -63,9 +61,9 @@ export class UserEntity {
         });
     }
 
-    static createUser(login: string, email: string, passwordHash: string) {
+    static createUser(this: Model<UserDB>,login: string, email: string, passwordHash: string) {
 
-        return new UserModel({
+        return new this({
             login: login,
             passwordHash: passwordHash,
             email: email,
@@ -133,7 +131,6 @@ export class UserEntity {
     }
 
 }
-
 
 type UserStatics = typeof UserEntity;
 type UserModelType = Model<UserDB, {}, UserMethods> & UserStatics;
