@@ -1,5 +1,4 @@
 import { ResultStatus } from "../../../core/result/resultCode";
-import { UserDB } from "../../user/types/user.db.interface";
 import { Result } from "../../../core/result/result.type";
 import { randomUUID } from "node:crypto";
 import { AuthRepository } from "../repositories/auth.repository";
@@ -14,10 +13,9 @@ import { inject, injectable } from "inversify";
 import { UserService } from "../../user/application/user.service";
 import { UserRepository } from "../../user/repositories/user.repository";
 import { SessionModel } from "../../../db/mongo.db";
-import { HydratedDocument } from "mongoose";
 
 @injectable()
-class AuthService {
+export class AuthService {
 
     constructor(
         @inject(JwtService) private jwtService: JwtService,
@@ -260,7 +258,6 @@ class AuthService {
     }
 
 
-
     //todo переписать на DDD
     async refreshSession(userId: string, deviceId: string): Promise<Result<TokensPair | null>> {
 
@@ -423,5 +420,3 @@ class AuthService {
         };
     }
 }
-
-export default AuthService
