@@ -61,7 +61,7 @@ export class UserEntity {
         });
     }
 
-    static createUser(this: Model<UserDB>,login: string, email: string, passwordHash: string) {
+    static createUser(this: Model<UserDB>, login: string, email: string, passwordHash: string) {
 
         return new this({
             login: login,
