@@ -2,7 +2,7 @@ import { UserQueryRepository } from "../../user/repositories/user.query.reposito
 import { Request, Response } from "express";
 import { HttpStatuses } from "../../../core/types/http-statuses";
 import { inject, injectable } from "inversify";
-import AuthService from "../application/auth.service";
+import { AuthService } from "../application/auth.service";
 import { LoginInputDto } from "../types/input/login.input-dto";
 import { ResultStatus } from "../../../core/result/resultCode";
 import { resultCodeToHttpException } from "../../../core/result/resultCodeToHttpException";

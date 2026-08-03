@@ -20,7 +20,7 @@ import { UserRepository } from "./modules/user/repositories/user.repository";
 import { UserService } from "./modules/user/application/user.service";
 import { BlogQueryRepository } from "./modules/blog/repositories/blog.query.repository";
 import { BlogService } from "./modules/blog/application/blog.service";
-import AuthService from "./modules/auth/application/auth.service";
+import { AuthService } from "./modules/auth/application/auth.service";
 import { AuthController } from "./modules/auth/controllers/auth.controller";
 import { BlogController } from "./modules/blog/controllers/blog.controller";
 import { CommentController } from "./modules/comment/controllers/comment.controller";
@@ -31,7 +31,6 @@ import { CommentLikeRepository } from "./modules/like/repositories/comment-like.
 import { CommentLikeService } from "./modules/like/application/comment-like.service";
 import { PostLikeRepository } from "./modules/like/repositories/post-like.repository";
 import { PostLikeService } from "./modules/like/application/post-like.service";
-import { UserEntity } from "./modules/user/domain/user.entity";
 
 
 export const container = new Container();

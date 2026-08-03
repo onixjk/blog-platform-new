@@ -34,15 +34,15 @@ interface UserMethods {
 export class UserEntity {
 
     private constructor(
-        private login: string,
-        private email: string,
+        // private login: string,
+        // private email: string,
         private passwordHash: string,
-        private createdAt: string,
+        // private createdAt: string,
         private emailConfirmation: EmailConfirmation,
         private passwordRecovery: PasswordRecovery,
     ) {}
 
-    static createConfirmedUser(this: Model<UserDB>, login: string, email: string, passwordHash: string) {
+    static createConfirmedUser(this: Model<UserDB, {}, UserMethods>, login: string, email: string, passwordHash: string): UserDocument {
 
         return new this({
             login: login,
@@ -61,7 +61,7 @@ export class UserEntity {
         });
     }
 
-    static createUser(this: Model<UserDB>, login: string, email: string, passwordHash: string) {
+    static createUser(this: Model<UserDB, {}, UserMethods>, login: string, email: string, passwordHash: string) {
 
         return new this({
             login: login,
