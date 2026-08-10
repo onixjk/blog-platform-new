@@ -2,7 +2,6 @@ import mongoose, { Schema } from 'mongoose';
 import { SETTINGS } from '../core/settings/settings';
 import { Blog } from "../modules/blog/types/blog";
 import { Post } from "../modules/post/types/post";
-import { UserDB } from "../modules/user/types/user.db.interface";
 import { Comment } from "../modules/comment/types/comment";
 import { Session } from "../modules/auth/types/session";
 import { ApiRequestLog } from "../modules/auth/types/api-request-log";
@@ -65,22 +64,6 @@ export const CommentSchema = new Schema<Comment>({
     }
 });
 
-// export const UserSchema = new Schema<IUserDB>({
-//     login: { type: String, required: true, unique: true },
-//     email: { type: String, required: true, unique: true },
-//     passwordHash: { type: String, required: true },
-//     createdAt: { type: String, required: true },
-//     emailConfirmation: {
-//         confirmationCode: { type: String },
-//         expirationDate: { type: Date },
-//         isConfirmed: { type: Boolean, default: false }
-//     },
-//     passwordRecovery: {
-//         recoveryCode: { type: String },
-//         expirationDate: { type: Date },
-//     },
-// });
-
 export const CommentLikeSchema = new Schema<CommentLike>({
     commentId: { type: String, required: true },
     userId: { type: String, required: true },
@@ -98,7 +81,6 @@ export const PostLikeSchema = new Schema<PostLike>({
 
 export let BlogModel = mongoose.model<Blog>('blogs', BlogSchema);
 export let PostModel = mongoose.model<Post>('posts', PostSchema);
-// export let UserModel = mongoose.model<IUserDB>('users', UserSchema);
 export let CommentModel = mongoose.model<Comment>('comments', CommentSchema);
 export let CommentLikeModel = mongoose.model<CommentLike>('commentLike', CommentLikeSchema);
 export let PostLikeModel = mongoose.model<PostLike>('postLike', PostLikeSchema);
